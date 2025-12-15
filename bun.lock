@@ -9,6 +9,7 @@
         "pinia": "^3.0.3",
         "tailwindcss": "^4.1.17",
         "vue": "^3.5.25",
+        "vue-gtag": "^3.6.3",
         "vue-router": "^4.6.3",
       },
       "devDependencies": {
@@ -1006,6 +1007,8 @@
     "vue": ["vue@3.5.25", "", { "dependencies": { "@vue/compiler-dom": "3.5.25", "@vue/compiler-sfc": "3.5.25", "@vue/runtime-dom": "3.5.25", "@vue/server-renderer": "3.5.25", "@vue/shared": "3.5.25" }, "peerDependencies": { "typescript": "*" }, "optionalPeers": ["typescript"] }, "sha512-YLVdgv2K13WJ6n+kD5owehKtEXwdwXuj2TTyJMsO7pSeKw2bfRNZGjhB7YzrpbMYj5b5QsUebHpOqR3R3ziy/g=="],
 
     "vue-component-type-helpers": ["vue-component-type-helpers@2.2.12", "", {}, "sha512-YbGqHZ5/eW4SnkPNR44mKVc6ZKQoRs/Rux1sxC6rdwXb4qpbOSYfDr9DsTHolOTGmIKgM9j141mZbBeg05R1pw=="],
+
+    "vue-gtag": ["vue-gtag@3.6.3", "", { "peerDependencies": { "vue": "^3.5.13", "vue-router": "^4.5.0" }, "optionalPeers": ["vue-router"] }, "sha512-IuSPUjHG63BVqUEpV1xHeKQd/jVe2tQVdrwyoy8flxEem0wLRoEWmxmD+1I+zjezvxQbt1NsGhf7zCwRrxbOTQ=="],
 
     "vue-router": ["vue-router@4.6.3", "", { "dependencies": { "@vue/devtools-api": "^6.6.4" }, "peerDependencies": { "vue": "^3.5.0" } }, "sha512-ARBedLm9YlbvQomnmq91Os7ck6efydTSpRP3nuOKCvgJOHNrhRoJDSKtee8kcL1Vf7nz6U+PMBL+hTvR3bTVQg=="],
 

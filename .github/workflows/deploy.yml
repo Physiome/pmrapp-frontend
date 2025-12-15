@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Triggers on pushes targeting the default branch.
   push:
-    branches: ['main']
+    branches: ['main', 'gh-pages']
 
   # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
@@ -40,7 +40,9 @@ jobs:
       - name: Build
         run: bun run build
         env:
-          VITE_USE_MOCK_DATA: 'true'
+          VITE_USE_MOCK_DATA: ${{ secrets.VITE_USE_MOCK_DATA }}
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

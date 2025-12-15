@@ -91,6 +91,7 @@ const handleSubmit = async () => {
         size="lg"
         :disabled="isLoading"
         class="w-full"
+        contentSection="login_page"
       >
         {{ isLoading ? 'Logging in...' : 'Login' }}
       </ActionButton>

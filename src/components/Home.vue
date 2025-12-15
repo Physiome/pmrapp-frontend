@@ -30,6 +30,7 @@ import ActionButton from './atoms/ActionButton.vue'
           size="lg"
           :to="'/workspace'"
           class="inline-block"
+          contentSection="home_page"
         >
           View Workspaces
         </ActionButton>

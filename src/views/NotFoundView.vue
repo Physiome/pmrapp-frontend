@@ -23,25 +23,26 @@ const goBack = () => {
     <p class="text-lg mb-8">
       The page you are looking for doesn't exist or has been moved.
     </p>
-
+    
     <ActionButton
       v-if="hasHistory"
       @click="goBack"
       variant="primary"
       size="lg"
       class="inline-block"
+      contentSection="not_found_view"
     >
       Go Back
     </ActionButton>
-
     <ActionButton
       v-else
       :to="'/'"
       variant="primary"
       size="lg"
       class="inline-block"
+      contentSection="not_found_view"
     >
-    Go to Home
+      Go to Home
     </ActionButton>
-  </div>
+  </div>      
 </template>
