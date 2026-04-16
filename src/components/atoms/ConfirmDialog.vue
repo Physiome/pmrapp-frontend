@@ -48,7 +48,7 @@ onUnmounted(() => {
 <template>
   <div
     v-if="show"
-    class="fixed inset-0 bg-gray-800/75 dark:bg-gray-900/85 z-50 flex justify-center items-center"
+    class="fixed inset-0 bg-gray-800/75 dark:bg-gray-900/85 z-50 flex justify-center items-center text-left"
     @click.self="emit('cancel')"
   >
     <div class="w-full max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">

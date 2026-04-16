@@ -242,20 +242,20 @@ describe('SearchInput.vue – exposures and workspaces groups', () => {
     // Simulate forward tabbing from the input.
     await input.trigger('keydown', { key: 'Tab' })
     await nextTick()
-    expect(document.activeElement).toBe(workspacesBtn?.element)
+    expect(document.activeElement).toBe(exposuresBtn?.element)
 
     // Simulate reverse tabbing (Shift+Tab) within the dropdown.
     await input.trigger('keydown', { key: 'Tab', shiftKey: true })
     await nextTick()
-    expect(document.activeElement).toBe(exposuresBtn?.element)
+    expect(document.activeElement).toBe(workspacesBtn?.element)
 
-    await workspacesBtn?.trigger('focus')
+    await exposuresBtn?.trigger('focus')
     await nextTick()
-    // Simulate tabbing from the focused workspaces suggestion button.
-    await workspacesBtn?.trigger('keydown', { key: 'Tab' })
+    // Simulate tabbing from the focused exposures suggestion button.
+    await exposuresBtn?.trigger('keydown', { key: 'Tab' })
     await nextTick()
-    // Focus should move to the next button, exposure.
-    expect(document.activeElement).toBe(exposuresBtn?.element)
+    // Focus should move to the next button, workspace.
+    expect(document.activeElement).toBe(workspacesBtn?.element)
 
     wrapper.unmount()
   })

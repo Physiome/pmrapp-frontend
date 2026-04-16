@@ -58,13 +58,13 @@ const setTermButtonRef = (el: Element | ComponentPublicInstance | null, index: n
 }
 
 // All focusable suggestion buttons in focus order: TermButtons first (rendered
-// per category group), then the Workspaces button, then the Exposures button.
+// per category group), then the Exposures button, then the Workspaces button.
 // This matches the DOM order used in the template.
 const allSuggestionButtons = computed<HTMLElement[]>(() => {
   const termEls = termButtonRefs.value.map((ref) => ref?.$el ?? ref).filter(Boolean)
   const extras: HTMLElement[] = []
-  if (workspacesButtonRef.value) extras.push(workspacesButtonRef.value)
   if (exposuresButtonRef.value) extras.push(exposuresButtonRef.value)
+  if (workspacesButtonRef.value) extras.push(workspacesButtonRef.value)
   return [...termEls, ...extras]
 })
 
@@ -335,22 +335,6 @@ defineExpose({
             </div>
           </div>
           <div
-            v-if="workspacesCount > 0"
-            class="result-group"
-          >
-            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">
-              Workspaces
-            </h4>
-            <button
-              type="button"
-              ref="workspacesButtonRef"
-              class="cursor-pointer text-primary hover:text-primary-hover transition-colors"
-              @click="handleWorkspacesClick"
-            >
-              See {{ formatNumber(workspacesCount) }} matching workspace{{ workspacesCount !== 1 ? 's' : '' }}
-            </button>
-          </div>
-          <div
             v-if="exposuresCount > 0"
             class="result-group"
           >
@@ -364,6 +348,22 @@ defineExpose({
               @click="handleExposuresClick"
             >
               See {{ formatNumber(exposuresCount) }} matching exposure{{ exposuresCount !== 1 ? 's' : '' }}
+            </button>
+          </div>
+          <div
+            v-if="workspacesCount > 0"
+            class="result-group"
+          >
+            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              Workspaces
+            </h4>
+            <button
+              type="button"
+              ref="workspacesButtonRef"
+              class="cursor-pointer text-primary hover:text-primary-hover transition-colors"
+              @click="handleWorkspacesClick"
+            >
+              See {{ formatNumber(workspacesCount) }} matching workspace{{ workspacesCount !== 1 ? 's' : '' }}
             </button>
           </div>
         </div>

@@ -21,8 +21,8 @@ const handleSearchClick = () => {
 }
 
 const navLinks = [
-  { path: '/workspaces', label: 'Workspaces' },
   { path: '/exposures', label: 'Exposures' },
+  { path: '/workspaces', label: 'Workspaces' },
 ]
 
 const isActive = (path: string) => computed(() => route.path.startsWith(path))
@@ -59,8 +59,7 @@ const isActive = (path: string) => computed(() => route.path.startsWith(path))
               {{ link.label }}
             </RouterLink>
           </li>
-          <li class="h-6 border-l border-gray-300 dark:border-gray-600"></li>
-          <li>
+          <li class="user-dropdown-divider">
             <UserDropdown />
           </li>
         </ul>
@@ -87,5 +86,22 @@ const isActive = (path: string) => computed(() => route.path.startsWith(path))
 
 .nav-link {
   @apply hover:opacity-80 transition-opacity;
+}
+
+.user-dropdown-divider {
+  @apply
+    relative
+    w-[5rem]
+    text-center
+    before:content-['']
+    before:absolute
+    before:left-0
+    before:top-1/2
+    before:h-6
+    before:-translate-y-1/2
+    before:transform
+    before:w-px
+    before:bg-gray-300
+    dark:before:bg-gray-600;
 }
 </style>
