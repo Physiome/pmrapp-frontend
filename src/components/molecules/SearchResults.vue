@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import TermButton from '@/components/atoms/TermButton.vue'
 import FileIcon from '@/components/icons/FileIcon.vue'
 import ListContent from '@/components/molecules/ListContent.vue'
@@ -9,7 +9,7 @@ import { SEARCH_KIND_LABEL_MAP } from '@/constants/search'
 import type { SearchResult } from '@/types/search'
 import { getExposureIdFromResourcePath } from '@/utils/exposure'
 import { formatDate, formatNumber } from '@/utils/format'
-import { isValidTerm } from '@/utils/search'
+import { buildSearchQuery, isValidTerm } from '@/utils/search'
 
 interface Props {
   results: SearchResult[]
@@ -22,15 +22,16 @@ interface Props {
 const props = defineProps<Props>()
 
 const router = useRouter()
+const route = useRoute()
 
 const textHighlightClass = 'text-highlight font-semibold'
 
 const handleKeywordClick = (kind: string, keyword: string) => {
-  router.push({ path: '/search', query: { kind, term: keyword } })
+  router.push({ path: '/search', query: buildSearchQuery(kind, keyword, route.query) })
 }
 
 const handleAuthorClick = (kind: string, author: string) => {
-  router.push({ path: '/search', query: { kind, term: author } })
+  router.push({ path: '/search', query: buildSearchQuery(kind, author, route.query) })
 }
 
 const kindLabel = computed(() => {

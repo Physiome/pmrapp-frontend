@@ -1,5 +1,7 @@
+import type { LocationQuery, LocationQueryRaw } from 'vue-router'
 import type { SortableEntity } from '@/types/common'
 import type { QueryFilterOptions, TextSegment } from '@/types/search'
+import { DEFAULT_SORT_OPTION, isValidSortOption } from '@/utils/sort'
 
 /**
  * Returns true if a search term is valid (non-empty and not a broken URN).
@@ -26,6 +28,28 @@ export const normaliseSearchText = (text: string): string => {
     .replace(/[^a-zA-Z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/**
+ * Builds a /search query and preserves the current sort option when it is valid.
+ */
+export const buildSearchQuery = (
+  kind: string,
+  term: string,
+  currentQuery: LocationQuery,
+): LocationQueryRaw => {
+  const query: LocationQueryRaw = { kind, term }
+  const sortQuery = currentQuery.sort
+
+  if (
+    typeof sortQuery === 'string' &&
+    isValidSortOption(sortQuery) &&
+    sortQuery !== DEFAULT_SORT_OPTION
+  ) {
+    query.sort = sortQuery
+  }
+
+  return query
 }
 
 /**

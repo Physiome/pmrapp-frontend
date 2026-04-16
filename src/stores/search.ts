@@ -99,12 +99,16 @@ export const useSearchStore = defineStore('search', () => {
     }
   }
 
-  const searchIndexTerm = async (kind: string, term: string): Promise<SearchResult[]> => {
+  const searchIndexTerm = async (
+    kind: string,
+    term: string,
+    forceRefresh = false,
+  ): Promise<SearchResult[]> => {
     const cacheKey = `${kind}:${term}`
     const cached = searchResultsCache.value.get(cacheKey)
 
     // Return cached results if valid.
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    if (!forceRefresh && cached && Date.now() - cached.timestamp < CACHE_TTL) {
       return cached.results
     }
 

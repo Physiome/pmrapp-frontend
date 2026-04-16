@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import SearchField from '@/components/atoms/SearchField.vue'
 import TermButton from '@/components/atoms/TermButton.vue'
 import { useSearchStore } from '@/stores/search'
-import { isValidTerm } from '@/utils/search'
+import { buildSearchQuery, isValidTerm } from '@/utils/search'
 
 interface Props {
   inSidebar: boolean
@@ -28,12 +28,13 @@ onMounted(async () => {
 
 const handleTermClick = async (kind: string, term: string) => {
   const currentRoute = router.currentRoute.value
+  const query = buildSearchQuery(kind, term, currentRoute.query)
   // If already on search page, replace query params to avoid duplicate navigation.
   // Otherwise, push to search page.
   if (currentRoute.path === '/search') {
-    await router.replace({ path: '/search', query: { kind, term } })
+    await router.replace({ path: '/search', query })
   } else {
-    await router.push({ path: '/search', query: { kind, term } })
+    await router.push({ path: '/search', query })
   }
 }
 

@@ -56,7 +56,7 @@ const handleRefresh = () => {
       @click="handleRefresh"
     >
       <RefreshIcon />
-      <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+      <span>{{ isLoading ? 'Loading...' : 'Refresh' }}</span>
     </ActionButton>
   </div>
 </template>

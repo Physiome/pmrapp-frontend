@@ -29,6 +29,7 @@ describe('ExposureDetail', () => {
     props = {},
     stubs = {},
     generatedCode = '',
+    mathsJSON = '[]',
   }: {
     props?: Partial<{
       alias: string
@@ -37,6 +38,7 @@ describe('ExposureDetail', () => {
     }>
     stubs?: Record<string, unknown>
     generatedCode?: string
+    mathsJSON?: string
   } = {}) => {
     vi.spyOn(exposureStore, 'getExposureInfo').mockResolvedValue(mockExposureInfo)
     vi.spyOn(exposureStore, 'getExposureSafeHTML').mockImplementation(
@@ -49,7 +51,7 @@ describe('ExposureDetail', () => {
     vi.spyOn(exposureStore, 'getExposureRawContent').mockImplementation(
       async (_id, _fileId, _view, filename) => {
         if (filename === 'cmeta.json') return JSON.stringify(mockMetadata)
-        if (filename === 'math.json') return '[]'
+        if (filename === 'math.json') return mathsJSON
         if (filename === 'code.C.c') return generatedCode
         return ''
       },
@@ -448,5 +450,52 @@ describe('ExposureDetail', () => {
 
     const sectionContent = sectionHeading?.element.nextElementSibling?.textContent
     expect(sectionContent).toContain('CC BY 3.0')
+  })
+
+  describe('cellml_math view', () => {
+    it('filters out entries with empty math arrays and renders only non-empty ones', async () => {
+      const mathData = JSON.stringify([
+        ['Component A', ['<math>x</math>', '<math>y</math>']],
+        ['Component B', []],
+        ['Component C', ['<math>z</math>']],
+      ])
+
+      const wrapper = await mountComponent({
+        props: { view: 'cellml_math' },
+        mathsJSON: mathData,
+      })
+
+      const mathBox = wrapper.find('.box')
+      expect(mathBox.exists()).toBe(true)
+
+      // Only the two non-empty components should have headings.
+      const sectionHeadings = mathBox.findAll('h4')
+      expect(sectionHeadings).toHaveLength(2)
+      expect(sectionHeadings[0].text()).toBe('Component A')
+      expect(sectionHeadings[1].text()).toBe('Component C')
+
+      // The empty-array entry title must not appear.
+      expect(mathBox.text()).not.toContain('Component B')
+    })
+
+    it('shows empty-state message and not the HTML view when all math sections are filtered out', async () => {
+      const mathData = JSON.stringify([
+        ['Component A', []],
+        ['Component B', []],
+      ])
+
+      const wrapper = await mountComponent({
+        props: { view: 'cellml_math' },
+        mathsJSON: mathData,
+      })
+
+      // Empty-state message must be visible.
+      const emptyMessage = wrapper.find('p.text-sm')
+      expect(emptyMessage.exists()).toBe(true)
+      expect(emptyMessage.text()).toBe('No mathematics content available.')
+
+      // Must NOT fall through to the detailHTML block.
+      expect(wrapper.find('.html-view').exists()).toBe(false)
+    })
   })
 })

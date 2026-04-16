@@ -3,6 +3,7 @@ import { nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import SearchInput from '@/components/molecules/SearchInput.vue'
+import { buildSearchQuery } from '@/utils/search'
 
 const props = defineProps<{
   show: boolean
@@ -54,7 +55,7 @@ onUnmounted(() => {
 })
 
 const handleSearch = (searchKind: string, searchTerm: string) => {
-  router.push({ path: '/search', query: { kind: searchKind, term: searchTerm } })
+  router.push({ path: '/search', query: buildSearchQuery(searchKind, searchTerm, route.query) })
   emit('close')
 }
 
