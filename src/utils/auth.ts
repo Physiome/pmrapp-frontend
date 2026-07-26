@@ -46,8 +46,8 @@ export const validateOAuthState = (expectedState: string | null): boolean => {
 
 /**
  * Decodes the payload (middle segment) of a JWT without verifying the signature.
- * This is only used for reading the `exp` claim for a local UX hint —
- * the server is the source of truth for authorisation.
+ * Used to read the `exp` claim so the client can proactively clear local auth state
+ * and redirect when a stored token has expired.
  *
  * Returns `null` if the token is malformed or the payload cannot be parsed.
  */
