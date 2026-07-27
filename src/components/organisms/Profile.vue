@@ -113,9 +113,10 @@ const cancelDisconnectGitHub = () => {
         variant="secondary"
         size="md"
         contentSection="profile_page"
+        customClasses="!border-gray-300 dark:!border-gray-600 !text-foreground hover:!text-foreground"
         @click="confirmDisconnectGitHub"
       >
-        <GitHubIcon class="w-4 h-4 text-black dark:text-white" />
+        <GitHubIcon class="w-4 h-4" />
         Disconnect GitHub
       </ActionButton>
 

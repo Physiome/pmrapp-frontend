@@ -101,10 +101,11 @@ onMounted(async () => {
     :disabled="isBusy"
     class="w-full"
     contentSection="login_page"
+    customClasses="!border-gray-300 dark:!border-gray-600 !text-foreground hover:!text-foreground"
     @click="handleGitHubLoginClick"
   >
     <LoadingIcon v-if="isBusy" class="w-5 h-5" />
-    <GitHubIcon v-else class="w-5 h-5 text-black dark:text-white" />
+    <GitHubIcon v-else class="w-5 h-5" />
     {{
       isAuthenticating
         ? 'Signing in with GitHub...'
