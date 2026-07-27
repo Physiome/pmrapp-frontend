@@ -104,7 +104,7 @@ onMounted(async () => {
     @click="handleGitHubLoginClick"
   >
     <LoadingIcon v-if="isBusy" class="w-5 h-5" />
-    <GitHubIcon v-else class="w-5 h-5" />
+    <GitHubIcon v-else class="w-5 h-5 text-black dark:text-white" />
     {{
       isAuthenticating
         ? 'Signing in with GitHub...'
