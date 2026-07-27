@@ -30,7 +30,8 @@ jobs:
       - name: Build
         run: bun run build
         env:
-          VITE_USE_MOCK_DATA: 'true'
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_PROXY }}
+          VITE_DOWNLOAD_API: ${{ secrets.VITE_DOWNLOAD_API }}
 
       - name: Run e2e tests
         run: bun run test:e2e
