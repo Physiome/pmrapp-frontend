@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress'
+import { loadEnv } from 'vite'
 
-const basePath = process.env.VITE_BASE_PATH ?? '/'
+const basePath = loadEnv('', process.cwd(), 'VITE_').VITE_BASE_PATH ?? '/'
 
 export default defineConfig({
   e2e: {
