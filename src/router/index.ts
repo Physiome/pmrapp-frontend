@@ -235,8 +235,12 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore()
   const storedToken = localStorage.getItem('auth_token')
+  const authMethod = localStorage.getItem('auth_method') as 'password' | 'github' | null
+  const looksLikeJwt = storedToken?.split('.').length === 3
 
-  if (storedToken && isJwtExpired(storedToken)) {
+  // Only check JWT expiry for GitHub OAuth tokens, which use JWTs.
+  // Password-auth tokens may not be JWTs, so skip the expiry check.
+  if (storedToken && looksLikeJwt && authMethod === 'github' && isJwtExpired(storedToken)) {
     authStore.clearAuth()
     return { name: 'login' }
   }
