@@ -12,10 +12,6 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
     </DefaultLayout>
     <BackToTop />
   </div>
-  <CookieBanner>
-    <div class="text-xl mb-2">This website uses cookies to ensure that you get the best experience.</div>
-    We use cookies, including Google Analytics, to improve your experience and understand how visitors use our site. By clicking Accept or closing
-    this banner, you consent to our use of cookies.
-  </CookieBanner>
+  <CookieBanner />
   <BetaRibbon />
 </template>

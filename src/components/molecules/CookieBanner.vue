@@ -4,17 +4,18 @@ import ActionButton from '@/components/atoms/ActionButton.vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import { Cookie } from '@/utils/cookie'
 
+const COOKIE_NAME = 'pmr_cookie_banner_dismissed'
+const COOKIE_DAYS = 30
+
 const isVisible = ref(true)
-const cookieName = 'pmr_cookie_banner_dismissed'
-const cookieDays = 30
 
 const dismissCookieBanner = async () => {
   isVisible.value = false
-  await Cookie.set(cookieName, 'true', cookieDays)
+  await Cookie.set(COOKIE_NAME, 'true', COOKIE_DAYS)
 }
 
 onMounted(async () => {
-  const dismissed = await Cookie.get(cookieName)
+  const dismissed = await Cookie.get(COOKIE_NAME)
   if (dismissed === 'true') {
     isVisible.value = false
   }
@@ -28,7 +29,9 @@ onMounted(async () => {
   >
     <div class="container mx-auto flex flex-col gap-4 px-4 py-4 pr-10 text-sm text-stone-700 dark:text-stone-200 sm:flex-row sm:items-center sm:justify-between">
       <div class="leading-6">
-        <slot />
+        <div class="text-xl mb-2">This website uses cookies to ensure that you get the best experience.</div>
+        We use cookies, including Google Analytics, to improve your experience and understand how visitors use our site. By clicking Accept or closing
+        this banner, you consent to our use of cookies.
       </div>
       <ActionButton variant="primary" type="button" @click="dismissCookieBanner">
         Accept
