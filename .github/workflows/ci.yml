@@ -8,6 +8,9 @@ jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
+    env:
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL_PROXY || '' }}
+      VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -29,9 +32,6 @@ jobs:
 
       - name: Build
         run: bun run build
-        env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_PROXY }}
-          VITE_DOWNLOAD_API: ${{ secrets.VITE_DOWNLOAD_API }}
 
       - name: Run e2e tests
         run: bun run test:e2e
