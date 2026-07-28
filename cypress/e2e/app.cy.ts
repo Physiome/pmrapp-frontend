@@ -5,4 +5,9 @@ describe('Home Page Test', () => {
     cy.visit('/')
     cy.contains('h1', 'Physiome Model Repository')
   })
+
+  it('visits the app login page', () => {
+    cy.visit('/login')
+    cy.contains('h1', 'Login')
+  })
 })
