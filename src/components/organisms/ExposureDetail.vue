@@ -19,7 +19,6 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
 import { TITLE } from '@/constants/global'
-import { getMathFormatOptionsStorageService } from '@/services'
 import { downloadCOMBINEArchive, downloadWorkspaceArchive } from '@/services/downloadUrlService'
 import { useExposureStore } from '@/stores/exposure'
 import { useSearchStore } from '@/stores/search'
@@ -103,10 +102,9 @@ const generatedCode = ref<string>('')
 const generatedCodeFilename = ref<string>('')
 const codeWrapActive = ref(false)
 const rawMathsData = ref<[string, string[]][]>([])
-const transformMaths = ref(false)
 const mathFormatOptions = ref<MathMLFormatOptions>({ ...DEFAULT_MATH_FORMAT_OPTIONS })
 const mathsJSON = computed<[string, string[]][]>(() => {
-  const appliedOptions = transformMaths.value
+  const appliedOptions = Object.values(mathFormatOptions.value).some(Boolean)
     ? mathFormatOptions.value
     : DEFAULT_MATH_FORMAT_OPTIONS
 
@@ -607,14 +605,6 @@ watch(detailHTML, async () => {
 })
 
 watch(
-  [transformMaths, mathFormatOptions],
-  ([transformMathsEnabled, options]) => {
-    getMathFormatOptionsStorageService().save(transformMathsEnabled, options)
-  },
-  { deep: true },
-)
-
-watch(
   () => props.file,
   async (newFile, oldFile) => {
     if (newFile === oldFile) return
@@ -645,12 +635,6 @@ watch(
 )
 
 onMounted(async () => {
-  const savedMathFormatState = getMathFormatOptionsStorageService().load()
-  if (savedMathFormatState) {
-    transformMaths.value = savedMathFormatState.transformMaths
-    mathFormatOptions.value = { ...savedMathFormatState.options }
-  }
-
   error.value = null
 
   try {
@@ -742,25 +726,25 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div v-else-if="props.view === 'cellml_math'" class="box">
+      <div v-else-if="props.view === 'cellml_math'" class="box p-0!">
         <MathTransformOptions
           :has-maths-data="rawMathsData.length > 0"
-          :transform-maths="transformMaths"
           :options="mathFormatOptions"
-          @update:transform-maths="transformMaths = $event"
           @update:options="mathFormatOptions = $event"
         />
-        <p v-if="!mathsJSON.length" class="text-sm text-gray-500 dark:text-gray-400">No mathematics content available.</p>
-        <template v-else>
-          <div v-for="value in mathsJSON" :key="value[0]"
-            class="mb-6 pb-6 last:mb-0 last:pb-0 border-b border-gray-200 dark:border-gray-700 last:border-0"
-          >
-            <h4 class="font-semibold mb-4">{{ value[0] }}</h4>
-            <div v-for="(math, mathIndex) in value[1]" :key="`${value[0]}-${mathIndex}`">
-              <div v-html="math" class="math-view"></div>
+        <div class="p-4">
+          <p v-if="!mathsJSON.length" class="text-sm text-gray-500 dark:text-gray-400">No mathematics content available.</p>
+          <template v-else>
+            <div v-for="value in mathsJSON" :key="value[0]"
+              class="mb-6 pb-6 last:mb-0 last:pb-0 border-b border-gray-200 dark:border-gray-700 last:border-0"
+            >
+              <h4 class="font-semibold mb-4">{{ value[0] }}</h4>
+              <div v-for="(math, mathIndex) in value[1]" :key="`${value[0]}-${mathIndex}`">
+                <div v-html="math" class="math-view"></div>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
 
       <div v-else-if="detailHTML" class="box">

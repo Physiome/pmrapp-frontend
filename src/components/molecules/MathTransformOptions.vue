@@ -1,66 +1,45 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
-import SettingsIcon from '@/components/icons/SettingsIcon.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import Checkbox from '@/components/atoms/Checkbox.vue'
+import Popover from '@/components/atoms/Popover.vue'
+import ChevronRightIcon from '@/components/icons/ChevronRightIcon.vue'
+import { MATHML_FORMAT_OPTIONS } from '@/constants/mathml'
+import { getMathFormatOptionsStorageService } from '@/services'
 import type { MathMLFormatOptions } from '@/types/mathml'
 
 interface Props {
   hasMathsData: boolean
-  transformMaths: boolean
   options: MathMLFormatOptions
 }
 
 const emit = defineEmits<{
-  'update:transformMaths': [value: boolean]
   'update:options': [value: MathMLFormatOptions]
 }>()
 
 const props = defineProps<Props>()
 
-const isOpen = ref(false)
-const dropdownRef = ref<HTMLDivElement | null>(null)
-const hasActiveFormatting = computed(
-  () => props.transformMaths && Object.values(props.options).some(Boolean),
-)
-const formattingOptionsAriaLabel = computed(() =>
-  hasActiveFormatting.value
-    ? 'View math formatting options. Mathematics formatting is active.'
-    : 'View math formatting options. Mathematics formatting is inactive.',
-)
+const collapsed = ref(false)
 
-const optionItems = [
-  {
-    key: 'digitGrouping',
-    label: 'Digit Grouping',
-  },
-  {
-    key: 'greekSymbols',
-    label: 'Greek Symbols',
-  },
-  {
-    key: 'subscripts',
-    label: 'Subscripts',
-  },
-] as const
+const expandLabel = 'Expand math toolbar'
+const collapseLabel = 'Collapse math toolbar'
+const mathToolbarLabel = computed(() => (collapsed.value ? expandLabel : collapseLabel))
 
-const toggleTransformMaths = () => {
-  if (props.transformMaths) {
-    emit('update:transformMaths', false)
-    return
-  }
+const stickyContainer = ['sticky-container', 'sticky top-20 left-0 right-0 p-4 pb-0 z-20']
 
-  const hasEnabledOption = Object.values(props.options).some(Boolean)
-  if (!hasEnabledOption) {
-    emit('update:options', {
-      digitGrouping: true,
-      greekSymbols: true,
-      subscripts: true,
-    })
-  }
+const stickyContainerInner = computed(() => [
+  'sticky-container-inner',
+  'ml-auto p-3 w-fit text-sm flex items-center justify-end gap-4',
+  'border border-gray-200 dark:border-gray-700 rounded-lg',
+  'bg-gray-50 dark:bg-gray-800',
+])
 
-  emit('update:transformMaths', true)
-}
+const collapseButtonClasses = computed(() => [
+  'shrink-0 flex items-center justify-center w-7 h-7 cursor-pointer',
+  'rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white',
+  'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700',
+  'transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
+  'shadow-xs dark:shadow-gray-900',
+])
 
 const toggleOption = (key: keyof MathMLFormatOptions) => {
   const nextOptions = {
@@ -71,118 +50,111 @@ const toggleOption = (key: keyof MathMLFormatOptions) => {
   emit('update:options', nextOptions)
 }
 
-const handleClickOutside = (event: MouseEvent) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-    isOpen.value = false
-  }
+const toggleCollapsed = () => {
+  collapsed.value = !collapsed.value
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  const savedOptions = getMathFormatOptionsStorageService().load()
+  if (savedOptions) {
+    emit('update:options', { ...savedOptions })
+  }
+
+  const savedCollapsed = getMathFormatOptionsStorageService().loadCollapsed()
+  if (savedCollapsed !== null) {
+    collapsed.value = savedCollapsed
+  }
 })
 
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+watch(collapsed, (value) => {
+  getMathFormatOptionsStorageService().saveCollapsed(value)
 })
+
+watch(
+  () => props.options,
+  (options) => {
+    getMathFormatOptionsStorageService().save(options)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
   <div
     v-if="hasMathsData"
-    class="sticky top-24 z-30 flex justify-end mb-4"
+    :class="stickyContainer"
   >
-    <div class="relative inline-block" ref="dropdownRef">
-      <ActionButton
-        variant="secondary"
-        customClasses="shadow-sm hover:shadow-none active:shadow-none"
-        size="md"
-        aria-haspopup="dialog"
-        :aria-expanded="isOpen"
-        aria-controls="math-format-options-panel"
-        :aria-label="formattingOptionsAriaLabel"
-        content-section="Exposure Detail - Mathematics"
-        @click="isOpen = !isOpen"
+    <div :class="stickyContainerInner">
+      <!-- Collapse/expand toggle button -->
+      <button
+        :class="collapseButtonClasses"
+        :aria-label="mathToolbarLabel"
+        :title="mathToolbarLabel"
+        @click="toggleCollapsed"
       >
-        <SettingsIcon class="w-4 h-4" />
-        <span>Formatting</span>
-        <ChevronDownIcon class="w-4 h-4" />
-      </ActionButton>
+        <ChevronRightIcon
+          class="w-4 h-4 transition-transform"
+          :class="collapsed ? 'rotate-180' : ''"
+        />
+        <span class="sr-only">{{ mathToolbarLabel }}</span>
+      </button>
 
-      <transition
-        enter-active-class="transition ease-out duration-100"
-        enter-from-class="transform opacity-0 scale-95"
-        enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-75"
-        leave-from-class="transform opacity-100 scale-100"
-        leave-to-class="transform opacity-0 scale-95"
-      >
+      <template v-if="!collapsed">
         <div
-          v-if="isOpen"
-          id="math-format-options-panel"
-          role="dialog"
-          aria-modal="false"
-          aria-label="Math formatting options"
-          class="absolute top-full right-0 mt-2 w-80 rounded-md border border-gray-200 bg-white shadow-lg z-50 dark:border-gray-700 dark:bg-background"
+          v-for="option in MATHML_FORMAT_OPTIONS"
+          :key="option.key"
+          class="flex"
         >
-          <div class="p-3 space-y-3">
-            <div class="flex items-center justify-between gap-4 rounded-md bg-gray-50 px-3 py-3 dark:bg-gray-800/70">
-              <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Enable formatting</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Format mathematical expressions.</p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                :aria-checked="transformMaths"
-                class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-background"
-                :class="transformMaths ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'"
-                @click="toggleTransformMaths"
+          <Popover>
+            <template #trigger>
+              <Checkbox
+                :model-value="!!options[option.key]"
+                @update:model-value="toggleOption(option.key)"
               >
-                <span class="sr-only">Enable formatting</span>
-                <span
-                  class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200"
-                  :class="transformMaths ? 'translate-x-6' : 'translate-x-1'"
-                />
-              </button>
-            </div>
-
-            <div class="space-y-1">
-              <label
-                v-for="option in optionItems"
-                :key="option.key"
-                class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-700 transition-colors dark:text-gray-300"
-                :class="transformMaths ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed opacity-50'"
-              >
-                <input
-                  type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  :checked="options[option.key]"
-                  :disabled="!transformMaths"
-                  @change="toggleOption(option.key)"
-                />
-                <span class="flex min-w-0 flex-1 items-center justify-between gap-3">
-                  <span class="truncate">{{ option.label }}</span>
+                <span class="flex items-center gap-1.5 text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                  <span class="text-xs sm:text-sm">{{ option.label }}</span>
                   <span
-                    class="inline-flex shrink-0 items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-medium tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                    class="hidden md:inline-flex shrink-0 items-center rounded-full border bg-white px-1.5 py-0.5 text-xs tracking-wide text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                    :class="!!options[option.key] ? 'border-primary': 'border-gray-200 dark:border-gray-700'"
                     aria-hidden="true"
                   >
-                    <span v-if="option.key === 'digitGrouping'">#,###</span>
-                    <span v-else-if="option.key === 'greekSymbols'">α β</span>
-                    <span v-else-if="option.key === 'subscripts'">x<sub class="text-[0.7em] leading-none">n</sub></span>
+                    <span v-html="option.preview" :class="!!options[option.key] ? 'text-primary' : ''"></span>
                   </span>
                 </span>
-              </label>
-            </div>
-          </div>
+              </Checkbox>
+            </template>
+            <template #content>
+              <p class="mb-3 text-gray-500 dark:text-gray-400">{{ option.description }}</p>
+              <code
+                class="block text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 p-2 text-center rounded"
+                v-html="option.example"
+              ></code>
+            </template>
+          </Popover>
         </div>
-      </transition>
-
-      <!-- Notification dot: shown when any option is enabled. -->
-      <div
-        class="pointer-events-none absolute top-0 right-0 -mt-1 -mr-1 block h-3 w-3 rounded-full bg-error"
-        v-if="hasActiveFormatting"
-        aria-hidden="true"
-      ></div>
+      </template>
     </div>
   </div>
 </template>
+
+<style scoped>
+@reference "tailwindcss";
+
+:deep(math mi) {
+  @apply italic;
+}
+
+:deep(math + math) {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.sticky-container {
+  container-type: scroll-state;
+}
+
+@container scroll-state(stuck: top) {
+  .sticky-container-inner {
+    @apply shadow-lg dark:shadow-gray-900;
+  }
+}
+</style>
