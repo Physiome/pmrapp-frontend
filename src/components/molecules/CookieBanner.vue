@@ -36,7 +36,7 @@ onMounted(async () => {
       <div class="leading-6">
         <div class="text-xl font-semibold mb-2">This site uses cookies to improve your experience.</div>
         We use cookies to analyse traffic and understand how the Physiome Model Repository is used.
-        By accepting, closing this banner, or continuing to use the site, you consent to the use of cookies in accordance with our policy.
+        By accepting, closing this banner, or continuing to use the site, you consent to the use of cookies.
       </div>
       <button
         type="button"
