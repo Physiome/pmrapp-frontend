@@ -25,7 +25,7 @@ onMounted(async () => {
     v-if="isVisible"
     class="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 shadow-[0_-12px_32px_rgba(15,23,42,0.12)] backdrop-blur dark:border-gray-800 dark:bg-slate-950/95"
   >
-    <div class="container mx-auto flex flex-col gap-4 px-4 py-8 pr-10 text-gray-700 dark:text-gray-200 sm:flex-row sm:items-center sm:justify-between">
+    <div class="container mx-auto flex flex-col items-end gap-4 sm:gap-8 px-4 py-8 pt-12 sm:pt-8 text-gray-700 dark:text-gray-200 sm:flex-row sm:items-center sm:justify-between">
       <div class="leading-6">
         <div class="text-xl font-semibold mb-2">We use cookies to ensure you get the best experience.</div>
         This allows us to analyse site traffic and improve your browsing experience.
