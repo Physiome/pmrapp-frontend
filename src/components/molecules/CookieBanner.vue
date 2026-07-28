@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import ActionButton from '@/components/atoms/ActionButton.vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import { Cookie } from '@/utils/cookie'
 import { COOKIE } from '@/constants/global'
 
 const isVisible = ref(true)
+
+const buttonClasses = [
+  'px-3 py-1 rounded border border-primary bg-primary text-white',
+  'hover:opacity-90 transition duration-200 ease-linear text-base',
+  'rounded-md disabled:opacity-60 disabled:cursor-not-allowed',
+  'inline-flex items-center justify-center gap-2 cursor-pointer',
+  'focus:outline-none focus:ring-1 focus:ring-primary'
+]
 
 const dismissCookieBanner = async () => {
   isVisible.value = false
@@ -31,9 +38,13 @@ onMounted(async () => {
         This allows us to analyse site traffic and improve your browsing experience.
         By closing this banner, clicking "Accept", or continuing to use this site, you agree to the use of cookies.
       </div>
-      <ActionButton variant="primary" type="button" @click="dismissCookieBanner">
+      <button
+        type="button"
+        :class="buttonClasses"
+        @click="dismissCookieBanner"
+      >
         Accept
-      </ActionButton>
+      </button>
     </div>
     <CloseButton
       class="absolute top-4 right-4 w-6 h-6 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
