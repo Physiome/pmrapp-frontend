@@ -6,7 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const basePath = loadEnv(mode, process.cwd(), 'VITE_').VITE_BASE_PATH ?? '/'
+  const basePath = loadEnv(mode, process.cwd(), 'VITE_').VITE_BASE_PATH || '/'
 
   return {
     base: basePath,
