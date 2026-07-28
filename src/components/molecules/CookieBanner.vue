@@ -29,7 +29,7 @@ onMounted(async () => {
       <div class="leading-6">
         <div class="text-xl font-semibold mb-2">We use cookies to ensure you get the best experience.</div>
         This allows us to analyse site traffic and improve your browsing experience.
-        By clicking "Accept" or continuing to use this site, you agree to the use of cookies.
+        By closing this banner, clicking "Accept", or continuing to use this site, you agree to the use of cookies.
       </div>
       <ActionButton variant="primary" type="button" @click="dismissCookieBanner">
         Accept
