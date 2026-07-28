@@ -27,8 +27,9 @@ onMounted(async () => {
   >
     <div class="container mx-auto flex flex-col gap-4 px-4 py-8 pr-10 text-gray-700 dark:text-gray-200 sm:flex-row sm:items-center sm:justify-between">
       <div class="leading-6">
-        <div class="text-xl mb-2">Privacy & site analytics</div>
-        We use cookies to improve your browsing experience and analyse site traffic. By clicking "Accept" or continuing to use this site, you agree to our use of cookies.
+        <div class="text-xl font-semibold mb-2">We use cookies to ensure you get the best experience.</div>
+        This allows us to analyse site traffic and improve your browsing experience.
+        By clicking "Accept" or continuing to use this site, you agree to the use of cookies.
       </div>
       <ActionButton variant="primary" type="button" @click="dismissCookieBanner">
         Accept
