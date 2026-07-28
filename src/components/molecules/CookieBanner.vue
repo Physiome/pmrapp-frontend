@@ -3,19 +3,17 @@ import { onMounted, ref } from 'vue'
 import ActionButton from '@/components/atoms/ActionButton.vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import { Cookie } from '@/utils/cookie'
-
-const COOKIE_NAME = 'pmr_cookie_banner_dismissed'
-const COOKIE_DAYS = 30
+import { COOKIE } from '@/constants/global'
 
 const isVisible = ref(true)
 
 const dismissCookieBanner = async () => {
   isVisible.value = false
-  await Cookie.set(COOKIE_NAME, 'true', COOKIE_DAYS)
+  await Cookie.set(COOKIE.BANNER_NAME, 'true', COOKIE.BANNER_DAYS)
 }
 
 onMounted(async () => {
-  const dismissed = await Cookie.get(COOKIE_NAME)
+  const dismissed = await Cookie.get(COOKIE.BANNER_NAME)
   if (dismissed === 'true') {
     isVisible.value = false
   }
