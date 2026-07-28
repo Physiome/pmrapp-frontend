@@ -76,7 +76,6 @@ const handleDownloadWorkspaceArchive = async (format: 'zip' | 'tgz') => {
 
   try {
     await downloadWorkspaceArchive(
-      workspaceInfo.value.workspace.url,
       props.alias,
       workspaceInfo.value.commit.commit_id,
       format,

@@ -242,7 +242,6 @@ const handleDownloadWorkspaceArchive = async (format: 'zip' | 'tgz') => {
 
   try {
     await downloadWorkspaceArchive(
-      exposureInfo.value.workspace.url,
       exposureInfo.value.workspace_alias,
       exposureInfo.value.exposure.commit_id,
       format,
