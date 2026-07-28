@@ -34,9 +34,9 @@ onMounted(async () => {
   >
     <div class="container mx-auto flex flex-col items-end gap-4 sm:gap-8 px-4 py-8 pt-12 sm:pt-8 text-gray-700 dark:text-gray-200 sm:flex-row sm:items-center sm:justify-between">
       <div class="leading-6">
-        <div class="text-xl font-semibold mb-2">We use cookies to ensure you get the best experience.</div>
-        This allows us to analyse site traffic and improve your browsing experience.
-        By closing this banner, clicking "Accept", or continuing to use this site, you agree to the use of cookies.
+        <div class="text-xl font-semibold mb-2">This site uses cookies to improve your experience.</div>
+        We use cookies to analyse traffic and understand how the Physiome Model Repository is used.
+        By accepting, closing this banner, or continuing to use the site, you consent to the use of cookies in accordance with our policy.
       </div>
       <button
         type="button"
