@@ -69,10 +69,6 @@ watch(
         <img src="/logo.png" alt="Physiome Model Repository" width="48" height="48" />
       </RouterLink>
 
-      <div class="flex items-center gap-2 md:hidden">
-
-      </div>
-
       <nav aria-label="Primary navigation">
         <ul class="flex items-center gap-4">
           <li>
