@@ -12,11 +12,21 @@ const isSearchOverlayVisible = ref(false)
 const isMobileMenuOpen = ref(false)
 const globalState = useGlobalStateStore()
 
-const mobileMenuClasses = [
-  'md:hidden px-4 pb-4 w-full z-10',
-  'absolute top-full left-0',
-  'bg-surface shadow-lg',
-  'border border-gray-200 dark:border-gray-700'
+const menuContainerClasses = computed(() =>[
+  isMobileMenuOpen.value ? 'block' : 'hidden',
+  'absolute top-full left-0 w-full p-4 z-10',
+  'bg-surface shadow-lg border-t border-gray-200 dark:border-gray-700',
+  'md:flex md:w-auto md:static md:top-auto md:left-auto md:items-center md:p-0',
+  'md:bg-transparent md:shadow-none md:border-0',
+])
+
+const menuBoxClasses = [
+  'flex flex-col md:flex-row gap-4 align-center',
+]
+
+const navLinkClasses = [
+  'block rounded-md px-3 py-2',
+  'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
 ]
 
 const handleSearchClick = () => {
@@ -55,45 +65,15 @@ watch(
 <template>
   <header class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
-      <RouterLink to="/" class="flex items-center nav-link">
+      <RouterLink to="/" class="flex items-center">
         <img src="/logo.png" alt="Physiome Model Repository" width="48" height="48" />
       </RouterLink>
 
       <div class="flex items-center gap-2 md:hidden">
-        <ActionButton
-          type="button"
-          variant="icon"
-          size="sm"
-          aria-label="Open search"
-          @click="handleSearchClick"
-          content-section="Header navigation"
-        >
-          <span class="sr-only">Open search</span>
-          <SearchIcon class="w-5 h-5" />
-        </ActionButton>
-        <ActionButton
-          type="button"
-          variant="icon"
-          size="sm"
-          aria-label="Toggle navigation menu"
-          :aria-expanded="isMobileMenuOpen"
-          aria-controls="mobile-navigation-menu"
-          @click="toggleMobileMenu"
-          content-section="Header navigation"
-        >
-          <span class="sr-only">Toggle navigation menu</span>
-          <span class="mobile-menu-icon" :class="{ 'mobile-menu-icon-open': isMobileMenuOpen }" aria-hidden="true">
-            <span class="mobile-menu-icon-bar" />
-            <span class="mobile-menu-icon-bar" />
-            <span class="mobile-menu-icon-bar" />
-          </span>
-        </ActionButton>
-        <div class="pl-2">
-          <UserDropdown />
-        </div>
+
       </div>
 
-      <nav class="hidden md:block" aria-label="Primary navigation">
+      <nav aria-label="Primary navigation">
         <ul class="flex items-center gap-4">
           <li>
             <ActionButton
@@ -105,17 +85,39 @@ watch(
               content-section="Header navigation"
             >
               <span class="sr-only">Open search</span>
-              <SearchIcon class="w-5 h-5" />
+              <SearchIcon class="w-6 h-6" />
             </ActionButton>
           </li>
-          <li v-for="link in navLinks" :key="link.path">
-            <RouterLink
-              :to="link.path"
-              class="nav-link"
-              :class="{ 'text-primary': isActive(link.path).value }"
+          <li class="md:hidden flex items-center">
+            <ActionButton
+              type="button"
+              variant="icon"
+              size="sm"
+              aria-label="Toggle navigation menu"
+              :aria-expanded="isMobileMenuOpen"
+              aria-controls="mobile-navigation-menu"
+              @click="toggleMobileMenu"
+              content-section="Header navigation"
             >
-              {{ link.label }}
-            </RouterLink>
+              <span class="sr-only">Toggle navigation menu</span>
+              <span class="mobile-menu-icon" :class="{ 'mobile-menu-icon-open': isMobileMenuOpen }" aria-hidden="true">
+                <span class="mobile-menu-icon-bar" />
+                <span class="mobile-menu-icon-bar" />
+                <span class="mobile-menu-icon-bar" />
+              </span>
+            </ActionButton>
+          </li>
+          <li :class="menuContainerClasses">
+            <ul :class="menuBoxClasses">
+              <li v-for="link in navLinks" :key="link.path">
+                <RouterLink
+                  :to="link.path"
+                  :class="[{ 'text-primary': isActive(link.path).value }, navLinkClasses]"
+                >
+                  {{ link.label }}
+                </RouterLink>
+              </li>
+            </ul>
           </li>
           <li class="user-dropdown-divider pl-4">
             <UserDropdown />
@@ -123,26 +125,6 @@ watch(
         </ul>
       </nav>
     </div>
-
-    <nav
-      v-if="isMobileMenuOpen"
-      id="mobile-navigation-menu"
-      :class="mobileMenuClasses"
-      aria-label="Mobile navigation"
-    >
-      <ul class="flex flex-col gap-1 pt-4">
-        <li v-for="link in navLinks" :key="link.path">
-          <RouterLink
-            :to="link.path"
-            class="mobile-nav-link"
-            :class="{ 'text-primary': isActive(link.path).value }"
-            @click="closeMobileMenu"
-          >
-            {{ link.label }}
-          </RouterLink>
-        </li>
-      </ul>
-    </nav>
   </header>
   <SearchOverlay :show="isSearchOverlayVisible" @close="isSearchOverlayVisible = false" />
 </template>
@@ -162,24 +144,8 @@ watch(
     before:bg-primary;
 }
 
-.nav-link {
-  @apply hover:opacity-80 transition-opacity;
-}
-
-.mobile-nav-link {
-  @apply block rounded-md px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
-}
-
-.mobile-nav-divider {
-  @apply border-t border-gray-300 dark:border-gray-700;
-}
-
-.mobile-user-menu {
-  @apply flex items-center;
-}
-
 .mobile-menu-icon {
-  @apply relative flex h-5 w-5 flex-col items-center justify-center gap-1;
+  @apply relative flex h-6 w-6 flex-col items-center justify-center gap-1;
 }
 
 .mobile-menu-icon-bar {
