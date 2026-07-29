@@ -166,7 +166,7 @@ const handleRefresh = async () => {
       @search="handleSearch"
       @querySearch="handleQuerySearch"
     />
-    <div class="flex w-full gap-4 lg:w-auto lg:flex-row lg:items-center">
+    <div class="flex w-full gap-4 lg:w-auto lg:flex-row lg:items-center justify-end">
       <SortDropdown
         :disabled="!(hasResults || isLoading)"
         :model-value="sortBy"
