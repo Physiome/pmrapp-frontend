@@ -179,7 +179,7 @@ onUnmounted(() => {
   <RouterLink
     v-else
     to="/login"
-    class="nav-link ml-4"
+    class="nav-link"
     :class="{ 'text-primary': isActive('/login') }"
     @click="handleLoginClick"
   >
