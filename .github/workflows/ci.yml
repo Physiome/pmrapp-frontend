@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  pull_request_target:
+  pull_request:
     branches: ['main']
 
 jobs:
@@ -14,9 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          # Checks out the HEAD commit of the PR instead of base branch
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
