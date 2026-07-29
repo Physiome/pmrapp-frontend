@@ -53,4 +53,9 @@ describe('It covers navigation and routing.', () => {
       cy.get('footer a[href*="github.com"]').should('have.length', 2)
     })
   })
+
+  it('visits the app login page', () => {
+    cy.visit('/login')
+    cy.contains('h1', 'Login')
+  })
 })
