@@ -8,6 +8,7 @@ import { LOGOUT_ERROR_MESSAGES } from '@/constants/auth'
 import { getAuthService } from '@/services'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStateStore } from '@/stores/globalState'
+import ActionButton from '@/components/atoms/ActionButton.vue'
 
 const authStore = useAuthStore()
 const globalStateStore = useGlobalStateStore()
@@ -31,16 +32,22 @@ const menuDividerClasses = [
 
 const accountButtonClasses = computed(() => {
   const buttonClasses = [
-    'block cursor-pointer relative rounded-full',
-    'bg-gray-200 dark:bg-gray-700',
+    'rounded-full ml-2',
+    'bg-gray-100 dark:bg-gray-700',
+    'outline-none! focus:ring-0!',
   ]
 
-  if (!authStore.avatarUrl) {
-    buttonClasses.push('p-1')
+  if (authStore.avatarUrl) {
+    buttonClasses.push('block! p-0!')
   }
 
   return buttonClasses
 })
+
+const navLinkClasses = [
+  'block rounded-md px-3 py-2',
+  'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
+]
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value
@@ -104,19 +111,23 @@ onUnmounted(() => {
 
 <template>
   <div v-if="authStore.isAuthenticated" ref="dropdownRef" class="relative">
-    <button
+    <ActionButton
+      type="button"
+      variant="icon"
+      size="sm"
       @click="toggleDropdown"
       :class="accountButtonClasses"
       :aria-label="buttonLabel"
       aria-haspopup="true"
       :aria-expanded="isOpen"
       :aria-controls="menuId"
+      content-section="Header navigation"
     >
       <template v-if="authStore.avatarUrl">
         <img
           :src="authStore.avatarUrl"
           :alt="authStore.username ?? ''"
-          class="w-8 h-8 rounded-full object-cover"
+          class="w-10 h-10 rounded-full object-cover"
         />
       </template>
       <template v-else>
@@ -125,7 +136,7 @@ onUnmounted(() => {
       <span class="sr-only sm:hidden">
         {{ authStore.username }}
       </span>
-    </button>
+    </ActionButton>
 
     <div
       v-if="isOpen"
@@ -141,8 +152,8 @@ onUnmounted(() => {
                 :src="authStore.avatarUrl"
                 :alt="authStore.username ?? ''"
                 class="w-8 h-8 rounded-full object-cover"
-                width="32"
-                height="32"
+                width="40"
+                height="40"
               />
             </template>
             <template v-else>
@@ -181,8 +192,7 @@ onUnmounted(() => {
   <RouterLink
     v-else
     to="/login"
-    class="nav-link"
-    :class="{ 'text-primary': isActive('/login') }"
+    :class="[{ 'text-primary': isActive('/login') }, navLinkClasses]"
     @click="handleLoginClick"
   >
     Log in
@@ -198,9 +208,3 @@ onUnmounted(() => {
     @cancel="cancelLogout"
   />
 </template>
-
-<style scoped>
-.nav-link {
-  @apply hover:opacity-80 transition-opacity;
-}
-</style>
