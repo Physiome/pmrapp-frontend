@@ -10,3 +10,12 @@ export interface GitHubAuthData {
   email: string
   avatar_url: string
 }
+
+/**
+ * Decoded JWT payload with the standard `exp` claim.
+ * The `exp` value is a Unix timestamp (seconds since epoch).
+ */
+export interface JwtPayload {
+  exp: number
+  [key: string]: unknown
+}

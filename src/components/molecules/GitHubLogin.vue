@@ -101,6 +101,7 @@ onMounted(async () => {
     :disabled="isBusy"
     class="w-full"
     contentSection="login_page"
+    customClasses="!border-gray-300 dark:!border-gray-600 !text-foreground hover:!text-foreground"
     @click="handleGitHubLoginClick"
   >
     <LoadingIcon v-if="isBusy" class="w-5 h-5" />
