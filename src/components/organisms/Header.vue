@@ -103,7 +103,7 @@ watch(
               </span>
             </ActionButton>
           </li>
-          <li :class="menuContainerClasses">
+          <li :class="menuContainerClasses" id="mobile-navigation-menu">
             <ul :class="menuBoxClasses">
               <li v-for="link in navLinks" :key="link.path">
                 <RouterLink
