@@ -12,6 +12,13 @@ const isSearchOverlayVisible = ref(false)
 const isMobileMenuOpen = ref(false)
 const globalState = useGlobalStateStore()
 
+const mobileMenuClasses = [
+  'md:hidden px-4 pb-4 w-full z-10',
+  'absolute top-full left-0',
+  'bg-surface shadow-lg',
+  'border border-gray-200 dark:border-gray-700'
+]
+
 const handleSearchClick = () => {
   isMobileMenuOpen.value = false
 
@@ -120,7 +127,7 @@ watch(
     <nav
       v-if="isMobileMenuOpen"
       id="mobile-navigation-menu"
-      class="md:hidden border-t border-gray-200 dark:border-gray-700 px-4 pb-4"
+      :class="mobileMenuClasses"
       aria-label="Mobile navigation"
     >
       <ul class="flex flex-col gap-1 pt-4">
