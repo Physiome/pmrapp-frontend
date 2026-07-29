@@ -12,7 +12,7 @@ describe('It covers navigation and routing.', () => {
 
     it('navigates to the home page when clicking the logo.', () => {
       cy.visit('/workspaces')
-      cy.get('header .nav-link').first().click()
+      cy.get('header [aria-label="Home"]').click()
       cy.url().should('eq', Cypress.config().baseUrl)
     })
 

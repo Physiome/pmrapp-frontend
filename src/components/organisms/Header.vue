@@ -30,7 +30,7 @@ const isActive = (path: string) => computed(() => route.path.startsWith(path))
 <template>
   <header class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-      <RouterLink to="/" class="flex items-center nav-link">
+      <RouterLink to="/" class="flex items-center nav-link" aria-label="Home">
         <img src="/logo.png" alt="Physiome Model Repository" width="48" height="48" />
       </RouterLink>
 
