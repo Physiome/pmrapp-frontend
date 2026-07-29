@@ -60,7 +60,9 @@ const handleLogout = async () => {
   try {
     await authService.logout()
     authStore.clearAuth()
-    router.push('/')
+    if (route.path === '/profile') {
+      router.push('/')
+    }
   } catch (error) {
     console.error(LOGOUT_ERROR_MESSAGES.generic, error)
   }

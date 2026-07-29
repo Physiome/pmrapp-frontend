@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useExposureStore } from '@/stores/exposure'
 import { useSearchStore } from '@/stores/search'
 import { useWorkspaceStore } from '@/stores/workspace'
+import { isJwtExpired } from '@/utils/auth'
 import { generateExposureTitle, resolveExposureFileTitle } from '@/utils/exposure'
 import { generateWorkspaceTitle } from '@/utils/workspace'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
@@ -233,6 +234,16 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
+  const storedToken = localStorage.getItem('auth_token')
+  const authMethod = localStorage.getItem('auth_method') as 'password' | 'github' | null
+  const looksLikeJwt = storedToken?.split('.').length === 3
+
+  // Only check JWT expiry for GitHub OAuth tokens, which use JWTs.
+  // Password-auth tokens may not be JWTs, so skip the expiry check.
+  if (storedToken && looksLikeJwt && authMethod === 'github' && isJwtExpired(storedToken)) {
+    authStore.clearAuth()
+    return { name: 'login' }
+  }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login' }

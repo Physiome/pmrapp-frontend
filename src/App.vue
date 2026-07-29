@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BackToTop from '@/components/atoms/BackToTop.vue'
 import BetaRibbon from '@/components/atoms/BetaRibbon.vue'
+import CookieBanner from '@/components/molecules/CookieBanner.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>
 
@@ -11,5 +12,6 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
     </DefaultLayout>
     <BackToTop />
   </div>
+  <CookieBanner />
   <BetaRibbon />
 </template>
