@@ -2,19 +2,17 @@
 import { onMounted, ref } from 'vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import { Cookie } from '@/utils/cookie'
-
-const COOKIE_NAME = 'pmr_notification_dismissed'
-const COOKIE_DAYS = 7
+import { COOKIE } from '@/constants/global'
 
 const isVisible = ref(true)
 
 const handleClose = async () => {
   isVisible.value = false
-  await Cookie.set(COOKIE_NAME, 'true', COOKIE_DAYS)
+  await Cookie.set(COOKIE.NOTIFICATION_NAME, 'true', COOKIE.NOTIFICATION_DAYS)
 }
 
 onMounted(async () => {
-  const dismissed = await Cookie.get(COOKIE_NAME)
+  const dismissed = await Cookie.get(COOKIE.NOTIFICATION_NAME)
   if (dismissed === 'true') {
     isVisible.value = false
   }
