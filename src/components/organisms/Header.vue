@@ -81,6 +81,9 @@ watch(
             <span class="mobile-menu-icon-bar" />
           </span>
         </ActionButton>
+        <div class="pl-2">
+          <UserDropdown />
+        </div>
       </div>
 
       <nav class="hidden md:block" aria-label="Primary navigation">
@@ -107,7 +110,7 @@ watch(
               {{ link.label }}
             </RouterLink>
           </li>
-          <li class="user-dropdown-divider">
+          <li class="user-dropdown-divider pl-4">
             <UserDropdown />
           </li>
         </ul>
@@ -130,11 +133,6 @@ watch(
           >
             {{ link.label }}
           </RouterLink>
-        </li>
-        <li class="mobile-nav-divider pt-3 mt-2">
-          <div class="mobile-user-menu">
-            <UserDropdown />
-          </div>
         </li>
       </ul>
     </nav>

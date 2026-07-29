@@ -101,7 +101,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="authStore.isAuthenticated" ref="dropdownRef" class="relative pl-4">
+  <div v-if="authStore.isAuthenticated" ref="dropdownRef" class="relative">
     <button
       @click="toggleDropdown"
       :class="accountButtonClasses"
