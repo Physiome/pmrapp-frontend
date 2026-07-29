@@ -26,30 +26,53 @@ describe('Header', () => {
     route.fullPath = '/'
   })
 
-  it('toggles the mobile navigation menu', async () => {
-    const wrapper = mount(Header, {
-      global: {
-        stubs: {
-          RouterLink: RouterLinkStub,
-          SearchIcon: true,
-          SearchOverlay: true,
-          UserDropdown: true,
-          Tooltip: true,
-        },
+  const mountHeader = () => mount(Header, {
+    global: {
+      stubs: {
+        RouterLink: RouterLinkStub,
+        SearchIcon: true,
+        SearchOverlay: true,
+        UserDropdown: true,
+        Tooltip: true,
       },
-    })
+    },
+  })
 
-    expect(wrapper.find('#mobile-navigation-menu').exists()).toBe(false)
+  it('has the logo with alt text', () => {
+    const wrapper = mountHeader()
+    const logo = wrapper.find('img[alt="Physiome Model Repository"]')
 
-    const toggleButton = wrapper.find('button[aria-controls="mobile-navigation-menu"]')
-    expect(toggleButton.attributes('aria-expanded')).toBe('false')
+    expect(logo.exists()).toBe(true)
+    expect(logo.attributes('src')).toBe('/logo.png')
+  })
 
-    await toggleButton.trigger('click')
+  it('does not show the toggle mobile menu button on desktop screen size', () => {
+    const wrapper = mountHeader()
+    const toggleMenuButton = wrapper.find('button[aria-controls="mobile-navigation-menu"]')
+    const toggleMenuContainer = toggleMenuButton.element.closest('li')
 
-    expect(wrapper.find('#mobile-navigation-menu').exists()).toBe(true)
-    expect(toggleButton.attributes('aria-expanded')).toBe('true')
-    expect(wrapper.text()).toContain('Exposures')
-    expect(wrapper.text()).toContain('Workspaces')
+    expect(toggleMenuButton.exists()).toBe(true)
+    expect(toggleMenuContainer).not.toBeNull()
+    expect(toggleMenuContainer?.classList.contains('md:hidden')).toBe(true)
+  })
+
+  it('toggles mobile menu visibility when the toggle button is clicked', async () => {
+    const wrapper = mountHeader()
+    const toggleMenuButton = wrapper.find('button[aria-controls="mobile-navigation-menu"]')
+    const mobileMenu = wrapper.find('#mobile-navigation-menu')
+
+    expect(toggleMenuButton.attributes('aria-expanded')).toBe('false')
+    expect(mobileMenu.classes()).toContain('hidden')
+
+    await toggleMenuButton.trigger('click')
+
+    expect(toggleMenuButton.attributes('aria-expanded')).toBe('true')
+    expect(mobileMenu.classes()).toContain('block')
+
+    await toggleMenuButton.trigger('click')
+
+    expect(toggleMenuButton.attributes('aria-expanded')).toBe('false')
+    expect(mobileMenu.classes()).toContain('hidden')
   })
 
   it('closes the mobile menu when the route changes', async () => {
@@ -66,12 +89,12 @@ describe('Header', () => {
     })
 
     await wrapper.find('button[aria-controls="mobile-navigation-menu"]').trigger('click')
-    expect(wrapper.find('#mobile-navigation-menu').exists()).toBe(true)
+    expect(wrapper.find('#mobile-navigation-menu').classes()).toContain('block')
 
     route.path = '/exposures'
     route.fullPath = '/exposures'
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.find('#mobile-navigation-menu').exists()).toBe(false)
+    expect(wrapper.find('#mobile-navigation-menu').classes()).toContain('hidden')
   })
 })
