@@ -50,6 +50,10 @@ export const validateOAuthState = (expectedState: string | null): boolean => {
  * and redirect when a stored token has expired.
  *
  * Returns `null` if the token is malformed or the payload cannot be parsed.
+ *
+ * @example { "exp": 1785288286, "iat": 1785284686, "sub": "abc1234567DEF" } (full token)
+ * @example { "exp": 1785288286 } (minimal token)
+ * @example null (malformed token)
  */
 export const decodeJwtPayload = (token: string): JwtPayload | null => {
   try {
