@@ -175,7 +175,7 @@ defineExpose({
     <!-- Backdrop overlay (only when not in SearchOverlay). -->
     <div
       v-if="showAdvancedSearch && !props.inOverlay"
-      class="fixed inset-0 bg-gray-600/75 dark:bg-gray-900/75 backdrop-blur-sm z-100"
+      class="fixed inset-0 bg-gray-300/75 dark:bg-gray-700/75 md:bg-gray-600/75 md:dark:bg-gray-900/75 backdrop-blur-sm z-100"
       @click="handleBackdropClick"
     ></div>
     <div class="flex flex-col md:flex-row items-center md:justify-between gap-2 w-full transition-all relative z-200">
@@ -198,7 +198,7 @@ defineExpose({
       <ActionButton
         variant="secondary"
         size="lg"
-        class="focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
+        class="focus-visible:ring-2 focus-visible:ring-primary focus:outline-none relative"
         aria-label="Advanced Search"
         :aria-expanded="showAdvancedSearch"
         @click="toggleAdvancedSearch"
