@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
-import { Cookie } from '@/utils/cookie'
 import { COOKIE } from '@/constants/global'
+import { Cookie } from '@/utils/cookie'
 
 const isVisible = ref(true)
 
