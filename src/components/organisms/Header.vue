@@ -20,7 +20,7 @@ const menuContainerClasses = computed(() => [
   'md:bg-transparent md:shadow-none md:border-0',
 ])
 
-const menuBoxClasses = ['flex flex-col md:flex-row gap-4 align-center']
+const menuBoxClasses = ['flex flex-col md:flex-row gap-4']
 
 const navLinkClasses = [
   'block rounded-md px-3 py-2',
