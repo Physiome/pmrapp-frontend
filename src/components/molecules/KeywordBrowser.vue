@@ -78,11 +78,12 @@ const searchFieldInputClass = computed(() => {
       <div
         v-for="category in cellmlKeywordCategory"
         :key="category.kind"
-        :class="{ 'box p-6': !inSidebar }"
+        class="p-4!"
+        :class="{ 'box': !inSidebar }"
       >
         <div
           class="flex items-center mb-4 gap-4"
-          :class="{ 'justify-end mb-6': !inSidebar }"
+          :class="{ 'justify-end mb-4': !inSidebar }"
         >
           <SearchField
             v-if="category.kindInfo"

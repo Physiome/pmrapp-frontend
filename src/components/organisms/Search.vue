@@ -156,9 +156,9 @@ const handleRefresh = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
     <SearchInput
-      class="flex-1 w-full sm:w-auto"
+      class="w-full lg:flex-1 lg:w-auto"
       ref="searchInputRef"
       :initial-kind="''"
       :initial-term="searchQueryParam"
@@ -166,22 +166,24 @@ const handleRefresh = async () => {
       @search="handleSearch"
       @querySearch="handleQuerySearch"
     />
-    <SortDropdown
-      :disabled="!(hasResults || isLoading)"
-      :model-value="sortBy"
-      :options="SORT_OPTIONS_GROUPED"
-      @update:model-value="(value) => (sortBy = value)"
-    />
-    <ActionButton
-      :disabled="!(hasResults || isLoading)"
-      variant="secondary"
-      size="lg"
-      content-section="Search Results"
-      @click="handleRefresh"
-    >
-      <RefreshIcon />
-      <span>{{ isLoading ? 'Loading...' : 'Refresh' }}</span>
-    </ActionButton>
+    <div class="flex w-full gap-4 lg:w-auto lg:flex-row lg:items-center justify-end">
+      <SortDropdown
+        :disabled="!(hasResults || isLoading)"
+        :model-value="sortBy"
+        :options="SORT_OPTIONS_GROUPED"
+        @update:model-value="(value) => (sortBy = value)"
+      />
+      <ActionButton
+        :disabled="!(hasResults || isLoading)"
+        variant="secondary"
+        size="lg"
+        content-section="Search Results"
+        @click="handleRefresh"
+      >
+        <RefreshIcon />
+        <span>{{ isLoading ? 'Loading...' : 'Refresh' }}</span>
+      </ActionButton>
+    </div>
   </div>
   <div class="mt-8">
     <main class="flex-1 min-w-0 relative">

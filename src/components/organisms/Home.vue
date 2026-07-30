@@ -5,7 +5,7 @@ import NavigationCard from '@/components/molecules/NavigationCard.vue'
 
 <template>
   <section class="text-center mt-8 mb-16">
-    <h1 class="text-5xl font-bold mb-8">
+    <h1 class="text-5xl font-bold mb-8 leading-tight md:leading-normal">
       Physiome Model Repository
     </h1>
     <p class="text-xl max-w-3xl mx-auto leading-relaxed">
