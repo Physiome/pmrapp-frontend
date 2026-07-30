@@ -339,7 +339,7 @@ const handleClearAllFilters = (): void => {
     :class="`top-full left-0 w-full z-200 ${inOverlay ? '' : 'absolute'}`"
   >
     <div class="mt-2 box box-small overflow-hidden !shadow-none !p-0">
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <p class="text-gray-500 dark:text-gray-400 text-sm">
           Click a term to add it to your search or use the filter to narrow results.
         </p>
