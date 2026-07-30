@@ -12,7 +12,7 @@ const isSearchOverlayVisible = ref(false)
 const isMobileMenuOpen = ref(false)
 const globalState = useGlobalStateStore()
 
-const menuContainerClasses = computed(() =>[
+const menuContainerClasses = computed(() => [
   isMobileMenuOpen.value ? 'block' : 'hidden',
   'absolute top-full left-0 w-full p-4 z-10',
   'bg-surface shadow-lg border-t border-gray-200 dark:border-gray-700',
@@ -20,13 +20,11 @@ const menuContainerClasses = computed(() =>[
   'md:bg-transparent md:shadow-none md:border-0',
 ])
 
-const menuBoxClasses = [
-  'flex flex-col md:flex-row gap-4 align-center',
-]
+const menuBoxClasses = ['flex flex-col md:flex-row gap-4 align-center']
 
 const navLinkClasses = [
   'block rounded-md px-3 py-2',
-  'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
+  'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors',
 ]
 
 const handleSearchClick = () => {

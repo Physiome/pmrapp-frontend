@@ -83,29 +83,27 @@ const cases: Case[] = [
 ]
 
 describe('FormattedEmailText', () => {
-  it.each(cases)('renders "$input" correctly', ({
-    input,
-    expectedText,
-    expectedLinked,
-    expectedHref,
-  }) => {
-    const wrapper = mount(FormattedEmailText, {
-      props: {
-        text: input,
-      },
-    })
+  it.each(cases)(
+    'renders "$input" correctly',
+    ({ input, expectedText, expectedLinked, expectedHref }) => {
+      const wrapper = mount(FormattedEmailText, {
+        props: {
+          text: input,
+        },
+      })
 
-    if (expectedLinked) {
-      const link = wrapper.find('a')
-      expect(link.exists()).toBe(true)
-      expect(link.text()).toBe(expectedText)
-      expect(link.attributes('href')).toBe(expectedHref)
-    } else {
-      const link = wrapper.find('a')
-      expect(link.exists()).toBe(false)
-      expect(wrapper.text()).toBe(expectedText)
-    }
+      if (expectedLinked) {
+        const link = wrapper.find('a')
+        expect(link.exists()).toBe(true)
+        expect(link.text()).toBe(expectedText)
+        expect(link.attributes('href')).toBe(expectedHref)
+      } else {
+        const link = wrapper.find('a')
+        expect(link.exists()).toBe(false)
+        expect(wrapper.text()).toBe(expectedText)
+      }
 
-    wrapper.unmount()
-  })
+      wrapper.unmount()
+    },
+  )
 })

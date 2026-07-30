@@ -11,7 +11,7 @@ const buttonClasses = [
   'hover:opacity-90 transition duration-200 ease-linear text-base',
   'rounded-md disabled:opacity-60 disabled:cursor-not-allowed',
   'inline-flex items-center justify-center gap-2 cursor-pointer',
-  'focus:outline-none focus:ring-1 focus:ring-primary'
+  'focus:outline-none focus:ring-1 focus:ring-primary',
 ]
 
 const dismissCookieBanner = async () => {

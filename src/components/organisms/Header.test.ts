@@ -26,17 +26,18 @@ describe('Header', () => {
     route.fullPath = '/'
   })
 
-  const mountHeader = () => mount(Header, {
-    global: {
-      stubs: {
-        RouterLink: RouterLinkStub,
-        SearchIcon: true,
-        SearchOverlay: true,
-        UserDropdown: true,
-        Tooltip: true,
+  const mountHeader = () =>
+    mount(Header, {
+      global: {
+        stubs: {
+          RouterLink: RouterLinkStub,
+          SearchIcon: true,
+          SearchOverlay: true,
+          UserDropdown: true,
+          Tooltip: true,
+        },
       },
-    },
-  })
+    })
 
   it('has the logo with alt text', () => {
     const wrapper = mountHeader()
