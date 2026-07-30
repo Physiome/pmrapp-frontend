@@ -5,7 +5,7 @@ This document covers deployment to production environments other than GitHub Pag
 ## Scope
 
 - This app is a static Vue/Vite build output (`dist/`).
-- Production target is a root domain (for example `https://www.pmrapp.com`) with `VITE_BASE_PATH=/`.
+- Production target is a root domain with `VITE_BASE_PATH=/`.
 - GitHub Pages-specific fallback behaviour is optional and controlled by environment variable.
 
 ## Prerequisites
@@ -123,7 +123,7 @@ A non-GitHub Pages workflow template is available at [.github/workflows/deploy-p
 
 Behaviour:
 
-- On push to `main`, it performs a production build and uploads `dist/` as an artefact.
+- On push to `production`, it performs a production build and uploads `dist/` as an artefact.
 - On manual run (`workflow_dispatch`), it can also run a deployment placeholder job when `run_deploy=true`.
 
 Defaults in this template are aligned with standard production hosting:
