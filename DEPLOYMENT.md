@@ -25,7 +25,7 @@ Set these in your CI/CD configuration or shell before running `bun run build`. S
 - `VITE_GITHUB_CLIENT_ID`: Public client ID of the GitHub OAuth application used for sign-in. Example: `Ov23liExampleClientId`.
 - `VITE_GITHUB_AUTH_API`: Base URL of the backend endpoint that completes GitHub OAuth authentication. _(This is used for GitHub login.)_ Example: `https://auth.[example-pmrapp-dev].com`.
 
-The API and download URLs are required for their respective application features. The GitHub OAuth values are required when GitHub sign-in is enabled; omit both only if the deployed application intentionally does not offer GitHub login.
+The API and download URLs are required for their respective application features. The GitHub OAuth values are required for GitHub sign-in; if they are unset, the GitHub login flow will fail (the UI currently always shows the GitHub login option).
 
 ### Optional or Deployment-Specific Variables
 
