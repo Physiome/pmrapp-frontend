@@ -10,7 +10,7 @@ This document covers deployment to production environments other than GitHub Pag
 
 ## Prerequisites
 
-- Node.js: `^20.19.0` or `>=22.12.0` (see [package.json](package.json)).
+- Node.js: `>=22.12.0` (see [package.json](package.json)).
 - Bun: use Bun for install/build commands in this repository.
 - Environment variables configured for your production API/auth endpoints.
 
