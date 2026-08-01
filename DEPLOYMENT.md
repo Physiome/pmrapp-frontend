@@ -36,9 +36,9 @@ The API and download URLs are required for their respective application features
 
 ### Optional or Deployment-Specific Variables
 
-- `VITE_GA_MEASUREMENT_ID`: Optional Google Analytics 4 measurement ID. Set it to a value such as `G-ABC123DEFG` to enable analytics; leave it unset to disable analytics.
+- `VITE_GA_MEASUREMENT_ID`: Google Analytics 4 measurement ID. Set it to a value such as `G-ABC123DEFG` to enable analytics; leave it unset to disable analytics.
 - `VITE_BASE_PATH`: Deployment path used for generated asset and router URLs. Use `/` for a root-domain deployment. It defaults to `/` when omitted. GitHub Pages project deployments instead use a repository path, such as `/pmrapp-frontend/`.
-- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`: Enables the GitHub Pages query-string redirect helper. It is optional and defaults to `false`. Set it to `true` only for GitHub Pages project deployments; use `false` for Nginx, S3/CloudFront, and other standard hosts with SPA rewrite rules.
+- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`: Enables the GitHub Pages query-string redirect helper. It defaults to `false`. Set it to `true` only for GitHub Pages project deployments; use `false` for Nginx, S3/CloudFront, and other standard hosts with SPA rewrite rules.
 
 For example, a standard root-domain production environment can use:
 
