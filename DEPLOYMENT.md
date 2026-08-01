@@ -23,7 +23,7 @@ This document covers deployment to production environments other than GitHub Pag
 
 ## Build-Time Environment Variables
 
-Set these in your CI/CD configuration or shell before running `bun run build`. See [`.env.example`](.env.example) for the full local-development template and its placeholder values. Vite embeds these values in the generated client bundle, so do not use them for secrets.
+Set these environment variables in your CI/CD configuration or shell before running `bun run build`. See [`.env.example`](.env.example) for the full local-development template and its placeholder values. Vite embeds these values in the generated client bundle, so <u>**do not**</u> use them for secrets.
 
 ### Required for a Full Production Deployment
 
