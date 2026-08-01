@@ -12,7 +12,14 @@ This document covers deployment to production environments other than GitHub Pag
 
 - Node.js: `>=22.12.0` (see [package.json](package.json)).
 - [Bun](https://bun.sh/) `>=1.3.3` (used for install/build commands in this repository).
-- Environment variables configured for your production API/auth endpoints.
+- Environment variables configured for your production API/auth endpoints:
+  - `VITE_API_BASE_URL`
+  - `VITE_DOWNLOAD_API`
+  - `VITE_GITHUB_CLIENT_ID`
+  - `VITE_GITHUB_AUTH_API`
+  - `VITE_GA_MEASUREMENT_ID`
+  - `VITE_BASE_PATH`
+  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`
 
 ## Build-Time Environment Variables
 
