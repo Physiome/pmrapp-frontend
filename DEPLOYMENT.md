@@ -6,7 +6,7 @@ This document covers deployment to production environments other than GitHub Pag
 
 - This app is a static Vue/Vite build output (`dist/`).
 - Production target is a root domain with `VITE_BASE_PATH=/`.
-- GitHub Pages-specific fallback behaviour is optional and controlled by environment variable.
+- GitHub Pages-specific fallback behaviour is optional and controlled by the `VITE_ENABLE_GH_PAGES_SPA_REDIRECT` environment variable.
 
 ## Prerequisites
 
