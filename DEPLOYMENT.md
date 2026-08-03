@@ -119,6 +119,10 @@ server {
 
 4. Reload Nginx.
 
+```sh
+sudo systemctl reload nginx   # or: sudo nginx -s reload
+```
+
 ### Option 2: AWS S3 + CloudFront
 
 1. Build with production variables (`VITE_BASE_PATH=/`, redirect toggle `false`).
