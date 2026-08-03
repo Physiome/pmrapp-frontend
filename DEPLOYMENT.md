@@ -34,7 +34,7 @@ Set these environment variables in your CI/CD configuration or shell before runn
 - `VITE_GITHUB_CLIENT_ID`: Public client ID of the GitHub OAuth application used for sign-in. Example: `Ov23liExampleClientId`.
 - `VITE_GITHUB_AUTH_API`: Base URL of the backend endpoint that completes GitHub OAuth authentication. _(This is used for GitHub login.)_ Example: `https://auth.[example-pmrapp-dev].com`.
 
-The API and download URLs are required for their respective application features. The GitHub OAuth values are required for GitHub sign-in; if they are unset, the GitHub login flow will fail (the UI currently always shows the GitHub login option).
+The API and download URLs are required for their respective features, and the GitHub OAuth values are required for GitHub login option. `vite build` fails if any required variable is missing or invalid.
 
 ### Optional or Deployment-Specific Variables
 
@@ -172,6 +172,7 @@ Before using it for live deployment, replace the placeholder step with your prov
 ## Validation Checklist
 
 - Build succeeds with Bun.
+- `bun run build` fails with a clear message when a required variable is missing or invalid (verify by unsetting one and rebuilding).
 - `/` loads correctly on the production domain.
 - Deep-link refresh works (e.g., `/workspaces/...` doesn't return 404).
 - API requests resolve to production backend URLs.
