@@ -1,4 +1,4 @@
-name: Deploy production static site (template)
+name: Deploy production static site
 
 on:
   push:

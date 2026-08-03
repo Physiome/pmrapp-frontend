@@ -149,7 +149,7 @@ Then publish the `dist/` artefact using your platform's deployment mechanism.
 
 ## GitHub Actions Template for Production
 
-A non-GitHub Pages workflow template is available at [.github/workflows/deploy-production.yml](.github/workflows/deploy-production.yml).
+A non-GitHub Pages workflow template is available at [.github/workflows/deploy-production-template.yml](.github/workflows/deploy-production-template.yml).
 
 Behaviour:
 
