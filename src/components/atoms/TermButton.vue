@@ -9,10 +9,10 @@ interface Props {
 const props = defineProps<Props>()
 
 const buttonBaseClass = [
-  'px-3',
-  'py-1.5',
+  'px-2 md:px-3',
+  'py-1 md:py-1.5',
   'rounded-md',
-  'text-sm',
+  'text-xs md:text-sm',
   'transition-colors',
   'relative',
   'focus:outline-none',
