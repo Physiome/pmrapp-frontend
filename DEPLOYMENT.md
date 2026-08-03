@@ -125,7 +125,7 @@ sudo systemctl reload nginx   # or: sudo nginx -s reload
 
 ### Option 2: AWS S3 + CloudFront
 
-1. Build with production variables (`VITE_BASE_PATH=/`, redirect toggle `false`).
+1. Build with production variables (`VITE_BASE_PATH=/` and `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false`).
 2. Upload `dist/` contents to S3 bucket origin.
 3. Configure CloudFront custom error response to serve `/index.html` for 403/404 (SPA fallback).
 4. Attach your domain (for example `www.pmrapp.com`) and TLS certificate.
