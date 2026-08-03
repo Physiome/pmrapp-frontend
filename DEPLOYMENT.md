@@ -168,10 +168,12 @@ Before using it for live deployment, replace the placeholder step with your prov
 
 ## Environment Profiles
 
-- GitHub Pages: `VITE_BASE_PATH=/pmrapp-frontend/` (or configured repository path).
-- GitHub Pages: `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=true`.
-- Standard production: `VITE_BASE_PATH=/`.
-- Standard production: `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false`.
+- GitHub Pages:
+  - `VITE_BASE_PATH=/pmrapp-frontend/` (or another repository path).
+  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=true`.
+- Standard production:
+  - `VITE_BASE_PATH=/`.
+  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false`.
 
 ## Validation Checklist
 
