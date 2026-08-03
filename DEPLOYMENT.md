@@ -179,7 +179,7 @@ Before using it for live deployment, replace the placeholder step with your prov
 
 - Build succeeds with Bun.
 - `/` loads correctly on the production domain.
-- Deep-link refresh works (for example `/workspaces/...` loads without 404).
+- Deep-link refresh works (e.g., `/workspaces/...` doesn't return 404).
 - API requests resolve to production backend URLs.
 - OAuth callback and login flow work.
 - Optional analytics loads only when configured.
