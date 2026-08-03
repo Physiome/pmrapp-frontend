@@ -178,7 +178,7 @@ Before using it for live deployment, replace the placeholder step with your prov
 ## Validation Checklist
 
 - Build succeeds with Bun.
-- `/` loads correctly on production domain.
+- `/` loads correctly on the production domain.
 - Deep-link refresh works (for example `/workspaces/...` loads without 404).
 - API requests resolve to production backend URLs.
 - OAuth callback and login flow work.
