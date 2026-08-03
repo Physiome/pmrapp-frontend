@@ -75,8 +75,6 @@ Once the browser has loaded `index.html`, the Vue Router (see [src/router/index.
 
 Without this fallback, refreshing a deep link such as `/exposures/4e4` returns 404.
 
-The file [public/404.html](public/404.html) is only needed for the GitHub Pages fallback approach and is not required for standard production hosts with proper SPA rewrite rules.
-
 ## Deployment Patterns
 
 ### Option 1: Nginx on VM/Bare Metal (`/var/www` style)
