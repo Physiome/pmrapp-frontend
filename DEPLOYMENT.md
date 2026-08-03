@@ -72,15 +72,6 @@ Examples:
 
 If your server does not rewrite these requests to `index.html`, refreshing a deep link will return 404.
 
-## GitHub Pages Script Toggle
-
-The query-string redirect helper in [index.html](index.html) is now guarded by:
-
-- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=true` for GitHub Pages deployments.
-- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false` for standard production hosting.
-
-For non-GitHub production deployments, the redirect script should stay disabled.
-
 The file [public/404.html](public/404.html) is only needed for the GitHub Pages fallback approach and is not required for standard production hosts with proper SPA rewrite rules.
 
 ## Deployment Patterns
