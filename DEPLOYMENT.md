@@ -105,15 +105,15 @@ sudo rsync -av --delete dist/ /var/www/pmrapp/
 
 ```nginx
 server {
-		listen 80;
-		server_name www.pmrapp.com pmrapp.com;
+  listen 80;
+  server_name www.pmrapp.com pmrapp.com;
 
-		root /var/www/pmrapp;
-		index index.html;
+  root /var/www/pmrapp;
+  index index.html;
 
-		location / {
-				try_files $uri $uri/ /index.html;
-		}
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
 }
 ```
 
