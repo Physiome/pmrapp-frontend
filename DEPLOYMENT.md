@@ -182,4 +182,4 @@ Before using it for live deployment, replace the placeholder step with your prov
 - Deep-link refresh works (e.g., `/workspaces/...` doesn't return 404).
 - API requests resolve to production backend URLs.
 - OAuth callback and login flow work.
-- Optional analytics loads only when configured.
+- Optional analytics loads, when configured.
