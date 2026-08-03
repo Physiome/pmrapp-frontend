@@ -158,8 +158,8 @@ Behaviour:
 
 Defaults in this template are aligned with standard production hosting:
 
-- `VITE_BASE_PATH='/'`
-- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT='false'`
+- `VITE_BASE_PATH=/`
+- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false`
 
 Before using it for live deployment, replace the placeholder step with your provider commands, for example:
 
