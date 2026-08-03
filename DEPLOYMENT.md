@@ -145,7 +145,7 @@ bun install --frozen-lockfile
 bun run build
 ```
 
-Then publish the `dist/` artifact using your platform-specific deploy mechanism.
+Then publish the `dist/` artefact using your platform's deployment mechanism.
 
 ## GitHub Actions Template for Production
 
