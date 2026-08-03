@@ -63,14 +63,17 @@ Build output is generated in `dist/`.
 
 ## Important Routing Behaviour (SPA)
 
-The app uses history mode routing (see [src/router/index.ts](src/router/index.ts)), so the hosting platform must return `index.html` for unknown routes.
+The app is a single-page application: the build output (`dist/`) only contains `index.html`, the compiled assets, and the files copied from `public/`. There are **no** physical files or folders on the server for application routes such as:
 
-Examples:
+- `/exposures` — the exposures listing page
+- `/exposures/4e4` — a specific exposure's detail page
+- `/workspaces/baylor_hollingworth_chandler_2002` — a specific workspace's detail page
 
-- `/exposures`
-- `/workspaces/some-alias`
+Once the browser has loaded `index.html`, the Vue Router (see [src/router/index.ts](src/router/index.ts)) decides which page to render. But if a user opens one of these URLs directly or refreshes the page, the server receives a request for a path that doesn't exist on disk and would normally respond with 404.
 
-If your server does not rewrite these requests to `index.html`, refreshing a deep link will return 404.
+**Therefore the hosting platform must return `index.html` for any request that doesn't match a real file** — commonly known as an "SPA fallback" (or "history-mode rewrite"). Worked examples for Nginx, CloudFront, and other hosts are given in the [Deployment Patterns](#deployment-patterns) section.
+
+Without this fallback, refreshing a deep link such as `/exposures/4e4` returns 404.
 
 The file [public/404.html](public/404.html) is only needed for the GitHub Pages fallback approach and is not required for standard production hosts with proper SPA rewrite rules.
 
