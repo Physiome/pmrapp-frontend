@@ -25,6 +25,8 @@ This document covers deployment to production environments other than GitHub Pag
 
 Set these environment variables in your CI/CD configuration or shell before running `bun run build`. See [`.env.example`](.env.example) for the full local-development template and its placeholder values. Vite embeds these values in the generated client bundle, so <u>**do not**</u> use them for secrets.
 
+> **Note:** `VITE_API_BASE_URL_PROXY` (shown in [`.env.example`](.env.example)) is a CI-only variable. The app never reads it — it is a GitHub repository variable used by the e2e workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) to supply `VITE_API_BASE_URL` for tests. It does not need to be set for production deployments.
+
 ### Required for a Full Production Deployment
 
 - `VITE_API_BASE_URL`: Base URL of the PMR backend API used for search, exposures, and workspaces. Example: `https://pmr3.demo.physiomeproject.org/`.
