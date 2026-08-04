@@ -136,14 +136,16 @@ const route = useRoute()
 const searchStore = useSearchStore()
 
 const backButtonLabel = computed(() => {
-  if (router.options.history.state.back) {
-    if (router.options.history.state.back === '/exposures') {
-      return 'Back to exposures'
-    }
-    return 'Back'
+  // Accessing route.path registers the reactive dependency.
+  // biome-lint-ignore-next-line no-unused-vars
+  const currentPath = route.path
+  const backPath = router.options.history.state.back
+
+  if (backPath === '/exposures') {
+    return 'Back to exposures'
   }
 
-  return 'Back to exposures'
+  return backPath ? 'Back' : 'Back to exposures'
 })
 
 const fileBrowserPath = computed(() => {
