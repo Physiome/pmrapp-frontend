@@ -135,6 +135,17 @@ const router = useRouter()
 const route = useRoute()
 const searchStore = useSearchStore()
 
+const backButtonLabel = computed(() => {
+  if (router.options.history.state.back) {
+    if (router.options.history.state.back === '/exposures') {
+      return 'Back to exposures'
+    }
+    return 'Back'
+  }
+
+  return 'Back to exposures'
+})
+
 const fileBrowserPath = computed(() => {
   const p = route.query.path
   return typeof p === 'string' ? p : undefined
@@ -663,7 +674,7 @@ onMounted(async () => {
 
 <template>
   <BackButton
-    label="Back to exposures"
+    :label="backButtonLabel"
     content-section="Exposure Detail"
     :on-click="goBack"
   />
