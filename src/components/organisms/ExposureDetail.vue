@@ -136,8 +136,7 @@ const route = useRoute()
 const searchStore = useSearchStore()
 
 const backButtonLabel = computed(() => {
-  // Accessing route.path registers the reactive dependency.
-  // biome-lint-ignore-next-line no-unused-vars
+  // biome-ignore lint/correctness/noUnusedVariables: Need to access route.path for Vue reactivity
   const currentPath = route.path
   const backPath = router.options.history.state.back
 
