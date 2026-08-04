@@ -25,8 +25,18 @@ const handleClick = () => {
       variant="link"
       :content-section="contentSection"
       @click="handleClick"
+      class="back-button"
     >
-      &larr; {{ label }}
+      {{ label }}
     </ActionButton>
   </div>
 </template>
+
+<style scoped>
+  .back-button {
+    &::before {
+      content: '\2190';
+      display: inline-block;
+    }
+  }
+</style>
