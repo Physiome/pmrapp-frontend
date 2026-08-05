@@ -135,6 +135,19 @@ const router = useRouter()
 const route = useRoute()
 const searchStore = useSearchStore()
 
+const backButtonLabel = computed(() => {
+  // Need to access route.path for Vue reactivity.
+  void route.path
+  const backPath = router.options.history.state.back
+  const backPathname = typeof backPath === 'string' ? backPath.split(/[?#]/)[0] : ''
+
+  if (backPathname === '/exposures') {
+    return 'Back to exposures'
+  }
+
+  return backPath ? 'Back' : 'Back to exposures'
+})
+
 const fileBrowserPath = computed(() => {
   const p = route.query.path
   return typeof p === 'string' ? p : undefined
@@ -663,7 +676,7 @@ onMounted(async () => {
 
 <template>
   <BackButton
-    label="Back to exposures"
+    :label="backButtonLabel"
     content-section="Exposure Detail"
     :on-click="goBack"
   />
