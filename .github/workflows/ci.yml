@@ -9,6 +9,10 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     env:
+      # This is a test build, not a deployment: the download and OAuth secrets
+      # are intentionally not available on PRs, so bypass the required-variable
+      # validation that otherwise fails `vite build`.
+      SKIP_ENV_VALIDATION: 'true'
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL_PROXY || '' }}
       VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
     steps:
