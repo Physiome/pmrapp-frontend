@@ -137,7 +137,7 @@ const searchStore = useSearchStore()
 
 const backButtonLabel = computed(() => {
   // Need to access route.path for Vue reactivity.
-  const currentPath = route.path
+  void route.path
   const backPath = router.options.history.state.back
 
   if (backPath === '/exposures') {
