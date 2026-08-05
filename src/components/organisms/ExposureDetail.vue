@@ -139,8 +139,9 @@ const backButtonLabel = computed(() => {
   // Need to access route.path for Vue reactivity.
   void route.path
   const backPath = router.options.history.state.back
+  const backPathname = typeof backPath === 'string' ? backPath.split(/[?#]/)[0] : ''
 
-  if (backPath === '/exposures') {
+  if (backPathname === '/exposures') {
     return 'Back to exposures'
   }
 
