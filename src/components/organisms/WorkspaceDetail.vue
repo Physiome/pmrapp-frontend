@@ -67,7 +67,7 @@ const backButtonText = computed(() => {
 const workspaceArchiveFilename = computed(() => {
   if (!workspaceInfo.value) return ''
 
-  return workspaceInfo.value.workspace.description || ''
+  return workspaceInfo.value.workspace.description || props.alias
 })
 
 const workspaceArchiveUrlBase = computed(() => {

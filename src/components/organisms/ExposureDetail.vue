@@ -247,7 +247,7 @@ const createdYear = computed(() => {
 const workspaceArchiveFilename = computed(() => {
   if (!exposureInfo.value) return ''
 
-  return exposureInfo.value.exposure.description || ''
+  return exposureInfo.value.exposure.description || exposureInfo.value.workspace_alias
 })
 
 const workspaceArchiveUrlBase = computed(() => {
