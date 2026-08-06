@@ -244,6 +244,12 @@ const createdYear = computed(() => {
   return formatYear(exposureInfo.value.exposure.created_ts)
 })
 
+const workspaceArchiveFilename = computed(() => {
+  if (!exposureInfo.value) return ''
+
+  return exposureInfo.value.exposure.description || ''
+})
+
 const workspaceArchiveUrlBase = computed(() => {
   if (!exposureInfo.value) return ''
 
@@ -894,7 +900,7 @@ onMounted(async () => {
                 variant="secondary"
                 size="sm"
                 :href="`${workspaceArchiveUrlBase}zip`"
-                download
+                :download="workspaceArchiveFilename"
                 content-section="Exposure Detail"
               >
                 <DownloadIcon class="w-4 h-4" />
@@ -906,7 +912,7 @@ onMounted(async () => {
                 variant="secondary"
                 size="sm"
                 :href="`${workspaceArchiveUrlBase}tgz`"
-                download
+                :download="workspaceArchiveFilename"
                 content-section="Exposure Detail"
               >
                 <DownloadIcon class="w-4 h-4" />

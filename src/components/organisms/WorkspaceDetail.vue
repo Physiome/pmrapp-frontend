@@ -64,6 +64,12 @@ const backButtonText = computed(() => {
   return !props.path ? 'Back to workspaces' : `Back to ${props.path}`
 })
 
+const workspaceArchiveFilename = computed(() => {
+  if (!workspaceInfo.value) return ''
+
+  return workspaceInfo.value.workspace.description || ''
+})
+
 const workspaceArchiveUrlBase = computed(() => {
   if (!workspaceInfo.value) return ''
 
@@ -170,7 +176,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             variant="secondary"
             size="sm"
             :href="`${workspaceArchiveUrlBase}zip`"
-            download
+            :download="workspaceArchiveFilename"
             content-section="Workspace Detail"
           >
             <DownloadIcon class="w-4 h-4" />
@@ -180,7 +186,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             variant="secondary"
             size="sm"
             :href="`${workspaceArchiveUrlBase}tgz`"
-            download
+            :download="workspaceArchiveFilename"
             content-section="Workspace Detail"
           >
             <DownloadIcon class="w-4 h-4" />
