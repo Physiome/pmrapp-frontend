@@ -41,11 +41,12 @@ describe('It covers navigation and routing.', () => {
   })
 
   describe('Footer', () => {
-    it('displays the footer with copyright information.', () => {
+    it('displays the footer.', () => {
       cy.visit('/')
       cy.get('footer').should('be.visible')
-      cy.get('footer').contains('IUPS Physiome project')
-      cy.get('footer').contains(new Date().getFullYear().toString())
+      // In the new update, the copyright has been removed.
+      // cy.get('footer').contains('IUPS Physiome project')
+      // cy.get('footer').contains(new Date().getFullYear().toString())
     })
 
     it('contains GitHub repository links.', () => {
