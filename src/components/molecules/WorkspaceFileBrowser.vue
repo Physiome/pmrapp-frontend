@@ -12,7 +12,7 @@ import FileBrowserBreadcrumb from '@/components/molecules/FileBrowserBreadcrumb.
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
-import { downloadWorkspaceFile } from '@/utils/download'
+import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
 import { isOpenCORFile } from '@/utils/file'
 import { formatFileCount } from '@/utils/format'
 
@@ -71,11 +71,15 @@ const buildOpenCorUrl = (filename: string): string => {
   return `//opencor.ws/app/?${opencorLink}`
 }
 
-const downloadFile = async (filename: string) => {
-  if (!workspaceInfo.value) return
+const buildWorkspaceFileUrl = (filename: string): string => {
+  if (!workspaceInfo.value) return ''
 
   const fullFilename = (props.path ? `${props.path}/` : '') + filename
-  await downloadWorkspaceFile(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
+  return getWorkspaceFileUrl(
+    props.alias,
+    workspaceInfo.value.commit.commit_id,
+    fullFilename,
+  )
 }
 
 const loadWorkspaceInfo = async () => {
@@ -191,8 +195,9 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
               v-if="entry.kind !== 'tree' && entry.kind !== 'commit'"
               variant="icon"
               size="sm"
+              :href="buildWorkspaceFileUrl(entry.name)"
+              :download="entry.name"
               content-section="Workspace Detail"
-              @click="downloadFile(entry.name)"
               tooltip="Download"
               aria-label="Download"
             >
