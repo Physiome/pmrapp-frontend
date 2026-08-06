@@ -17,6 +17,13 @@ vi.mock('vue-router', () => ({
     push: vi.fn(),
     back: vi.fn(),
     resolve: vi.fn(() => ({ href: '/exposures/test-alias' })),
+    options: {
+      history: {
+        state: {
+          back: '/exposures',
+        },
+      },
+    },
     currentRoute: {
       value: {
         query: {},
