@@ -33,8 +33,10 @@ describe('Workspace detail page', () => {
 
   it('renders the downloads section.', () => {
     cy.contains('Downloads').should('exist')
-    cy.get('button').contains('.zip').should('exist')
-    cy.get('button').contains('.tgz').should('exist')
+    // In the new update, the buttons changed to links.
+    // So, we support both for now.
+    cy.get('button, a').contains('.zip').should('exist')
+    cy.get('button, a').contains('.tgz').should('exist')
   })
 
   it('renders the file browser section.', () => {
