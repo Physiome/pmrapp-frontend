@@ -900,7 +900,7 @@ onMounted(async () => {
                 variant="secondary"
                 size="sm"
                 :href="`${workspaceArchiveUrlBase}zip`"
-                :download="workspaceArchiveFilename"
+                :download="`${workspaceArchiveFilename}.zip`"
                 content-section="Exposure Detail"
               >
                 <DownloadIcon class="w-4 h-4" />
@@ -912,7 +912,7 @@ onMounted(async () => {
                 variant="secondary"
                 size="sm"
                 :href="`${workspaceArchiveUrlBase}tgz`"
-                :download="workspaceArchiveFilename"
+                :download="`${workspaceArchiveFilename}.tgz`"
                 content-section="Exposure Detail"
               >
                 <DownloadIcon class="w-4 h-4" />
