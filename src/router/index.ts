@@ -14,6 +14,7 @@ import LoginView from '@/views/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SearchView from '@/views/SearchView.vue'
+import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
 import WorkspaceDetailView from '@/views/WorkspaceDetailView.vue'
 import WorkspaceView from '@/views/WorkspaceView.vue'
 
@@ -210,6 +211,12 @@ const router = createRouter({
       name: 'search-results',
       component: SearchView,
       meta: { title: `Search Results – ${TITLE}` },
+    },
+    {
+      path: '/feature-comparison',
+      name: 'feature-comparison',
+      component: FeatureComparisonView,
+      meta: { title: `Feature Comparison – ${TITLE}` },
     },
     {
       path: '/login',
