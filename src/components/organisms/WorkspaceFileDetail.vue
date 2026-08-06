@@ -15,6 +15,7 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
 import { getWorkspaceService } from '@/services'
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
+import { downloadWorkspaceFile } from '@/utils/download'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { WorkspaceInfo } from '@/types/workspace'
 import { trackButtonClick } from '@/utils/analytics'
@@ -147,6 +148,16 @@ const isTooLargeForPreview = computed(() => fileSizeBytes.value > MAX_PREVIEW_FI
 const downloadUrl = computed(() => {
   return getWorkspaceFileUrl(props.alias, props.commitId, props.path)
 })
+
+const downloadWorkspaceFileDetail = async (event: Event) => {
+  event.preventDefault()
+
+  try {
+    await downloadWorkspaceFile(props.alias, props.commitId, props.path)
+  } catch (err) {
+    console.error('Error downloading file:', err)
+  }
+}
 
 const toggleCodeWrap = () => {
   codeWrapActive.value = !codeWrapActive.value
@@ -317,6 +328,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
             :contentSection="pageTitle"
             :href="downloadUrl"
             :download="filename"
+            @click.prevent="downloadWorkspaceFileDetail"
             tooltip="Download"
             aria-label="Download"
           >

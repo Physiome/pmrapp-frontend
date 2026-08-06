@@ -14,6 +14,7 @@ import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
 import { isOpenCORFile } from '@/utils/file'
+import { downloadWorkspaceFile } from '@/utils/download'
 import { formatFileCount } from '@/utils/format'
 
 const props = defineProps<{
@@ -76,6 +77,22 @@ const buildWorkspaceFileUrl = (filename: string): string => {
 
   const fullFilename = (props.path ? `${props.path}/` : '') + filename
   return getWorkspaceFileUrl(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
+}
+
+const downloadWorkspaceFileEntry = async (event: Event, filename: string) => {
+  event.preventDefault()
+
+  if (!workspaceInfo.value) {
+    return
+  }
+
+  const fullFilename = (props.path ? `${props.path}/` : '') + filename
+
+  try {
+    await downloadWorkspaceFile(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
+  } catch (err) {
+    console.error('Error downloading file:', err)
+  }
 }
 
 const loadWorkspaceInfo = async () => {
@@ -196,6 +213,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
               content-section="Workspace Detail"
               tooltip="Download"
               aria-label="Download"
+              @click.prevent="downloadWorkspaceFileEntry($event, entry.name)"
             >
               <DownloadIcon class="w-4 h-4" />
               <span class="sr-only">Download {{ entry.name }}</span>
