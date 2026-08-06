@@ -255,7 +255,7 @@ const workspaceArchiveUrlBase = computed(() => {
 
   return getWorkspaceArchiveUrl(
     exposureInfo.value.workspace_alias,
-    exposureInfo.value.exposure.commit_id
+    exposureInfo.value.exposure.commit_id,
   )
 })
 

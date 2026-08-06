@@ -75,11 +75,7 @@ const buildWorkspaceFileUrl = (filename: string): string => {
   if (!workspaceInfo.value) return ''
 
   const fullFilename = (props.path ? `${props.path}/` : '') + filename
-  return getWorkspaceFileUrl(
-    props.alias,
-    workspaceInfo.value.commit.commit_id,
-    fullFilename,
-  )
+  return getWorkspaceFileUrl(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
 }
 
 const loadWorkspaceInfo = async () => {

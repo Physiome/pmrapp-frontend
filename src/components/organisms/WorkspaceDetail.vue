@@ -73,10 +73,7 @@ const workspaceArchiveFilename = computed(() => {
 const workspaceArchiveUrlBase = computed(() => {
   if (!workspaceInfo.value) return ''
 
-  return getWorkspaceArchiveUrl(
-    props.alias,
-    workspaceInfo.value.commit.commit_id
-  )
+  return getWorkspaceArchiveUrl(props.alias, workspaceInfo.value.commit.commit_id)
 })
 
 const pageTitle = computed(() => {
