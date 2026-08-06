@@ -6,11 +6,10 @@ import BackButton from '@/components/atoms/BackButton.vue'
 import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
-import LoadingIcon from '@/components/icons/LoadingIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
-import { downloadWorkspaceArchive } from '@/services/downloadUrlService'
+import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
@@ -27,8 +26,6 @@ const workspaceStore = useWorkspaceStore()
 const workspaceInfo = ref<WorkspaceInfo | null>(null)
 const error = ref<ErrorInfo | null>(null)
 const isLoading = ref(true)
-const isDownloadingWorkspaceZip = ref(false)
-const isDownloadingWorkspaceTgz = ref(false)
 const requestCounter = ref(0)
 
 const backPath = computed(() => {
@@ -67,27 +64,17 @@ const backButtonText = computed(() => {
   return !props.path ? 'Back to workspaces' : `Back to ${props.path}`
 })
 
-const handleDownloadWorkspaceArchive = async (format: 'zip' | 'tgz') => {
-  if (!workspaceInfo.value) return
+const workspaceArchiveFilename = computed(() => {
+  if (!workspaceInfo.value) return ''
 
-  const fileName = workspaceInfo.value.workspace.description || ''
-  const loadingRef = format === 'zip' ? isDownloadingWorkspaceZip : isDownloadingWorkspaceTgz
-  loadingRef.value = true
+  return workspaceInfo.value.workspace.description || props.alias
+})
 
-  try {
-    await downloadWorkspaceArchive(
-      workspaceInfo.value.workspace.url,
-      props.alias,
-      workspaceInfo.value.commit.commit_id,
-      format,
-      fileName,
-    )
-  } catch (err) {
-    console.error('Error downloading workspace archive:', err)
-  } finally {
-    loadingRef.value = false
-  }
-}
+const workspaceArchiveUrlBase = computed(() => {
+  if (!workspaceInfo.value) return ''
+
+  return getWorkspaceArchiveUrl(props.alias, workspaceInfo.value.commit.commit_id)
+})
 
 const pageTitle = computed(() => {
   return generateWorkspaceTitle(
@@ -185,23 +172,21 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
           <ActionButton
             variant="secondary"
             size="sm"
-            :disabled="isDownloadingWorkspaceZip"
-            @click="handleDownloadWorkspaceArchive('zip')"
+            :href="`${workspaceArchiveUrlBase}zip`"
+            :download="`${workspaceArchiveFilename}.zip`"
             content-section="Workspace Detail"
           >
-            <LoadingIcon v-if="isDownloadingWorkspaceZip" class="w-4 h-4" />
-            <DownloadIcon v-else class="w-4 h-4" />
+            <DownloadIcon class="w-4 h-4" />
             <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code> file)</span>
           </ActionButton>
           <ActionButton
             variant="secondary"
             size="sm"
-            :disabled="isDownloadingWorkspaceTgz"
-            @click="handleDownloadWorkspaceArchive('tgz')"
+            :href="`${workspaceArchiveUrlBase}tgz`"
+            :download="`${workspaceArchiveFilename}.tgz`"
             content-section="Workspace Detail"
           >
-            <LoadingIcon v-if="isDownloadingWorkspaceTgz" class="w-4 h-4" />
-            <DownloadIcon v-else class="w-4 h-4" />
+            <DownloadIcon class="w-4 h-4" />
             <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code> file)</span>
           </ActionButton>
         </div>

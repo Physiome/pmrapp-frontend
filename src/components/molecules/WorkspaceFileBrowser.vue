@@ -9,6 +9,7 @@ import FolderIcon from '@/components/icons/FolderIcon.vue'
 import GitIcon from '@/components/icons/GitIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import FileBrowserBreadcrumb from '@/components/molecules/FileBrowserBreadcrumb.vue'
+import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
@@ -71,11 +72,27 @@ const buildOpenCorUrl = (filename: string): string => {
   return `//opencor.ws/app/?${opencorLink}`
 }
 
-const downloadFile = async (filename: string) => {
-  if (!workspaceInfo.value) return
+const buildWorkspaceFileUrl = (filename: string): string => {
+  if (!workspaceInfo.value) return ''
 
   const fullFilename = (props.path ? `${props.path}/` : '') + filename
-  await downloadWorkspaceFile(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
+  return getWorkspaceFileUrl(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
+}
+
+const downloadWorkspaceFileEntry = async (event: Event, filename: string) => {
+  event.preventDefault()
+
+  if (!workspaceInfo.value) {
+    return
+  }
+
+  const fullFilename = (props.path ? `${props.path}/` : '') + filename
+
+  try {
+    await downloadWorkspaceFile(props.alias, workspaceInfo.value.commit.commit_id, fullFilename)
+  } catch (err) {
+    console.error('Error downloading file:', err)
+  }
 }
 
 const loadWorkspaceInfo = async () => {
@@ -191,10 +208,12 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
               v-if="entry.kind !== 'tree' && entry.kind !== 'commit'"
               variant="icon"
               size="sm"
+              :href="buildWorkspaceFileUrl(entry.name)"
+              :download="entry.name"
               content-section="Workspace Detail"
-              @click="downloadFile(entry.name)"
               tooltip="Download"
               aria-label="Download"
+              @click.prevent="downloadWorkspaceFileEntry($event, entry.name)"
             >
               <DownloadIcon class="w-4 h-4" />
               <span class="sr-only">Download {{ entry.name }}</span>

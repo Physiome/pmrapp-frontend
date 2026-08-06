@@ -35,7 +35,10 @@ describe('validateRequiredEnv', () => {
   })
 
   it('rejects non-http(s) protocols', () => {
-    const { problems } = validateRequiredEnv({ ...validEnv, VITE_DOWNLOAD_API: 'ftp://example.com' })
+    const { problems } = validateRequiredEnv({
+      ...validEnv,
+      VITE_DOWNLOAD_API: 'ftp://example.com',
+    })
     expect(problems.some((problem) => problem.name === 'VITE_DOWNLOAD_API')).toBe(true)
   })
 

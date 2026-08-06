@@ -21,6 +21,9 @@ This document covers deployment to production environments other than GitHub Pag
   - `VITE_BASE_PATH`; and
   - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`.
 
+- Optional when the app host and download API host differ:
+  - `VITE_DOWNLOAD_HOST`.
+
 ## Build-Time Environment Variables
 
 Set these environment variables in your CI/CD configuration or shell before running `bun run build`. See [`.env.example`](.env.example) for the full local-development template and its placeholder values. Vite embeds these values in the generated client bundle, so <ins>**do not**</ins> use them for secrets.
@@ -41,6 +44,7 @@ The API and download URLs are required for their respective features, and the Gi
 - `VITE_GA_MEASUREMENT_ID`: Google Analytics 4 measurement ID. Set it to a value such as `G-ABC123DEFG` to enable analytics; leave it unset to disable analytics.
 - `VITE_BASE_PATH`: Deployment path used for generated asset and router URLs. Use `/` for a root-domain deployment. It defaults to `/` when omitted. GitHub Pages project deployments instead use a repository path, such as `/pmrapp-frontend/`.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`: Enables the GitHub Pages query-string redirect helper. It defaults to `false`. Set it to `true` only for GitHub Pages project deployments; use `false` for Nginx, S3/CloudFront, and other standard hosts with SPA rewrite rules.
+- `VITE_DOWNLOAD_HOST`: Optional base URL for workspace archive links when download routes are served from a different origin than the app. If unset, the app uses the current host. Not required for same-origin production deployments.
 
 For example, a standard root-domain production environment can use:
 

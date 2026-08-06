@@ -45,6 +45,7 @@ jobs:
           VITE_ENABLE_GH_PAGES_SPA_REDIRECT: 'true'
           VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
           VITE_DOWNLOAD_API: ${{ secrets.VITE_DOWNLOAD_API }}
+          VITE_DOWNLOAD_HOST: ${{ secrets.VITE_DOWNLOAD_HOST }}
           VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
           VITE_GITHUB_AUTH_API: ${{ secrets.VITE_GITHUB_AUTH_API }}
 
