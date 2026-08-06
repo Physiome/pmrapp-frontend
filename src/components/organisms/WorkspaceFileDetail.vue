@@ -15,10 +15,10 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
 import { getWorkspaceService } from '@/services'
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
-import { downloadWorkspaceFile } from '@/utils/download'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { WorkspaceInfo } from '@/types/workspace'
 import { trackButtonClick } from '@/utils/analytics'
+import { downloadWorkspaceFile } from '@/utils/download'
 import {
   isCodeFile,
   isImageFile,

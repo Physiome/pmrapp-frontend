@@ -13,8 +13,8 @@ import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
-import { isOpenCORFile } from '@/utils/file'
 import { downloadWorkspaceFile } from '@/utils/download'
+import { isOpenCORFile } from '@/utils/file'
 import { formatFileCount } from '@/utils/format'
 
 const props = defineProps<{
