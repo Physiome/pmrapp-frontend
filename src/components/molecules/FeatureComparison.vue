@@ -18,7 +18,6 @@ onMounted(() => {
   Papa.parse(SHEET_CSV_URL, {
     download: true,
     header: true,
-    newline: '', // auto-detect
     dynamicTyping: true,
     skipEmptyLines: true,
     complete: (results: ParseCompleteResults) => {

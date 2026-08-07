@@ -9,12 +9,12 @@ import { generateExposureTitle, resolveExposureFileTitle } from '@/utils/exposur
 import { generateWorkspaceTitle } from '@/utils/workspace'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
 import ExposureView from '@/views/ExposureView.vue'
+import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SearchView from '@/views/SearchView.vue'
-import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
 import WorkspaceDetailView from '@/views/WorkspaceDetailView.vue'
 import WorkspaceView from '@/views/WorkspaceView.vue'
 
