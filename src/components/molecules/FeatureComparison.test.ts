@@ -83,7 +83,7 @@ describe('FeatureComparison', () => {
       message: 'Failed to detect delimiter',
     }
 
-    mockPapaInstance.parse.mockImplementation((url: string, config: { error: Function }) => {
+    mockPapaInstance.parse.mockImplementation((_url: string, config: { error: (error: ParseErrorEvent) => void }) => {
       config.error(mockError)
     })
 
@@ -106,7 +106,7 @@ describe('FeatureComparison', () => {
   })
 
   it('renders table with correct headers when data loads successfully', async () => {
-    mockPapaInstance.parse.mockImplementation((url: string, config: { complete: Function }) => {
+    mockPapaInstance.parse.mockImplementation((_url: string, config: { complete: (result: ParseCompleteResults) => void }) => {
       config.complete(mockParsedResults)
     })
 
@@ -130,7 +130,7 @@ describe('FeatureComparison', () => {
   })
 
   it('renders table rows with correct data', async () => {
-    mockPapaInstance.parse.mockImplementation((url: string, config: { complete: Function }) => {
+    mockPapaInstance.parse.mockImplementation((_url: string, config: { complete: (result: ParseCompleteResults) => void }) => {
       config.complete(mockParsedResults)
     })
 
@@ -163,7 +163,7 @@ describe('FeatureComparison', () => {
   })
 
   it('applies correct styling to feature column cells', async () => {
-    mockPapaInstance.parse.mockImplementation((url: string, config: { complete: Function }) => {
+    mockPapaInstance.parse.mockImplementation((_url: string, config: { complete: (result: ParseCompleteResults) => void }) => {
       config.complete(mockParsedResults)
     })
 
@@ -192,7 +192,7 @@ describe('FeatureComparison', () => {
   })
 
   it('calls Papa.parse with correct configuration', async () => {
-    mockPapaInstance.parse.mockImplementation((url: string, config: { complete: Function }) => {
+    mockPapaInstance.parse.mockImplementation((_url: string, config: { complete: (result: ParseCompleteResults) => void }) => {
       config.complete(mockParsedResults)
     })
 
