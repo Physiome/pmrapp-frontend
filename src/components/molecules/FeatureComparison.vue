@@ -54,13 +54,14 @@ onMounted(() => {
     :error="errorMessage"
   />
 
-  <div v-else class="box p-0! overflow-hidden">
-    <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4">
+  <div v-else class="box p-0! overflow-hidden" role="table">
+    <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4" role="row">
       <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
         <div
           v-for="header in tableHeaders"
           :key="header"
           class="text-left font-semibold text-gray-900 dark:text-gray-100 capitalize"
+          role="columnheader"
         >
           {{ header }}
         </div>
@@ -71,6 +72,7 @@ onMounted(() => {
         v-for="row in tableData"
         :key="row.id"
         class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        role="row"
       >
         <div class="px-4 py-3 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
           <div
@@ -78,6 +80,7 @@ onMounted(() => {
             :key="header + row.id"
             class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words"
             :class="header === 'feature' ? 'font-medium text-gray-900 dark:text-gray-100' : ''"
+            role="cell"
           >
             {{ row[header] }}
           </div>
