@@ -15,7 +15,7 @@ interface Props {
   href?: string
   disabled?: boolean
   contentSection?: string
-  download?: boolean
+  download?: string | boolean
   target?: string
   rel?: string
   tooltip?: string

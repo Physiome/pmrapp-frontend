@@ -19,7 +19,7 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
 import { TITLE } from '@/constants/global'
-import { downloadCOMBINEArchive, downloadWorkspaceArchive } from '@/services/downloadUrlService'
+import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useExposureStore } from '@/stores/exposure'
 import { useSearchStore } from '@/stores/search'
 import type { ErrorInfo } from '@/types/error'
@@ -125,8 +125,6 @@ const licenseInfo = ref<string>(DEFAULT_LICENSE)
 const availableViews = ref<ViewEntry[]>([])
 const isCitationDetailsOpen = ref(false)
 const hasOtherRelatedModels = ref(false)
-const isDownloadingWorkspaceZip = ref(false)
-const isDownloadingWorkspaceTgz = ref(false)
 const isDownloadingCOMBINE = ref(false)
 const loadedFileTitle = ref('')
 const { goBack } = useBackNavigation('/exposures')
@@ -246,27 +244,20 @@ const createdYear = computed(() => {
   return formatYear(exposureInfo.value.exposure.created_ts)
 })
 
-const handleDownloadWorkspaceArchive = async (format: 'zip' | 'tgz') => {
-  if (!exposureInfo.value) return
+const workspaceArchiveFilename = computed(() => {
+  if (!exposureInfo.value) return ''
 
-  const fileName = exposureInfo.value.exposure.description || ''
-  const loadingRef = format === 'zip' ? isDownloadingWorkspaceZip : isDownloadingWorkspaceTgz
-  loadingRef.value = true
+  return exposureInfo.value.exposure.description || exposureInfo.value.workspace_alias
+})
 
-  try {
-    await downloadWorkspaceArchive(
-      exposureInfo.value.workspace.url,
-      exposureInfo.value.workspace_alias,
-      exposureInfo.value.exposure.commit_id,
-      format,
-      fileName,
-    )
-  } catch (err) {
-    console.error('Error downloading workspace archive:', err)
-  } finally {
-    loadingRef.value = false
-  }
-}
+const workspaceArchiveUrlBase = computed(() => {
+  if (!exposureInfo.value) return ''
+
+  return getWorkspaceArchiveUrl(
+    exposureInfo.value.workspace_alias,
+    exposureInfo.value.exposure.commit_id,
+  )
+})
 
 const handleDownloadCOMBINEArchive = async () => {
   const exposureAlias = props.alias
@@ -908,12 +899,11 @@ onMounted(async () => {
               <ActionButton
                 variant="secondary"
                 size="sm"
-                :disabled="isDownloadingWorkspaceZip"
-                @click="handleDownloadWorkspaceArchive('zip')"
+                :href="`${workspaceArchiveUrlBase}zip`"
+                :download="`${workspaceArchiveFilename}.zip`"
                 content-section="Exposure Detail"
               >
-                <LoadingIcon v-if="isDownloadingWorkspaceZip" class="w-4 h-4" />
-                <DownloadIcon v-else class="w-4 h-4" />
+                <DownloadIcon class="w-4 h-4" />
                 <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code> file)</span>
               </ActionButton>
             </li>
@@ -921,12 +911,11 @@ onMounted(async () => {
               <ActionButton
                 variant="secondary"
                 size="sm"
-                :disabled="isDownloadingWorkspaceTgz"
-                @click="handleDownloadWorkspaceArchive('tgz')"
+                :href="`${workspaceArchiveUrlBase}tgz`"
+                :download="`${workspaceArchiveFilename}.tgz`"
                 content-section="Exposure Detail"
               >
-                <LoadingIcon v-if="isDownloadingWorkspaceTgz" class="w-4 h-4" />
-                <DownloadIcon v-else class="w-4 h-4" />
+                <DownloadIcon class="w-4 h-4" />
                 <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code> file)</span>
               </ActionButton>
             </li>

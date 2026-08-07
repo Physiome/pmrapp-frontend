@@ -62,6 +62,13 @@ cp .env.example .env
 **Environment Variables:**
 
 - `VITE_API_BASE_URL` - Base URL for the PMR API server (default: `http://127.0.0.1:9380` for local Rust backend)
+- `VITE_DOWNLOAD_API` - Base URL of the service used for COMBINE and workspace archive downloads. _(This will be removed after all download APIs are available on PMR3.)_
+- `VITE_DOWNLOAD_HOST` - Optional base URL used for workspace archive links when the site and download API are hosted on different origins. If unset, the app uses the current host. Not required for same-origin production deployments.
+- `VITE_GITHUB_CLIENT_ID` - Public client ID of the GitHub OAuth application used for sign-in.
+- `VITE_GITHUB_AUTH_API` - Base URL of the backend endpoint that completes GitHub OAuth authentication.
+- `VITE_GA_MEASUREMENT_ID` - Google Analytics 4 measurement ID. Leave unset to disable analytics.
+- `VITE_BASE_PATH` - Deployment path used for generated asset and router URLs.
+- `VITE_ENABLE_GH_PAGES_SPA_REDIRECT` - Enables GitHub Pages redirect helper when set to `true`.
 
 > **Note:** To run the backend locally, see the [pmrplatform](https://github.com/Physiome/pmrplatform/) repository for setup instructions.
 

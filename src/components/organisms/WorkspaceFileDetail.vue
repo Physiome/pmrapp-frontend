@@ -14,10 +14,11 @@ import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
 import { getWorkspaceService } from '@/services'
+import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { WorkspaceInfo } from '@/types/workspace'
 import { trackButtonClick } from '@/utils/analytics'
-import { downloadFileFromBlob } from '@/utils/download'
+import { downloadWorkspaceFile } from '@/utils/download'
 import {
   isCodeFile,
   isImageFile,
@@ -144,8 +145,18 @@ const imageDataUrl = computed(() => {
 // Fast guard: avoid rendering very large payloads in the browser preview.
 const isTooLargeForPreview = computed(() => fileSizeBytes.value > MAX_PREVIEW_FILE_SIZE_BYTES)
 
-const downloadFile = () => {
-  downloadFileFromBlob(fileBlob.value, filename.value)
+const downloadUrl = computed(() => {
+  return getWorkspaceFileUrl(props.alias, props.commitId, props.path)
+})
+
+const downloadWorkspaceFileDetail = async (event: Event) => {
+  event.preventDefault()
+
+  try {
+    await downloadWorkspaceFile(props.alias, props.commitId, props.path)
+  } catch (err) {
+    console.error('Error downloading file:', err)
+  }
 }
 
 const toggleCodeWrap = () => {
@@ -315,7 +326,9 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
             variant="icon"
             size="sm"
             :contentSection="pageTitle"
-            @click="downloadFile"
+            :href="downloadUrl"
+            :download="filename"
+            @click.prevent="downloadWorkspaceFileDetail"
             tooltip="Download"
             aria-label="Download"
           >
@@ -351,7 +364,8 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
         <ActionButton
           variant="primary"
           size="lg"
-          @click="downloadFile"
+          :href="downloadUrl"
+          :download="filename"
           :contentSection="pageTitle"
         >
           <DownloadIcon class="w-4 h-4" />
@@ -374,7 +388,8 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
         <ActionButton
           variant="primary"
           size="lg"
-          @click="downloadFile"
+          :href="downloadUrl"
+          :download="filename"
           :contentSection="pageTitle"
         >
           <DownloadIcon class="w-4 h-4" />
