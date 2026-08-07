@@ -3,33 +3,33 @@
  */
 
 export interface ComparisonRow extends Record<string, unknown> {
-  id: string | number;
-  [key: string]: unknown;
+  id: string | number
+  [key: string]: unknown
 }
 
 export interface ParseCompleteResults {
-  data: ComparisonRow[];
-  errors: ParseError[];
-  meta: ParseMeta;
+  data: ComparisonRow[]
+  errors: ParseError[]
+  meta: ParseMeta
 }
 
 export interface ParseError {
-  type: string;
-  code: string;
-  message: string;
-  row?: number;
+  type: string
+  code: string
+  message: string
+  row?: number
 }
 
 export interface ParseMeta {
-  delimiter: string;
-  linebreak: string;
-  aborted: boolean;
-  truncated: boolean;
-  cursor: number;
-  fields?: string[];
+  delimiter: string
+  linebreak: string
+  aborted: boolean
+  truncated: boolean
+  cursor: number
+  fields?: string[]
 }
 
 export interface ParseErrorEvent {
-  name: string;
-  message: string;
+  name: string
+  message: string
 }
