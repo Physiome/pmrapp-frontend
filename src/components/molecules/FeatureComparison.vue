@@ -14,6 +14,7 @@ onMounted(() => {
   Papa.parse(SHEET_CSV_URL, {
     download: true,
     header: true,
+    newline: '', // auto-detect
     dynamicTyping: true,
     skipEmptyLines: true,
     complete: (results: ParseCompleteResults) => {
@@ -64,7 +65,7 @@ onMounted(() => {
           <div
             v-for="header in tableHeaders"
             :key="header + row.id"
-            class="text-sm text-gray-600 dark:text-gray-400"
+            class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words"
             :class="header === 'feature' ? 'font-medium text-gray-900 dark:text-gray-100' : ''"
           >
             {{ row[header] }}

@@ -4,6 +4,7 @@ declare module 'papaparse' {
   export interface ParseConfig {
     download?: boolean;
     header?: boolean;
+    newline?: string;
     dynamicTyping?: boolean;
     skipEmptyLines?: boolean;
     complete?: (results: any) => void;
