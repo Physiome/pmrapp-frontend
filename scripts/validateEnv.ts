@@ -52,6 +52,11 @@ const REQUIRED_VARS: RequiredVarSpec[] = [
     description: 'base URL of the GitHub OAuth authentication API',
     type: 'url',
   },
+  {
+    name: 'VITE_FEATURE_COMPARISON_SHEET_CSV_URL',
+    description: 'CSV file URL for the feature comparison page',
+    type: 'url',
+  },
 ]
 
 /** GA4 measurement IDs look like `G-XXXXXXXXXX`. */

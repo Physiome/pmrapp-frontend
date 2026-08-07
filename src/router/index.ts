@@ -9,6 +9,7 @@ import { generateExposureTitle, resolveExposureFileTitle } from '@/utils/exposur
 import { generateWorkspaceTitle } from '@/utils/workspace'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
 import ExposureView from '@/views/ExposureView.vue'
+import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
@@ -210,6 +211,12 @@ const router = createRouter({
       name: 'search-results',
       component: SearchView,
       meta: { title: `Search Results – ${TITLE}` },
+    },
+    {
+      path: '/feature-comparison',
+      name: 'feature-comparison',
+      component: FeatureComparisonView,
+      meta: { title: `Feature Comparison – ${TITLE}` },
     },
     {
       path: '/login',
