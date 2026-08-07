@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Papa from 'papaparse'
 import { onMounted, ref } from 'vue'
+import type { ComparisonRow, ParseCompleteResults, ParseErrorEvent } from '@/types/featureComparison'
 
-const tableData = ref([])
-const tableHeaders = ref([])
+const tableData = ref<ComparisonRow[]>([])
+const tableHeaders = ref<string[]>([])
 const isLoading = ref(true)
 const errorMessage = ref('')
 
@@ -15,12 +16,12 @@ onMounted(() => {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    complete: (results) => {
+    complete: (results: ParseCompleteResults) => {
       tableData.value = results.data;
-      tableHeaders.value = results.meta.fields.filter(header => header !== 'id');
+      tableHeaders.value = results.meta.fields?.filter((header: string) => header !== 'id') ?? [];
       isLoading.value = false;
     },
-    error: (error) => {
+    error: (error: ParseErrorEvent) => {
       console.error("Error fetching sheet:", error);
       errorMessage.value = "Failed to load comparison data.";
       isLoading.value = false;
