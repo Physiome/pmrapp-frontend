@@ -69,6 +69,7 @@ cp .env.example .env
 - `VITE_GA_MEASUREMENT_ID` - Google Analytics 4 measurement ID. Leave unset to disable analytics.
 - `VITE_BASE_PATH` - Deployment path used for generated asset and router URLs.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT` - Enables GitHub Pages redirect helper when set to `true`.
+- `VITE_FEATURE_COMPARISON_SHEET_CSV_URL` - CSV file URL for the feature comparison page.
 
 > **Note:** To run the backend locally, see the [pmrplatform](https://github.com/Physiome/pmrplatform/) repository for setup instructions.
 

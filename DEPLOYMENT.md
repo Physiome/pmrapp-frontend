@@ -18,8 +18,9 @@ This document covers deployment to production environments other than GitHub Pag
   - `VITE_GITHUB_CLIENT_ID`;
   - `VITE_GITHUB_AUTH_API`;
   - `VITE_GA_MEASUREMENT_ID`;
-  - `VITE_BASE_PATH`; and
-  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`.
+  - `VITE_BASE_PATH`;
+  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`; and
+  - `VITE_FEATURE_COMPARISON_SHEET_CSV_URL`.
 
 - Optional when the app host and download API host differ:
   - `VITE_DOWNLOAD_HOST`.
@@ -36,6 +37,7 @@ Set these environment variables in your CI/CD configuration or shell before runn
 - `VITE_DOWNLOAD_API`: Base URL of the service that provides COMBINE and workspace archive downloads. _(This will be removed after all download APIs are available on PMR3.)_
 - `VITE_GITHUB_CLIENT_ID`: Public client ID of the GitHub OAuth application used for sign-in. Example: `Ov23liExampleClientId`.
 - `VITE_GITHUB_AUTH_API`: Base URL of the backend endpoint that completes GitHub OAuth authentication. _(This is used for GitHub login.)_ Example: `https://auth.[example-pmrapp-dev].com`.
+- `VITE_FEATURE_COMPARISON_SHEET_CSV_URL`: CSV file URL for the feature comparison page. Example: `https://example.com/feature-comparison.csv`.
 
 The API and download URLs are required for their respective features, and the GitHub OAuth values are required for GitHub login option. `vite build` fails if any required variable is missing or invalid.
 
@@ -56,6 +58,7 @@ VITE_GITHUB_AUTH_API=https://auth.pmrapp.com
 VITE_GA_MEASUREMENT_ID=G-ABC123DEFG
 VITE_BASE_PATH=/
 VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false
+VITE_FEATURE_COMPARISON_SHEET_CSV_URL=https://example.com/feature-comparison.csv
 ```
 
 ## Production Build
