@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import Papa from 'papaparse'
 import { onMounted, ref } from 'vue'
+import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
+import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import type {
   ComparisonRow,
   ParseCompleteResults,
@@ -44,17 +46,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- Loading -->
-  <div v-if="isLoading" class="text-center text-gray-500 py-10 animate-pulse">
-    Loading latest data from Google Sheets...
-  </div>
+  <LoadingBox v-if="isLoading" message="Loading latest data from Google Sheets..." />
 
-  <!-- Error -->
-  <div v-else-if="errorMessage" class="text-center text-red-500 py-10 bg-red-50 rounded-lg">
-    {{ errorMessage }}
-  </div>
+  <ErrorBlock
+    v-else-if="errorMessage"
+    title="Feature Comparison Error"
+    :error="errorMessage"
+  />
 
-  <!-- Success: Comparison Table -->
   <div v-else class="box p-0! overflow-hidden">
     <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4">
       <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
