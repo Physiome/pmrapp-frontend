@@ -8,61 +8,61 @@ export interface ComparisonRow extends Record<string, unknown> {
 }
 
 /**
- * Parse result from Papa Parse
+ * Parse result from Papa Parse.
  * @see https://www.papaparse.com/docs#results
  */
 export interface ParseCompleteResults {
-  /** Array of parsed rows - each row is an array or object depending on header setting */
+  /** Array of parsed rows—each row is an array or object depending on header setting. */
   data: ComparisonRow[]
-  /** Array of errors encountered during parsing */
+  /** Array of errors encountered during parsing. */
   errors: ParseError[]
-  /** Metadata about the parse operation */
+  /** Metadata about the parse operation. */
   meta: ParseMeta
 }
 
 /**
- * Error object from Papa Parse
+ * Error object from Papa Parse.
  * @see https://www.papaparse.com/docs#errors
  */
 export interface ParseError {
-  /** Type of error: 'Quotes', 'Delimiter', or 'FieldMismatch' */
+  /** Type of error: 'Quotes', 'Delimiter', or 'FieldMismatch'. */
   type: 'Quotes' | 'Delimiter' | 'FieldMismatch'
-  /** Standardized error code */
+  /** Standardised error code. */
   code:
     | 'MissingQuotes'
     | 'UndetectableDelimiter'
     | 'TooFewFields'
     | 'TooManyFields'
-  /** Human-readable error message */
+  /** Human-readable error message. */
   message: string
-  /** Row index where the error occurred */
+  /** Row index where the error occurred. */
   row?: number
 }
 
 /**
- * Metadata from a Papa Parse operation
+ * Metadata from a Papa Parse operation.
  * @see https://www.papaparse.com/docs#meta
  */
 export interface ParseMeta {
-  /** Delimiter used in the parse */
+  /** Delimiter used in the parse. */
   delimiter: string
-  /** Line break sequence used in the parse */
+  /** Line break sequence used in the parse. */
   linebreak: string
-  /** Whether the parse was aborted */
+  /** Whether the parse was aborted. */
   aborted: boolean
-  /** Whether preview consumed all input */
+  /** Whether preview consumed all input. */
   truncated: boolean
-  /** Current cursor position in the input */
+  /** Current cursor position in the input. */
   cursor: number
-  /** Array of field names (only when header: true) */
+  /** Array of field names (only when header: true). */
   fields?: string[]
-  /** Headers that were automatically renamed to avoid duplication */
+  /** Headers that were automatically renamed to avoid duplication. */
   renamedHeaders?: Record<string, string>
 }
 
 /**
- * Parse error event from Papa Parse error callback
- * Note: This may differ from ParseError depending on the error context
+ * Parse error event from Papa Parse error callback.
+ * Note: This may differ from ParseError depending on the error context.
  */
 export interface ParseErrorEvent {
   name: string
