@@ -14,7 +14,16 @@ const errorMessage = ref('')
 
 const SHEET_CSV_URL = import.meta.env.VITE_FEATURE_COMPARISON_SHEET_CSV_URL
 
+if (!SHEET_CSV_URL) {
+  errorMessage.value = 'Feature comparison data URL is not configured.'
+}
+
 onMounted(() => {
+  if (!SHEET_CSV_URL) {
+    isLoading.value = false
+    return
+  }
+
   Papa.parse(SHEET_CSV_URL, {
     download: true,
     header: true,
