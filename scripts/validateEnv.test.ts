@@ -6,6 +6,7 @@ const validEnv = {
   VITE_DOWNLOAD_API: 'https://downloads.example.com',
   VITE_GITHUB_CLIENT_ID: 'Ov23liExampleClientId',
   VITE_GITHUB_AUTH_API: 'https://auth.example.com',
+  VITE_FEATURE_COMPARISON_SHEET_CSV_URL: 'https://example.com/features.csv',
 }
 
 describe('validateRequiredEnv', () => {
@@ -20,6 +21,7 @@ describe('validateRequiredEnv', () => {
       'VITE_DOWNLOAD_API',
       'VITE_GITHUB_CLIENT_ID',
       'VITE_GITHUB_AUTH_API',
+      'VITE_FEATURE_COMPARISON_SHEET_CSV_URL',
     ])
   })
 
