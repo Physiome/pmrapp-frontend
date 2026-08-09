@@ -25,10 +25,7 @@ onMounted(async () => {
     class="bg-amber-100 dark:bg-amber-900/20 border-b border-amber-300 dark:border-amber-700 relative"
   >
     <div class="container mx-auto px-4 pr-10 lg:pr-4 py-2 flex items-center justify-center gap-2 text-sm text-amber-900 dark:text-amber-100">
-      <span>⚠️</span>
-      <span>
-        This is a general notification message.
-      </span>
+      <slot />
     </div>
     <CloseButton
       class="absolute top-1/2 right-4 -translate-y-1/2"
