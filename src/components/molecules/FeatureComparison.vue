@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Papa from 'papaparse'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import type {
@@ -8,6 +8,11 @@ import type {
   ParseCompleteResults,
   ParseErrorEvent,
 } from '@/types/featureComparison'
+
+interface ComparisonGroup {
+  title: string
+  rows: ComparisonRow[]
+}
 
 const tableData = ref<ComparisonRow[]>([])
 const tableHeaders = ref<string[]>([])
@@ -19,6 +24,50 @@ const SHEET_CSV_URL = import.meta.env.VITE_FEATURE_COMPARISON_SHEET_CSV_URL
 if (!SHEET_CSV_URL) {
   errorMessage.value = 'Feature comparison data URL is not configured.'
 }
+
+/**
+ * The name of the column that holds the feature/category title.
+ * Papa Parse preserves the original header casing, so this is matched
+ * case-insensitively to be robust against variations such as "Feature".
+ */
+const featureColumn = computed(() =>
+  tableHeaders.value.find((header: string) => header.toLowerCase() === 'feature'),
+)
+
+/**
+ * Groups the parsed rows by category. Rows with an integer id (e.g. 1, 2)
+ * are treated as category group titles, while rows with a decimal id
+ * (e.g. 1.1, 1.2) are grouped under the category matching their integer part.
+ * Rows without an id (all-null rows) are stripped out.
+ */
+const groupedData = computed<ComparisonGroup[]>(() => {
+  const groups: ComparisonGroup[] = []
+  let currentGroup: ComparisonGroup | null = null
+
+  for (const row of tableData.value) {
+    const id = row.id
+
+    // Skip rows without an id, such as the all-null separator rows.
+    if (id === null || id === undefined || id === '') {
+      continue
+    }
+
+    const numericId = Number(id)
+    if (Number.isInteger(numericId)) {
+      // This row is a category group title.
+      currentGroup = {
+        title: featureColumn.value ? String(row[featureColumn.value] ?? '') : '',
+        rows: [],
+      }
+      groups.push(currentGroup)
+    } else if (currentGroup) {
+      // This row belongs to the current category group.
+      currentGroup.rows.push(row)
+    }
+  }
+
+  return groups
+})
 
 onMounted(() => {
   if (!SHEET_CSV_URL) {
@@ -68,24 +117,34 @@ onMounted(() => {
       </div>
     </div>
     <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-      <li
-        v-for="row in tableData"
-        :key="row.id"
-        class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-        role="row"
-      >
-        <div class="px-4 py-3 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
-          <div
-            v-for="header in tableHeaders"
-            :key="header + row.id"
-            class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words"
-            :class="header === 'feature' ? 'font-medium text-gray-900 dark:text-gray-100' : ''"
-            role="cell"
-          >
-            {{ row[header] }}
+      <template v-for="group in groupedData" :key="group.title">
+        <li
+          class="bg-gray-100 dark:bg-gray-800 px-4 py-3"
+          role="row"
+        >
+          <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+            {{ group.title }}
           </div>
-        </div>
-      </li>
+        </li>
+        <li
+          v-for="row in group.rows"
+          :key="row.id"
+          class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          role="row"
+        >
+          <div class="px-4 py-3 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
+            <div
+              v-for="header in tableHeaders"
+              :key="header + row.id"
+              class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words"
+              :class="header === featureColumn ? 'font-medium text-gray-900 dark:text-gray-100' : ''"
+              role="cell"
+            >
+              {{ row[header] }}
+            </div>
+          </div>
+        </li>
+      </template>
     </ul>
   </div>
 </template>
