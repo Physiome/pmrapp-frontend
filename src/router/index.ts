@@ -223,9 +223,7 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LOGIN_DISABLED ? NotFoundView : LoginView,
-      meta: LOGIN_DISABLED
-        ? { title: `Page Not Found – ${TITLE}` }
-        : { title: `Login – ${TITLE}` },
+      meta: LOGIN_DISABLED ? { title: `Page Not Found – ${TITLE}` } : { title: `Login – ${TITLE}` },
     },
     {
       path: '/profile',
