@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Papa from 'papaparse'
 import { onMounted, ref } from 'vue'
-import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
+import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import type {
   ComparisonRow,
   ParseCompleteResults,

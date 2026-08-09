@@ -4,8 +4,8 @@ import { createGtag } from 'vue-gtag'
 import './assets/main.css'
 
 import App from './App.vue'
-import router from './router'
 import { LOGIN_DISABLED } from './constants/auth'
+import router from './router'
 import { useAuthStore } from './stores/auth'
 
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID
