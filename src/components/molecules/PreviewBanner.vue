@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import NotificationBar from './NotificationBar.vue'
 import { PMR2_URL } from '@/constants/global'
+import NotificationBar from './NotificationBar.vue'
 </script>
 
 <template>
