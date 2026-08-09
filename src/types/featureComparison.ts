@@ -3,7 +3,8 @@
  */
 
 export interface ComparisonRow extends Record<string, unknown> {
-  id: string | number
+  /** Row identifier. May be null for separator rows that are stripped out during grouping. */
+  id: string | number | null
   [key: string]: unknown
 }
 
