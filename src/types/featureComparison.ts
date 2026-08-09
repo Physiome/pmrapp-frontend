@@ -28,11 +28,7 @@ export interface ParseError {
   /** Type of error: 'Quotes', 'Delimiter', or 'FieldMismatch'. */
   type: 'Quotes' | 'Delimiter' | 'FieldMismatch'
   /** Standardised error code. */
-  code:
-    | 'MissingQuotes'
-    | 'UndetectableDelimiter'
-    | 'TooFewFields'
-    | 'TooManyFields'
+  code: 'MissingQuotes' | 'UndetectableDelimiter' | 'TooFewFields' | 'TooManyFields'
   /** Human-readable error message. */
   message: string
   /** Row index where the error occurred. */
