@@ -5,7 +5,17 @@ import ActionButton from '@/components/atoms/ActionButton.vue'
 import SearchIcon from '@/components/icons/SearchIcon.vue'
 import UserDropdown from '@/components/molecules/UserDropdown.vue'
 import SearchOverlay from '@/components/organisms/SearchOverlay.vue'
+import { LOGIN_DISABLED } from '@/constants/auth'
 import { useGlobalStateStore } from '@/stores/globalState'
+
+const props = withDefaults(
+  defineProps<{
+    showUserDropdown?: boolean
+  }>(),
+  {
+    showUserDropdown: !LOGIN_DISABLED,
+  },
+)
 
 const route = useRoute()
 const isSearchOverlayVisible = ref(false)
@@ -113,7 +123,7 @@ watch(
               </li>
             </ul>
           </li>
-          <li class="user-dropdown-divider pl-4">
+          <li v-if="props.showUserDropdown" class="user-dropdown-divider pl-4">
             <UserDropdown />
           </li>
         </ul>
