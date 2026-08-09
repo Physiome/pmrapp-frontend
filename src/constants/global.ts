@@ -22,3 +22,5 @@ export const COOKIE = {
    */
   NOTIFICATION_DAYS: 7,
 }
+
+export const PMR2_URL = 'https://models.physiomeproject.org'

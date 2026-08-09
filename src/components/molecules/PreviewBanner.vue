@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import ActionButton from '@/components/atoms/ActionButton.vue'
 import NotificationBar from './NotificationBar.vue'
+import { PMR2_URL } from '@/constants/global'
 </script>
 
 <template>
   <NotificationBar>
     You are viewing a preview version of PMR.
     <ActionButton
-      href="#"
+      :href="PMR2_URL"
       variant="secondary"
       size="sm"
     >
