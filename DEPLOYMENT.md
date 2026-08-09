@@ -19,8 +19,9 @@ This document covers deployment to production environments other than GitHub Pag
   - `VITE_GITHUB_AUTH_API`;
   - `VITE_GA_MEASUREMENT_ID`;
   - `VITE_BASE_PATH`;
-  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`; and
-  - `VITE_FEATURE_COMPARISON_SHEET_CSV_URL`.
+  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`;
+  - `VITE_FEATURE_COMPARISON_SHEET_CSV_URL`; and
+  - `VITE_LOGIN_DISABLED`.
 
 - Optional when the app host and download API host differ:
   - `VITE_DOWNLOAD_HOST`.
@@ -47,6 +48,7 @@ The API and download URLs are required for their respective features, and the Gi
 - `VITE_BASE_PATH`: Deployment path used for generated asset and router URLs. Use `/` for a root-domain deployment. It defaults to `/` when omitted. GitHub Pages project deployments instead use a repository path, such as `/pmrapp-frontend/`.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`: Enables the GitHub Pages query-string redirect helper. It defaults to `false`. Set it to `true` only for GitHub Pages project deployments; use `false` for Nginx, S3/CloudFront, and other standard hosts with SPA rewrite rules.
 - `VITE_DOWNLOAD_HOST`: Optional base URL for workspace archive links when download routes are served from a different origin than the app. If unset, the app uses the current host. Not required for same-origin production deployments.
+- `VITE_LOGIN_DISABLED`: Optional flag that disables login and hides the login button. Set it to `true` to disable login; leave it unset to show login by default.
 
 For example, a standard root-domain production environment can use:
 
