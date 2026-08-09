@@ -5,6 +5,7 @@ import './assets/main.css'
 
 import App from './App.vue'
 import router from './router'
+import { LOGIN_DISABLED } from './constants/auth'
 import { useAuthStore } from './stores/auth'
 
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID
@@ -28,7 +29,14 @@ if (GA_MEASUREMENT_ID && !isCypress) {
 
 // Initialise authentication state from local storage.
 const authStore = useAuthStore()
-authStore.initAuth()
+
+// When login is disabled, any previously stored authentication data is stale
+// and should be removed so that it is not left behind in storage.
+if (LOGIN_DISABLED) {
+  authStore.clearAuth()
+} else {
+  authStore.initAuth()
+}
 
 // Synchronises authentication state across browser tabs.
 // When another tab logs in or out, localStorage updates and triggers the storage event in all other tabs.
