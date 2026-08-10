@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { reactive } from 'vue'
 import Header from '@/components/organisms/Header.vue'
+import UserDropdown from '@/components/molecules/UserDropdown.vue'
 
 const route = reactive({
   name: 'home',
@@ -97,5 +98,43 @@ describe('Header', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.find('#mobile-navigation-menu').classes()).toContain('hidden')
+  })
+
+  it('shows the user dropdown when showUserDropdown is true', () => {
+    const wrapper = mount(Header, {
+      props: {
+        showUserDropdown: true,
+      },
+      global: {
+        stubs: {
+          RouterLink: RouterLinkStub,
+          SearchIcon: true,
+          SearchOverlay: true,
+          UserDropdown: true,
+          Tooltip: true,
+        },
+      },
+    })
+
+    expect(wrapper.findComponent(UserDropdown).exists()).toBe(true)
+  })
+
+  it('hides the user dropdown when showUserDropdown is false', () => {
+    const wrapper = mount(Header, {
+      props: {
+        showUserDropdown: false,
+      },
+      global: {
+        stubs: {
+          RouterLink: RouterLinkStub,
+          SearchIcon: true,
+          SearchOverlay: true,
+          UserDropdown: true,
+          Tooltip: true,
+        },
+      },
+    })
+
+    expect(wrapper.findComponent(UserDropdown).exists()).toBe(false)
   })
 })
