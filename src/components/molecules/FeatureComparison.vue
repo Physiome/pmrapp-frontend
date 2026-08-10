@@ -37,6 +37,24 @@ const featureColumn = computed(() =>
 )
 
 /**
+ * Defines the relative widths of the table columns.
+ * The feature column and note column are given more space,
+ * while the remaining columns (which typically hold the
+ * tick/cross availability icons) are kept narrower.
+ */
+const gridTemplateColumns = computed(() =>
+  tableHeaders.value
+    .map((header: string, index: number) => {
+      if (header === featureColumn.value) {
+        return '1fr'
+      }
+      // The last column is given a wider width than the middle icon columns.
+      return index === tableHeaders.value.length - 1 ? '1fr' : '0.5fr'
+    })
+    .join(' '),
+)
+
+/**
  * Groups the parsed rows by category. Rows with an integer id (e.g. 1, 2)
  * are treated as category group titles, while rows with a decimal id
  * (e.g. 1.1, 1.2) are grouped under the category matching their integer part.
@@ -107,7 +125,7 @@ onMounted(() => {
 
   <div v-else class="box p-0! overflow-hidden" role="table">
     <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4" role="row">
-      <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
+      <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns }">
         <div
           v-for="header in tableHeaders"
           :key="header"
@@ -134,7 +152,7 @@ onMounted(() => {
           class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           role="row"
         >
-          <div class="px-4 py-3 grid gap-4" :style="{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }">
+          <div class="px-4 py-3 grid gap-4" :style="{ gridTemplateColumns }">
             <div
               v-for="header in tableHeaders"
               :key="header + row.id"
