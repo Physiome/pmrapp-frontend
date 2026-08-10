@@ -3,7 +3,8 @@
  */
 
 export interface ComparisonRow extends Record<string, unknown> {
-  id: string | number
+  /** Row identifier. May be null for separator rows that are stripped out during grouping. */
+  id: string | number | null
   [key: string]: unknown
 }
 
@@ -28,11 +29,7 @@ export interface ParseError {
   /** Type of error: 'Quotes', 'Delimiter', or 'FieldMismatch'. */
   type: 'Quotes' | 'Delimiter' | 'FieldMismatch'
   /** Standardised error code. */
-  code:
-    | 'MissingQuotes'
-    | 'UndetectableDelimiter'
-    | 'TooFewFields'
-    | 'TooManyFields'
+  code: 'MissingQuotes' | 'UndetectableDelimiter' | 'TooFewFields' | 'TooManyFields'
   /** Human-readable error message. */
   message: string
   /** Row index where the error occurred. */
