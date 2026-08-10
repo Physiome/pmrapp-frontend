@@ -17,7 +17,7 @@ const newIssueUrl = (): string => {
 
 <template>
   <div class="fixed bottom-8 right-8 z-40">
-    <Popover placement="left">
+    <Popover placement="left" maxWidth="320px">
       <template #trigger>
         <ActionButton
           :href="newIssueUrl()"
