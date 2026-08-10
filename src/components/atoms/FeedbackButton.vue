@@ -41,9 +41,7 @@ const newIssueUrl = (): string => {
           <RouterLink
             to="/feature-comparison"
             class="text-primary underline underline-offset-2 hover:opacity-80"
-          >
-            feature-comparison page
-          </RouterLink>.
+          >feature-comparison</RouterLink> page.
         </p>
       </template>
     </Popover>
