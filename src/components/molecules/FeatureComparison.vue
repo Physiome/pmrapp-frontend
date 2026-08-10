@@ -170,7 +170,9 @@ onMounted(() => {
               :key="header + row.id"
               class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words"
               :class="[
-                header === featureColumn ? 'font-medium text-gray-900 dark:text-gray-100' : '',
+                header === featureColumn
+                  ? 'font-medium text-gray-900 dark:text-gray-100 md:pl-8'
+                  : '',
                 iconColumns.includes(header) ? 'place-items-center' : '',
               ]"
               role="cell"
