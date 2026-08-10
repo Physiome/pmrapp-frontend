@@ -2,6 +2,8 @@
 import Papa from 'papaparse'
 import { computed, onMounted, ref } from 'vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
+import CheckmarkIcon from '@/components/icons/CheckmarkIcon.vue'
+import CrossIcon from '@/components/icons/CrossIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import type {
   ComparisonRow,
@@ -140,7 +142,19 @@ onMounted(() => {
               :class="header === featureColumn ? 'font-medium text-gray-900 dark:text-gray-100' : ''"
               role="cell"
             >
-              {{ row[header] }}
+              <CheckmarkIcon
+                v-if="String(row[header]).trim().toLowerCase() === 'yes'"
+                class="w-5 h-5 text-green-600 dark:text-green-400"
+                aria-label="Yes"
+              />
+              <CrossIcon
+                v-else-if="String(row[header]).trim().toLowerCase() === 'no'"
+                class="w-5 h-5 text-red-600 dark:text-red-400"
+                aria-label="No"
+              />
+              <template v-else>
+                {{ row[header] }}
+              </template>
             </div>
           </div>
         </li>
