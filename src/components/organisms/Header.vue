@@ -24,7 +24,7 @@ const menuContainerClasses = computed(() => [
 const menuBoxClasses = ['flex flex-col md:flex-row gap-4']
 
 const navLinkClasses = [
-  'block rounded-md px-3 py-2',
+  'block rounded px-3 py-2',
   'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors',
 ]
 
