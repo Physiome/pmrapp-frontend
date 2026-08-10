@@ -134,8 +134,8 @@ onMounted(() => {
     :error="errorMessage"
   />
 
-  <div v-else class="box p-0! overflow-hidden" role="table">
-    <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4" role="row">
+  <div v-else class="box p-0!" role="table">
+    <div class="sticky top-[76px] z-10 bg-gray-50 dark:bg-gray-800 px-4 py-3 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex items-center gap-4" role="row">
       <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns }">
         <div
           v-for="header in tableHeaders"
