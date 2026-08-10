@@ -165,14 +165,14 @@ describe('FeatureComparison', () => {
     // Check the first feature row data.
     const firstRowCells = rows[1].findAll('[class*="text-sm"]')
     expect(firstRowCells[0].text()).toBe('Feature A')
-    expect(firstRowCells[1].text()).toBe('Yes')
-    expect(firstRowCells[2].text()).toBe('No')
+    expect(firstRowCells[1].find('svg').attributes('aria-label')).toBe('Yes')
+    expect(firstRowCells[2].find('svg').attributes('aria-label')).toBe('No')
 
     // Check the second feature row data.
     const secondRowCells = rows[2].findAll('[class*="text-sm"]')
     expect(secondRowCells[0].text()).toBe('Feature B')
     expect(secondRowCells[1].text()).toBe('Partial')
-    expect(secondRowCells[2].text()).toBe('Yes')
+    expect(secondRowCells[2].find('svg').attributes('aria-label')).toBe('Yes')
 
     // Check the second category title row.
     expect(rows[3].text()).toBe('Category B')
@@ -180,8 +180,8 @@ describe('FeatureComparison', () => {
     // Check the third feature row data.
     const thirdRowCells = rows[4].findAll('[class*="text-sm"]')
     expect(thirdRowCells[0].text()).toBe('Feature C')
-    expect(thirdRowCells[1].text()).toBe('Yes')
-    expect(thirdRowCells[2].text()).toBe('Yes')
+    expect(thirdRowCells[1].find('svg').attributes('aria-label')).toBe('Yes')
+    expect(thirdRowCells[2].find('svg').attributes('aria-label')).toBe('Yes')
   })
 
   it('strips out rows without an id', async () => {
