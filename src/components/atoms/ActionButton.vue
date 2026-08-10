@@ -54,8 +54,10 @@ const disabledClasses = {
   icon: 'disabled:opacity-60 disabled:cursor-not-allowed',
 }
 
-const secondaryLightModeClasses = 'bg-gray-100 hover:bg-gray-100 border-primary hover:text-link-hover'
-const secondaryDarkModeClasses = 'dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-700 dark:hover:text-link!'
+const secondaryLightModeClasses =
+  'bg-gray-100 hover:bg-gray-100 border-primary hover:text-link-hover'
+const secondaryDarkModeClasses =
+  'dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-700 dark:hover:text-link!'
 
 const transitionClasses = 'transition duration-200 ease-linear'
 

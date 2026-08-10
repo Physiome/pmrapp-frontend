@@ -33,7 +33,7 @@ const headerRowClasses = [
   'px-4 py-3',
   'flex items-center gap-4',
   'bg-gray-50 dark:bg-gray-800',
-  'rounded-t-lg border-b border-gray-200 dark:border-gray-700'
+  'rounded-t-lg border-b border-gray-200 dark:border-gray-700',
 ]
 
 const categoryTitleClasses = [
