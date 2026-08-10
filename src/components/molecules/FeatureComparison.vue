@@ -199,6 +199,20 @@ onMounted(() => {
                 class="w-5 h-5 text-red-600 dark:text-red-400"
                 aria-label="No"
               />
+              <div
+                v-else-if="String(row[header]).trim().toLowerCase() === 'enhanced'"
+                class="flex items-center justify-center gap-1"
+                aria-label="Enhanced"
+              >
+                <CheckmarkIcon
+                  class="w-5 h-5 text-green-600 dark:text-green-400"
+                  aria-label="Yes"
+                />
+                <CheckmarkIcon
+                  class="w-5 h-5 text-green-600 dark:text-green-400"
+                  aria-label="Yes"
+                />
+              </div>
               <template v-else>
                 {{ row[header] }}
               </template>
