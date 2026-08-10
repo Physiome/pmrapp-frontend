@@ -25,10 +25,10 @@ describe('PreviewBanner', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('You are viewing a preview version of PMR.')
+    expect(wrapper.text()).toContain('You are viewing a preview version.')
   })
 
-  it('renders action buttons for classic site and feature comparison', () => {
+  it('renders action buttons for production site and feature comparison', () => {
     const wrapper = mount(PreviewBanner, {
       global: {
         stubs: {
@@ -40,9 +40,9 @@ describe('PreviewBanner', () => {
 
     const buttons = wrapper.findAll('a')
     expect(buttons).toHaveLength(2)
-    expect(buttons[0].text()).toBe('View classic site')
+    expect(buttons[0].text()).toBe('Go back to production')
     expect(buttons[0].attributes('href')).toBe(PMR2_URL)
-    expect(buttons[1].text()).toBe('Compare features')
+    expect(buttons[1].text()).toBe('Feature comparison')
     expect(buttons[1].attributes('data-to')).toBe('/feature-comparison')
   })
 })
