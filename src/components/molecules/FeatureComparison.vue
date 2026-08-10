@@ -185,7 +185,7 @@ onMounted(() => {
                 header === featureColumn
                   ? 'font-medium text-gray-900 dark:text-gray-100 md:pl-8'
                   : '',
-                iconColumns.includes(header) ? 'place-items-center' : '',
+                iconColumns.includes(header) ? 'place-items-center text-center' : '',
               ]"
               role="cell"
             >
