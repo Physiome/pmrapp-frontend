@@ -1,18 +1,35 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import BugIcon from '@/components/icons/BugIcon.vue'
 import { GITHUB_ISSUES_URL } from '@/constants/global'
 import ActionButton from './ActionButton.vue'
 import Popover from './Popover.vue'
 
+const route = useRoute()
+
 /**
  * Build the GitHub "new issue" URL with the current page URL
  * prefilled in the issue body.
  */
-const newIssueUrl = (): string => {
-  const currentUrl = window.location.href
-  const body = `**Page:** ${currentUrl}\n\n`
+const newIssueUrl = computed((): string => {
+  // Make this computed update on navigation (window.location is not reactive).
+  void route.fullPath
+
+  if (typeof window === 'undefined') {
+    return `${GITHUB_ISSUES_URL}/new`
+  }
+
+  const pageUrl = new URL(window.location.href)
+
+  // Avoid leaking OAuth and other sensitive query params into a public GitHub issue.
+  for (const key of ['code', 'state', 'error', 'error_description', 'access_token']) {
+    pageUrl.searchParams.delete(key)
+  }
+
+  const body = `**Page:** ${pageUrl.toString()}\n\n`
   return `${GITHUB_ISSUES_URL}/new?title=&body=${encodeURIComponent(body)}`
-}
+})
 </script>
 
 <template>
