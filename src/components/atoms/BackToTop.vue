@@ -41,20 +41,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-@reference 'tailwindcss';
-@reference '@/assets/main.css';
-
-.button-rounded-full {
-  @apply
-    bg-primary
-    hover:bg-primary-hover
-    text-white
-    p-3
-    transition-colors
-    rounded-full
-    shadow-md
-    hover:shadow-lg;
-}
+@import '@/assets/button.css';
 
 .fade-enter-active,
 .fade-leave-active {

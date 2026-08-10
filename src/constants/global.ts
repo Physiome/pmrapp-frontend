@@ -4,6 +4,11 @@
 
 export const TITLE = 'Physiome Model Repository'
 
+/**
+ * URL for reporting bugs or providing feedback via GitHub issues.
+ */
+export const GITHUB_ISSUES_URL = 'https://github.com/Physiome/pmrapp-frontend/issues'
+
 export const COOKIE = {
   /**
    * Cookie name for the cookie banner dismissal.
