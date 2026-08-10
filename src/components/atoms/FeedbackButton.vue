@@ -32,16 +32,17 @@ const newIssueUrl = (): string => {
       </template>
       <template #content>
         <p class="mb-2">
-          This website is a work in progress. Some parts have bugs and others have
-          outright infestations. We are working to fix these issues but feel free
-          to add an issue by clicking this button.
+          This website is a work in progress, so you may come across bugs or
+          unfinished features. We are working to fix these, but please feel free
+          to report any issues you find by clicking this button.
         </p>
         <p>
-          Before adding a new bug, you may find some features are listed on the
+          Before reporting a bug, you may want to check the
           <RouterLink
             to="/feature-comparison"
             class="text-primary underline underline-offset-2 hover:opacity-80"
-          >feature-comparison</RouterLink> page.
+          >feature-comparison</RouterLink> page, as some features may already be
+          listed there.
         </p>
       </template>
     </Popover>
