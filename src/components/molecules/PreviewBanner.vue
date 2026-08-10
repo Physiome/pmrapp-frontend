@@ -6,20 +6,21 @@ import NotificationBar from './NotificationBar.vue'
 
 <template>
   <NotificationBar>
-    You are viewing a preview version of PMR.
+    You are viewing a preview version.
     <ActionButton
       :href="PMR2_URL"
       variant="secondary"
       size="sm"
     >
-      View classic site
+      Go back to production
     </ActionButton>
     <ActionButton
       to="/feature-comparison"
       variant="primary"
+      class="ml-auto"
       size="sm"
     >
-      Compare features
+      Feature comparison
     </ActionButton>
   </NotificationBar>
 </template>
