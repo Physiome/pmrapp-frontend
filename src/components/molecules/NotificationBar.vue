@@ -28,7 +28,7 @@ onMounted(async () => {
       <slot />
     </div>
     <CloseButton
-      class="absolute top-1/2 right-4 -translate-y-1/2"
+      class="absolute top-1/2 right-4 -translate-y-1/2 w-6 h-6 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
       @click="handleClose"
       aria-label="Close notification"
     />
