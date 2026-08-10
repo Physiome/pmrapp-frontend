@@ -31,7 +31,7 @@ onUnmounted(() => {
     <button
       v-if="isVisible"
       @click="scrollToTop"
-      class="fixed bottom-8 right-8 button-rounded-full z-40 cursor-pointer"
+      class="fixed bottom-24 right-8 button-rounded-full z-40 cursor-pointer"
       type="button"
       aria-label="Back to top"
     >

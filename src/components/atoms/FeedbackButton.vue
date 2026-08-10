@@ -10,7 +10,7 @@ import ActionButton from './ActionButton.vue'
     target="_blank"
     rel="noopener noreferrer"
     variant="icon"
-    class="fixed bottom-24 right-8 button-rounded-full z-40"
+    class="fixed bottom-8 right-8 button-rounded-full z-40"
     aria-label="Report a bug or give feedback"
   >
     <BugIcon class="w-6 h-6" />
