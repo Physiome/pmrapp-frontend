@@ -1,14 +1,18 @@
 import { mount, RouterLinkStub, type VueWrapper } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { reactive } from 'vue'
 import FeedbackButton from '@/components/atoms/FeedbackButton.vue'
 import { GITHUB_ISSUES_URL } from '@/constants/global'
 
-const route = reactive({
-  name: 'home',
-  path: '/',
-  fullPath: '/',
-})
+// Define the route with vi.hoisted so it is available before the mock factory
+// runs. The component import is hoisted above this declaration, so referencing
+// a plain const here would hit the temporal dead zone.
+const { route } = vi.hoisted(() => ({
+  route: {
+    name: 'home',
+    path: '/',
+    fullPath: '/',
+  },
+}))
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
