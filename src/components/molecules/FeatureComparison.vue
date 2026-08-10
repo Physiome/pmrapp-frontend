@@ -82,8 +82,8 @@ const iconColumns = computed(() =>
 
 /**
  * Groups the parsed rows by category. Rows with an integer id (e.g. 1, 2)
- * are treated as category group titles, while rows with a decimal id
- * (e.g. 1.1, 1.2) are grouped under the category matching their integer part.
+ * are treated as category group titles, and subsequent non-integer rows are
+ * grouped under the most recent category row (ordering in the CSV matters).
  * Rows without an id (all-null rows) are stripped out.
  */
 const groupedData = computed<ComparisonGroup[]>(() => {
