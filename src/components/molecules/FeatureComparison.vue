@@ -27,6 +27,20 @@ if (!SHEET_CSV_URL) {
   errorMessage.value = 'Feature comparison data URL is not configured.'
 }
 
+const headerRowClasses = [
+  'sticky top-[76px] z-10',
+  'px-4 py-3',
+  'flex items-center gap-4',
+  'bg-gray-50 dark:bg-gray-800',
+  'rounded-t-lg border-b border-gray-200 dark:border-gray-700'
+]
+
+const categoryTitleClasses = [
+  'sticky top-[120px] z-10',
+  'px-4 py-3',
+  'bg-gray-100 dark:bg-gray-700',
+]
+
 /**
  * The name of the column that holds the feature/category title.
  * Papa Parse preserves the original header casing, so this is matched
@@ -135,7 +149,7 @@ onMounted(() => {
   />
 
   <div v-else class="box p-0!" role="table">
-    <div class="sticky top-[76px] z-10 bg-gray-50 dark:bg-gray-800 px-4 py-3 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex items-center gap-4" role="row">
+    <div :class="headerRowClasses" role="row">
       <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns }">
         <div
           v-for="header in tableHeaders"
@@ -150,10 +164,7 @@ onMounted(() => {
     </div>
     <ul class="divide-y divide-gray-200 dark:divide-gray-700">
       <template v-for="group in groupedData" :key="group.title">
-        <li
-          class="bg-gray-100 dark:bg-gray-700 px-4 py-3"
-          role="row"
-        >
+        <li :class="categoryTitleClasses" role="row">
           <div class="font-semibold dark:font-normal text-sm text-gray-700 dark:text-gray-200">
             {{ group.title }}
           </div>
