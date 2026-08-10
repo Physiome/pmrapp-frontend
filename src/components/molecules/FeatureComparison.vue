@@ -126,7 +126,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <LoadingBox v-if="isLoading" message="Loading latest data from Google Sheets..." />
+  <LoadingBox v-if="isLoading" message="Loading latest data..." />
 
   <ErrorBlock
     v-else-if="errorMessage"
