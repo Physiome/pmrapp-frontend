@@ -26,7 +26,7 @@ describe('FeatureComparison', () => {
     { id: 1.2, feature: 'Feature B', platform1: 'Partial', platform2: 'Yes' },
     { id: null, feature: null, platform1: null, platform2: null },
     { id: 2, feature: 'Category B', platform1: null, platform2: null },
-    { id: 2.1, feature: 'Feature C', platform1: 'Yes', platform2: 'Yes' },
+    { id: 2.1, feature: 'Feature C', platform1: 'Yes', platform2: 'Enhanced' },
   ]
 
   const mockParsedResults: ParseCompleteResults = {
@@ -181,7 +181,7 @@ describe('FeatureComparison', () => {
     const thirdRowCells = rows[4].findAll('[class*="text-sm"]')
     expect(thirdRowCells[0].text()).toBe('Feature C')
     expect(thirdRowCells[1].find('svg').attributes('aria-label')).toBe('Yes')
-    expect(thirdRowCells[2].find('svg').attributes('aria-label')).toBe('Yes')
+    expect(thirdRowCells[2].find('svg').attributes('aria-label')).toBe('Enhanced')
   })
 
   it('strips out rows without an id', async () => {

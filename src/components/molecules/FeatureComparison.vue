@@ -206,11 +206,11 @@ onMounted(() => {
               >
                 <CheckmarkIcon
                   class="w-5 h-5 text-green-600 dark:text-green-400"
-                  aria-label="Yes"
+                  aria-label="Enhanced"
                 />
                 <CheckmarkIcon
                   class="w-5 h-5 text-green-600 dark:text-green-400"
-                  aria-label="Yes"
+                  aria-label="Enhanced"
                 />
               </div>
               <template v-else>
