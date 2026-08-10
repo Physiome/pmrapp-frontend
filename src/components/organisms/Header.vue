@@ -133,11 +133,14 @@ watch(
   @apply
     before:content-['']
     before:absolute
-    before:top-auto
     before:left-0
     before:right-0
     before:h-[6px]
     before:bg-primary;
+
+  &::before {
+    top: var(--notification-bar-height);
+  }
 }
 
 .mobile-menu-icon {

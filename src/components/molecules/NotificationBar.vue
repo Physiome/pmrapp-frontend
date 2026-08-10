@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import { COOKIE } from '@/constants/global'
 import { Cookie } from '@/utils/cookie'
 
 const isVisible = ref(true)
+
+const updateNotificationBarHeight = () => {
+  const height = isVisible.value ? '47px' : '0'
+  document.documentElement.style.setProperty('--notification-bar-height', height)
+}
 
 const handleClose = async () => {
   isVisible.value = false
@@ -16,6 +21,11 @@ onMounted(async () => {
   if (dismissed === 'true') {
     isVisible.value = false
   }
+  updateNotificationBarHeight()
+})
+
+watch(isVisible, () => {
+  updateNotificationBarHeight()
 })
 </script>
 
