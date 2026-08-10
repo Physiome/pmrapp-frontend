@@ -119,10 +119,10 @@ onMounted(() => {
     <ul class="divide-y divide-gray-200 dark:divide-gray-700">
       <template v-for="group in groupedData" :key="group.title">
         <li
-          class="bg-gray-100 dark:bg-gray-800 px-4 py-3"
+          class="bg-gray-100 dark:bg-gray-700 px-4 py-3"
           role="row"
         >
-          <div class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+          <div class="font-semibold dark:font-normal text-sm text-gray-700 dark:text-gray-200">
             {{ group.title }}
           </div>
         </li>
