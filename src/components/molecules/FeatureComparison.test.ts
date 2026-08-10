@@ -129,7 +129,7 @@ describe('FeatureComparison', () => {
     await flushPromises()
     await nextTick()
 
-    const headers = wrapper.findAll('.bg-gray-50 .grid > div')
+    const headers = wrapper.findAll('[role="columnheader"]')
     expect(headers).toHaveLength(3)
     expect(headers[0].text()).toBe('feature')
     expect(headers[1].text()).toBe('platform1')
@@ -182,6 +182,36 @@ describe('FeatureComparison', () => {
     expect(thirdRowCells[0].text()).toBe('Feature C')
     expect(thirdRowCells[1].find('svg').attributes('aria-label')).toBe('Yes')
     expect(thirdRowCells[2].find('svg').attributes('aria-label')).toBe('Enhanced')
+  })
+
+  it('renders legend with availability labels', async () => {
+    mockPapaInstance.parse.mockImplementation(
+      (_url: string, config: { complete: (result: ParseCompleteResults) => void }) => {
+        config.complete(mockParsedResults)
+      },
+    )
+
+    const wrapper = mount(FeatureComparison, {
+      global: {
+        stubs: {
+          LoadingBox: true,
+          ErrorBlock: true,
+        },
+      },
+    })
+
+    await flushPromises()
+    await nextTick()
+
+    const legend = wrapper.find('[aria-label="Legend"]')
+    expect(legend.exists()).toBe(true)
+    expect(legend.text()).toContain('Legend')
+    expect(legend.text()).toContain('Available')
+    expect(legend.text()).toContain('Not available')
+    expect(legend.text()).toContain('Available with enhanced capabilities')
+    expect(legend.find('[aria-label="Available"]').exists()).toBe(true)
+    expect(legend.find('[aria-label="Not available"]').exists()).toBe(true)
+    expect(legend.findAll('[aria-label="Enhanced"]').length).toBeGreaterThanOrEqual(2)
   })
 
   it('strips out rows without an id', async () => {
