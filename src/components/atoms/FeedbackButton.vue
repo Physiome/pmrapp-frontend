@@ -20,7 +20,7 @@ const newIssueUrl = (): string => {
     <Popover placement="left" maxWidth="320px">
       <template #trigger>
         <ActionButton
-          :href="newIssueUrl()"
+          :href="newIssueUrl"
           target="_blank"
           rel="noopener noreferrer"
           variant="icon"
