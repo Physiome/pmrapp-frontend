@@ -233,17 +233,17 @@ onMounted(() => {
     <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
       <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Legend</div>
       <div class="grid gap-2" style="grid-template-columns: auto 1fr;">
-        <div class="flex justify-end">
+        <div class="flex justify-center">
           <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Available" />
         </div>
         <span class="text-sm text-gray-600 dark:text-gray-400">Available</span>
 
-        <div class="flex justify-end">
+        <div class="flex justify-center">
           <CrossIcon class="w-5 h-5 text-red-600 dark:text-red-400" aria-label="Not available" />
         </div>
         <span class="text-sm text-gray-600 dark:text-gray-400">Not available</span>
 
-        <div class="flex justify-end gap-1">
+        <div class="flex justify-center gap-1">
           <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Enhanced" />
           <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Enhanced" />
         </div>
