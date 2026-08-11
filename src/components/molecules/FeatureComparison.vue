@@ -202,15 +202,18 @@ onMounted(() => {
               <div
                 v-else-if="String(row[header]).trim().toLowerCase() === 'enhanced'"
                 class="flex items-center justify-center gap-1"
+                role="img"
                 aria-label="Enhanced"
               >
                 <CheckmarkIcon
                   class="w-5 h-5 text-green-600 dark:text-green-400"
-                  aria-label="Enhanced"
+                  aria-hidden="true"
+                  focusable="false"
                 />
                 <CheckmarkIcon
                   class="w-5 h-5 text-green-600 dark:text-green-400"
-                  aria-label="Enhanced"
+                  aria-hidden="true"
+                  focusable="false"
                 />
               </div>
               <template v-else>
