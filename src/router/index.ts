@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
+import { LOGIN_DISABLED } from '@/constants/auth'
 import { TITLE } from '@/constants/global'
 import { useAuthStore } from '@/stores/auth'
 import { useExposureStore } from '@/stores/exposure'
@@ -221,14 +222,16 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView,
-      meta: { title: `Login – ${TITLE}` },
+      component: LOGIN_DISABLED ? NotFoundView : LoginView,
+      meta: LOGIN_DISABLED ? { title: `Page Not Found – ${TITLE}` } : { title: `Login – ${TITLE}` },
     },
     {
       path: '/profile',
       name: 'profile',
-      component: ProfileView,
-      meta: { title: `Profile – ${TITLE}`, requiresAuth: true },
+      component: LOGIN_DISABLED ? NotFoundView : ProfileView,
+      meta: LOGIN_DISABLED
+        ? { title: `Page Not Found – ${TITLE}` }
+        : { title: `Profile – ${TITLE}`, requiresAuth: true },
     },
     {
       path: '/:pathMatch(.*)*',

@@ -2,6 +2,13 @@ export const GITHUB_OAUTH_AUTHORIZE_URL = 'https://github.com/login/oauth/author
 export const GITHUB_OAUTH_SCOPE = 'user:email'
 export const OAUTH_STATE_KEY = 'github_oauth_state'
 
+/**
+ * Disables login via `VITE_LOGIN_DISABLED`, hiding the login button
+ * and making the login and profile pages inaccessible.
+ * If `VITE_LOGIN_DISABLED` is not defined, login is shown by default.
+ */
+export const LOGIN_DISABLED = import.meta.env.VITE_LOGIN_DISABLED === 'true'
+
 export const LOGIN_ERROR_MESSAGES = {
   invalidCredentials: 'Incorrect username or password. Please try again.',
   forbidden: 'Your account does not have permission to sign in here.',
