@@ -56,8 +56,8 @@ describe('FeedbackButton', () => {
 
     expect(href).toContain(`${GITHUB_ISSUES_URL}/new`)
     expect(href).toContain('title=')
-    expect(href).toContain('body=')
-    expect(href).toContain(encodeURIComponent('**Page:**'))
+    expect(href).toContain('template=preview_feedback.yml')
+    expect(href).toContain('page-url=')
   })
 
   it('opens the link in a new tab with noopener and noreferrer', () => {
