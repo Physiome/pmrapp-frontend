@@ -187,7 +187,7 @@ onMounted(() => {
                 header === featureColumn
                   ? 'font-medium text-gray-900 dark:text-gray-100 md:pl-8'
                   : '',
-                iconColumns.includes(header) ? 'place-items-center' : '',
+                iconColumns.includes(header) ? 'place-items-center text-center' : '',
               ]"
               role="cell"
             >
@@ -201,6 +201,23 @@ onMounted(() => {
                 class="w-5 h-5 text-red-600 dark:text-red-400"
                 aria-label="No"
               />
+              <div
+                v-else-if="String(row[header]).trim().toLowerCase() === 'enhanced'"
+                class="flex items-center justify-center gap-1"
+                role="img"
+                aria-label="Enhanced"
+              >
+                <CheckmarkIcon
+                  class="w-5 h-5 text-green-600 dark:text-green-400"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+                <CheckmarkIcon
+                  class="w-5 h-5 text-green-600 dark:text-green-400"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              </div>
               <template v-else>
                 {{ row[header] }}
               </template>
@@ -209,6 +226,30 @@ onMounted(() => {
         </li>
       </template>
     </ul>
+  </div>
+
+  <!-- Legend -->
+  <div class="py-4 px-0" aria-label="Legend" v-if="!isLoading && !errorMessage">
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Legend</div>
+      <div class="grid gap-2" style="grid-template-columns: auto 1fr;">
+        <div class="flex justify-end">
+          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Available" />
+        </div>
+        <span class="text-sm text-gray-600 dark:text-gray-400">Available</span>
+
+        <div class="flex justify-end">
+          <CrossIcon class="w-5 h-5 text-red-600 dark:text-red-400" aria-label="Not available" />
+        </div>
+        <span class="text-sm text-gray-600 dark:text-gray-400">Not available</span>
+
+        <div class="flex justify-end gap-1">
+          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Enhanced" />
+          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Enhanced" />
+        </div>
+        <span class="text-sm text-gray-600 dark:text-gray-400">Available with enhanced capabilities</span>
+      </div>
+    </div>
   </div>
 </template>
 
