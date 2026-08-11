@@ -181,7 +181,7 @@ describe('FeatureComparison', () => {
     const thirdRowCells = rows[4].findAll('[class*="text-sm"]')
     expect(thirdRowCells[0].text()).toBe('Feature C')
     expect(thirdRowCells[1].find('svg').attributes('aria-label')).toBe('Yes')
-    expect(thirdRowCells[2].find('svg').attributes('aria-label')).toBe('Enhanced')
+    expect(thirdRowCells[2].find('[aria-label="Enhanced"]').exists()).toBe(true)
   })
 
   it('renders legend with availability labels', async () => {
