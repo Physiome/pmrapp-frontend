@@ -70,6 +70,7 @@ cp .env.example .env
 - `VITE_BASE_PATH` - Deployment path used for generated asset and router URLs.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT` - Enables GitHub Pages redirect helper when set to `true`.
 - `VITE_FEATURE_COMPARISON_SHEET_CSV_URL` - CSV file URL for the feature comparison page.
+- `VITE_LOGIN_DISABLED` - Set to `true` to disable login and hide the login button. If not defined, login is shown by default.
 
 > **Note:** To run the backend locally, see the [pmrplatform](https://github.com/Physiome/pmrplatform/) repository for setup instructions.
 

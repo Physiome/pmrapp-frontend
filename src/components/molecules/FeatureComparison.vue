@@ -158,7 +158,7 @@ onMounted(() => {
           v-for="header in tableHeaders"
           :key="header"
           class="font-semibold text-gray-900 dark:text-gray-100 capitalize"
-          :class="iconColumns.includes(header) ? 'place-items-center text-center' : 'text-left'"
+          :class="iconColumns.includes(header) ? 'grid place-items-center text-center' : 'text-left'"
           role="columnheader"
         >
           {{ header }}
@@ -187,7 +187,7 @@ onMounted(() => {
                 header === featureColumn
                   ? 'font-medium text-gray-900 dark:text-gray-100 md:pl-8'
                   : '',
-                iconColumns.includes(header) ? 'place-items-center text-center' : '',
+                iconColumns.includes(header) ? 'grid place-items-center text-center' : '',
               ]"
               role="cell"
             >

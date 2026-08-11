@@ -49,6 +49,7 @@ jobs:
           VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
           VITE_GITHUB_AUTH_API: ${{ secrets.VITE_GITHUB_AUTH_API }}
           VITE_FEATURE_COMPARISON_SHEET_CSV_URL: ${{ secrets.VITE_FEATURE_COMPARISON_SHEET_CSV_URL }}
+          VITE_LOGIN_DISABLED: ${{ vars.VITE_LOGIN_DISABLED || '' }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
