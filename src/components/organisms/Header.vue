@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
 import SearchIcon from '@/components/icons/SearchIcon.vue'
+import PreviewBanner from '@/components/molecules/PreviewBanner.vue'
 import UserDropdown from '@/components/molecules/UserDropdown.vue'
 import SearchOverlay from '@/components/organisms/SearchOverlay.vue'
 import { useGlobalStateStore } from '@/stores/globalState'
@@ -62,6 +63,7 @@ watch(
 
 <template>
   <header class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]">
+    <PreviewBanner />
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <RouterLink to="/" class="flex items-center" aria-label="Home">
         <img src="/logo.png" alt="Physiome Model Repository" width="48" height="48" />
@@ -131,11 +133,14 @@ watch(
   @apply
     before:content-['']
     before:absolute
-    before:top-0
     before:left-0
     before:right-0
     before:h-[6px]
     before:bg-primary;
+
+  &::before {
+    top: var(--notification-bar-height);
+  }
 }
 
 .mobile-menu-icon {

@@ -28,15 +28,17 @@ if (!SHEET_CSV_URL) {
 }
 
 const headerRowClasses = [
-  'sticky top-[76px] z-10',
+  'header-row',
+  'sticky z-10',
   'px-4 py-3',
   'flex items-center gap-4',
   'bg-gray-50 dark:bg-gray-800',
-  'rounded-t-lg border-b border-gray-200 dark:border-gray-700'
+  'rounded-t-lg border-b border-gray-200 dark:border-gray-700',
 ]
 
 const categoryTitleClasses = [
-  'sticky top-[120px] z-10',
+  'category-title',
+  'sticky z-10',
   'px-4 py-3',
   'bg-gray-100 dark:bg-gray-700',
   'border-t border-gray-200 dark:border-gray-700 -mt-[1px]',
@@ -212,4 +214,12 @@ onMounted(() => {
 
 <style scoped>
 @import '@/assets/box.css';
+
+.header-row {
+  top: calc(var(--notification-bar-height) + 76px);
+}
+
+.category-title {
+  top: calc(var(--notification-bar-height) + 120px);
+}
 </style>
