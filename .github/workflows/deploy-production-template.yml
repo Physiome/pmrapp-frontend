@@ -71,7 +71,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_deploy == 'true'
     steps:
       - name: Download production artefact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: pmrapp-frontend-dist
           path: ./dist
