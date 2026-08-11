@@ -6,11 +6,13 @@ const props = withDefaults(
     disabled?: boolean
     offset?: number
     maxWidth?: string
+    placement?: 'bottom' | 'left'
   }>(),
   {
     disabled: false,
     offset: 6,
     maxWidth: '260px',
+    placement: 'bottom',
   },
 )
 
@@ -42,6 +44,13 @@ const updatePosition = () => {
   // Default: position below the trigger, centered.
   let nextTop = triggerRect.bottom + props.offset
   let nextLeft = triggerRect.left + triggerRect.width / 2 - popoverRect.width / 2
+
+  // If placement is "left", position to the left of the trigger,
+  // with the bottom of the popover aligned to the bottom of the trigger.
+  if (props.placement === 'left') {
+    nextLeft = triggerRect.left - popoverRect.width - props.offset
+    nextTop = triggerRect.bottom - popoverRect.height
+  }
 
   // Keep within viewport horizontally.
   nextLeft = Math.max(
