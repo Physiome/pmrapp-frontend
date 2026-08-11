@@ -1,0 +1,21 @@
+name: Preview Site Feedback
+description: Report an issue or feedback found while using the preview site.
+title: "[Preview Feedback]: "
+labels: ["bug", "preview-site"]
+body:
+  - type: input
+    id: page-url
+    attributes:
+      label: Page URL
+      description: The page URL where you encountered the issue.
+      placeholder: https://...
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description / Feedback
+      description: What went wrong or what feedback do you have?
+    validations:
+      required: true
