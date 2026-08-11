@@ -20,12 +20,20 @@ const handleClose = async () => {
 
 const handleResize = () => {
   if (!notificationBarEl.value || !notificationContainerEl.value) return
-  const viewportWidth = window.innerWidth
-  const notificationBarRect = notificationBarEl.value.getBoundingClientRect()
 
-  if ((notificationBarRect.width + 40) >= viewportWidth) {
-    notificationContainerEl.value.style.paddingRight = `44px`
+  const CLOSE_BUTTON_WIDTH = 24 // w-6 in Tailwind.
+  const CLOSE_BUTTON_RIGHT_OFFSET = 16 // right-4 in Tailwind.
+  const GAP = 8 // gap-2 in Tailwind.
+
+  const REQUIRED_PADDING = CLOSE_BUTTON_WIDTH + CLOSE_BUTTON_RIGHT_OFFSET + GAP
+
+  const notificationBarWidth = notificationBarEl.value.offsetWidth - (CLOSE_BUTTON_RIGHT_OFFSET * 2)
+  const containerWidth = notificationContainerEl.value.offsetWidth
+
+  if (containerWidth >= notificationBarWidth) {
+    notificationContainerEl.value.style.paddingRight = `${REQUIRED_PADDING}px`
   } else {
+    // Remove inline style to restore default CSS class padding.
     notificationContainerEl.value.style.paddingRight = ''
   }
 }
@@ -56,7 +64,7 @@ onBeforeUnmount(() => {
   >
     <div
       ref="notificationContainerEl"
-      class="container mx-auto px-4 pr-10 lg:pr-4 py-2 flex items-center justify-center gap-2 text-sm">
+      class="container mx-auto px-4 py-2 flex items-center justify-center gap-2 text-sm">
       <slot />
     </div>
     <CloseButton
