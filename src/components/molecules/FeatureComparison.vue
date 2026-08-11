@@ -227,7 +227,7 @@ onMounted(() => {
   </div>
 
   <!-- Legend -->
-  <div class="py-4 px-0" aria-label="Legend">
+  <div class="py-4 px-0" aria-label="Legend" v-if="!isLoading && !errorMessage">
     <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
       <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Legend</div>
       <div class="grid gap-2" style="grid-template-columns: auto 1fr;">
