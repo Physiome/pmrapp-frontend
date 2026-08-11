@@ -27,7 +27,7 @@ const handleResize = () => {
 
   const REQUIRED_PADDING = CLOSE_BUTTON_WIDTH + CLOSE_BUTTON_RIGHT_OFFSET + GAP
 
-  const notificationBarWidth = notificationBarEl.value.offsetWidth - (CLOSE_BUTTON_RIGHT_OFFSET * 2)
+  const notificationBarWidth = notificationBarEl.value.offsetWidth - REQUIRED_PADDING
   const containerWidth = notificationContainerEl.value.offsetWidth
 
   if (containerWidth >= notificationBarWidth) {
