@@ -6,7 +6,7 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 <template>
   <PageHeader
     title="Feature comparison"
-    description="Compare feature availability between PMR2 and PMR3."
+    description="Compare feature availability between production and preview."
   />
 
   <FeatureComparison />
