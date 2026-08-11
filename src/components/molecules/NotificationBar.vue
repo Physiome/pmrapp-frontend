@@ -49,6 +49,7 @@ onMounted(async () => {
   }
   updateNotificationBarHeight()
   window.addEventListener('resize', handleResize)
+  handleResize()
 })
 
 onBeforeUnmount(() => {
