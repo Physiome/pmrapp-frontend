@@ -6,7 +6,6 @@ import NotificationBar from './NotificationBar.vue'
 
 <template>
   <NotificationBar>
-    You are viewing a preview version.
     <ActionButton
       :href="PMR2_URL"
       variant="secondary"
@@ -14,13 +13,15 @@ import NotificationBar from './NotificationBar.vue'
     >
       Go back to production
     </ActionButton>
-    <ActionButton
-      to="/feature-comparison"
-      variant="primary"
-      class="ml-auto"
-      size="sm"
-    >
-      Feature comparison
-    </ActionButton>
+    <div class="ml-auto flex items-center gap-2">
+      <span>You are viewing a preview version.</span>
+      <ActionButton
+        to="/feature-comparison"
+        variant="primary"
+        size="sm"
+      >
+        Feature comparison
+      </ActionButton>
+    </div>
   </NotificationBar>
 </template>
