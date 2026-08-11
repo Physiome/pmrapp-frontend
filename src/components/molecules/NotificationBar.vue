@@ -7,7 +7,7 @@ import { Cookie } from '@/utils/cookie'
 const isVisible = ref(true)
 
 const updateNotificationBarHeight = () => {
-  const height = isVisible.value ? '47px' : '0'
+  const height = isVisible.value ? '46px' : '0'
   document.documentElement.style.setProperty('--notification-bar-height', height)
 }
 
@@ -32,7 +32,7 @@ watch(isVisible, () => {
 <template>
   <div
     v-if="isVisible"
-    class="bg-amber-100 dark:bg-amber-900/20 border-b border-amber-300 dark:border-amber-700 relative"
+    class="bg-amber-100 dark:bg-amber-900/20 relative"
   >
     <div class="container mx-auto px-4 pr-10 lg:pr-4 py-2 flex items-center justify-center gap-2 text-sm">
       <slot />
