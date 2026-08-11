@@ -27,8 +27,13 @@ const newIssueUrl = computed((): string => {
     pageUrl.searchParams.delete(key)
   }
 
-  const body = `**Page:** ${pageUrl.toString()}\n\n`
-  return `${GITHUB_ISSUES_URL}/new?title=&body=${encodeURIComponent(body)}`
+  const params = new URLSearchParams({
+    template: 'preview_feedback.yml',
+    title: '[Preview Feedback]: ',
+    'page-url': pageUrl.toString(),
+  })
+
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
 })
 </script>
 
