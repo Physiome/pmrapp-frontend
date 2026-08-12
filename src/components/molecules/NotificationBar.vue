@@ -47,6 +47,9 @@ onMounted(async () => {
   if (dismissed === 'true') {
     isVisible.value = false
   }
+})
+
+onMounted(() => {
   updateNotificationBarHeight()
   window.addEventListener('resize', handleResize)
   handleResize()
