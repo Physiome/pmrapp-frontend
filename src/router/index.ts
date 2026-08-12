@@ -7,6 +7,7 @@ import { useSearchStore } from '@/stores/search'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { isJwtExpired } from '@/utils/auth'
 import { generateExposureTitle, resolveExposureFileTitle } from '@/utils/exposure'
+import { getQueryTextFromRouteQuery } from '@/utils/search'
 import { generateWorkspaceTitle } from '@/utils/workspace'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
 import ExposureView from '@/views/ExposureView.vue'
@@ -243,6 +244,17 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
+  if (to.path === '/search' && to.query.SearchableText !== undefined && to.query.query === undefined) {
+    const legacyQuery = getQueryTextFromRouteQuery(to.query)
+
+    if (legacyQuery) {
+      const nextQuery = { ...to.query }
+      delete nextQuery.SearchableText
+      nextQuery.query = legacyQuery
+      return { path: to.path, query: nextQuery, replace: true }
+    }
+  }
+
   const authStore = useAuthStore()
   const storedToken = localStorage.getItem('auth_token')
   const authMethod = localStorage.getItem('auth_method') as 'password' | 'github' | null
