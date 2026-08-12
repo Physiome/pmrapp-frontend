@@ -10,7 +10,7 @@ import { PMR2_URL } from '@/constants/global'
     <ActionButton
       :href="PMR2_URL"
       variant="secondary"
-      class="lg:absolute lg:left-4"
+      class="absolute left-4"
       size="sm"
     >
       <span class="hidden md:block">Go back to production</span>
