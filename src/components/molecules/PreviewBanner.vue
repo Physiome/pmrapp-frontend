@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import { PMR2_URL } from '@/constants/global'
-import NotificationBar from '@/components/molecules/NotificationBar.vue'
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue'
+import NotificationBar from '@/components/molecules/NotificationBar.vue'
+import { PMR2_URL } from '@/constants/global'
 </script>
 
 <template>
