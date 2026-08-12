@@ -1,0 +1,40 @@
+name: Issue with a PMR workspace
+description: Use this form to report any issue or problems encountered with a workspace on PMR
+title: "[Workspace]: "
+labels: [workspace]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue with a workspace on PMR. Please fill out the following details.
+  - type: input
+    id: workspace-url
+    attributes:
+      label: URI of the workspace
+      description: This typically take the form of https[]()://models.physiomeproject.org/workspace/{workspace_id}.
+      placeholder: https://models.physiomeproject.org/workspace/...
+    validations:
+      required: true
+  - type: textarea
+    id: workspace-issue
+    attributes:
+      label: The issue encountered with the workspace
+      description: Describe the issue you have encountered with the workspace specified above; please also include what you were trying to do, if applicable.
+      placeholder: |
+        - Interaction via git (e.g. `git clone`, `git pull`) does not work.
+        - Latest exposure to the workspace is out of date.
+        - Problems downloading a file.
+        - The link above results in a "We’re sorry, but there seems to be an error…" message.
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Which browser(s) were you using when you encountered the above issue?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Safari
