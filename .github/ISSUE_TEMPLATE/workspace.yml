@@ -1,5 +1,5 @@
 name: Issue with a workspace
-description: Use this form to report an issue with a workspace on this site.
+description: Use this form to report an issue with a workspace on the preview site.
 title: "[Workspace]: "
 labels: ["workspace", "preview-feedback"]
 body:
@@ -12,8 +12,8 @@ body:
     id: workspace-url
     attributes:
       label: URI of the workspace
-      description: This usually takes the form of https://https://preview.models.physiomeproject.org/workspace/{workspace_id}.
-      placeholder: https://https://preview.models.physiomeproject.org/workspace/...
+      description: This usually takes the form of https://preview.models.physiomeproject.org/workspace/{workspace_id}.
+      placeholder: https://preview.models.physiomeproject.org/workspace/1
     validations:
       required: true
 

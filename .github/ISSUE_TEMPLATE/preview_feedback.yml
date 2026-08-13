@@ -1,12 +1,12 @@
 name: Preview Site Feedback
-description: Report a bug or feedback about the preview version of the site.
+description: Report a bug or share feedback about the preview site.
 title: "[Preview Feedback]: "
 labels: ["bug", "preview-feedback"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping us improve the preview version of the site. Please tell us where the issue occurred and what you expected to happen.
+        Thank you for helping us improve the preview site. Please tell us where the issue occurred and what you expected to happen.
 
   - type: input
     id: page-url

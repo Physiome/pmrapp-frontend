@@ -1,5 +1,5 @@
 name: Issue with an exposure
-description: Use this form to report an issue with an exposure on this site.
+description: Use this form to report an issue with an exposure on the preview site.
 title: "[Exposure]: "
 labels: ["exposure", "preview-feedback"]
 body:
@@ -12,8 +12,8 @@ body:
     id: exposure-url
     attributes:
       label: URI of the exposure
-      description: This usually takes the form of https://https://preview.models.physiomeproject.org/e/{exposure_id}. You can also point to a specific file or subpath within the exposure.
-      placeholder: https://https://preview.models.physiomeproject.org/e/1
+      description: This usually takes the form of https://preview.models.physiomeproject.org/exposure/{exposure_id}. You can also point to a specific file or subpath within the exposure.
+      placeholder: https://preview.models.physiomeproject.org/exposure/1
     validations:
       required: true
 
