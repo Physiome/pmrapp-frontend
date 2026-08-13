@@ -198,6 +198,18 @@ const refreshLoadedFileTitle = async () => {
   }
 }
 
+const actionToolbarWidth = computed(() => {
+  if (error.value || isLoading.value) {
+    return 'w-full'
+  }
+
+  return [
+    'w-full ',
+    'lg:w-[calc(100%-theme(spacing.72)-theme(spacing.8))]',
+    'xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))]'
+  ]
+})
+
 const exposureTitle = computed(() => {
   if (loadedFileTitle.value) {
     return loadedFileTitle.value
@@ -691,7 +703,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex justify-between mb-6 action-toolbar-width">
+  <div class="flex justify-between mb-6" :class="actionToolbarWidth">
     <BackButton
       :label="backButtonLabel"
       content-section="Exposure Detail"
@@ -715,20 +727,6 @@ onMounted(async () => {
     :title="error.title"
     :error="error.message"
   />
-
-  <div class="pt-6" v-if="error">
-    <ActionButton
-      variant="link"
-      size="sm"
-      :href="exposureIssueUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-      content-section="Exposure Detail"
-    >
-      <BugIcon class="w-4 h-4" />
-      <span>Report a problem with this {{ props.file ? 'resource' : 'exposure'}}</span>
-    </ActionButton>
-  </div>
 
   <LoadingBox v-else-if="isLoading" message="Loading exposure..." />
 
@@ -1109,10 +1107,6 @@ onMounted(async () => {
 <style scoped>
 @import '@/assets/text-link.css';
 @import '@/assets/box.css';
-
-.action-toolbar-width {
-  @apply w-full lg:w-[calc(100%-theme(spacing.72)-theme(spacing.8))] xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))];
-}
 
 .code-inline {
   display: inline-block;
