@@ -5,10 +5,12 @@ import ActionButton from '@/components/atoms/ActionButton.vue'
 import BackButton from '@/components/atoms/BackButton.vue'
 import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
+import BugIcon from '@/components/icons/BugIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
+import { GITHUB_ISSUES_URL } from '@/constants/global'
 import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
@@ -81,6 +83,23 @@ const pageTitle = computed(() => {
     workspaceInfo.value?.workspace.description,
     workspaceInfo.value?.workspace.id,
   )
+})
+
+const workspaceIssueUrl = computed(() => {
+  const workspaceUrl = workspaceInfo.value?.workspace.url
+
+  if (!workspaceUrl) {
+    return `${GITHUB_ISSUES_URL}/new`
+  }
+
+  const params = new URLSearchParams({
+    labels: 'workspace',
+    template: 'workspace.yml',
+    title: '[Workspace]: ',
+    'workspace-url': workspaceUrl,
+  })
+
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
 })
 
 const loadWorkspaceInfo = async () => {
@@ -190,6 +209,21 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code> file)</span>
           </ActionButton>
         </div>
+      </div>
+
+      <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2">
+        <span class="font-bold text-gray-600 dark:text-gray-400">Report issue:</span>
+        <ActionButton
+          variant="secondary"
+          size="sm"
+          :href="workspaceIssueUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          content-section="Workspace Detail"
+        >
+          <BugIcon class="w-4 h-4" />
+          <span>Report issue</span>
+        </ActionButton>
       </div>
     </div>
 
