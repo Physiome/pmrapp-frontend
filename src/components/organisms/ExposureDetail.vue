@@ -236,7 +236,7 @@ const exposureIssueUrl = computed(() => {
   const params = new URLSearchParams({
     labels: 'exposure, preview-feedback',
     template: 'exposure.yml',
-    title: `[Exposure]: ${exposureTitle.value}`,
+    title: `[Exposure]: ${error?.value ? error.value.title : exposureTitle.value}`,
     'exposure-url': exposureUrl,
   })
 
@@ -699,6 +699,19 @@ onMounted(async () => {
     :title="error.title"
     :error="error.message"
   />
+
+  <div class="pt-6" v-if="error">
+    <ActionButton
+      variant="link"
+      size="sm"
+      :href="exposureIssueUrl"
+      target="_blank"
+      content-section="Exposure Detail"
+    >
+      <BugIcon class="w-4 h-4" />
+      <span>Report a problem with this {{ props.file ? 'resource' : 'exposure'}}</span>
+    </ActionButton>
+  </div>
 
   <LoadingBox v-else-if="isLoading" message="Loading exposure..." />
 
