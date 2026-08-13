@@ -94,7 +94,7 @@ const workspaceIssueUrl = computed(() => {
   const params = new URLSearchParams({
     labels: 'workspace, preview-feedback',
     template: 'workspace.yml',
-    title: `[Workspace]: ${pageTitle.value}`,
+    title: `[Workspace]: ${error?.value ? error.value.title : pageTitle.value}`,
     'workspace-url': workspaceUrl,
   })
 
@@ -158,6 +158,20 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
     :title="error.title"
     :error="error.message"
   />
+
+  <div class="pt-6" v-if="error">
+    <ActionButton
+      variant="link"
+      size="sm"
+      :href="workspaceIssueUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      content-section="Workspace Detail"
+    >
+      <BugIcon class="w-4 h-4" />
+      <span>Report a problem with this workspace</span>
+    </ActionButton>
+  </div>
 
   <LoadingBox v-else-if="isLoading" message="Loading workspace..." />
 
