@@ -703,7 +703,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex justify-between mb-6" :class="actionToolbarWidth">
+  <div class="flex flex-wrap gap-2 justify-between mb-6" :class="actionToolbarWidth">
     <BackButton
       :label="backButtonLabel"
       content-section="Exposure Detail"
