@@ -13,12 +13,13 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
+import BugIcon from '@/components/icons/BugIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
-import { TITLE } from '@/constants/global'
+import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useExposureStore } from '@/stores/exposure'
 import { useSearchStore } from '@/stores/search'
@@ -219,6 +220,27 @@ const pageTitle = computed(() => {
   }
 
   return exposureTitle.value
+})
+
+const exposureIssueUrl = computed(() => {
+  if (!props.alias) {
+    return `${GITHUB_ISSUES_URL}/new`
+  }
+
+  let exposureUrl = window.location.origin + `/exposure/${props.alias}`
+
+  if (props.file) {
+    exposureUrl += `/${props.file}`
+  }
+
+  const params = new URLSearchParams({
+    labels: 'exposure, preview-feedback',
+    template: 'exposure.yml',
+    title: `[Exposure]: ${exposureTitle.value}`,
+    'exposure-url': exposureUrl,
+  })
+
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
 })
 
 const openCORFiles = computed(() => {
@@ -1016,7 +1038,7 @@ onMounted(async () => {
           </dl>
         </div>
       </section>
-      <section v-if="licenseInfo" class="pt-6 border-t border-gray-200 dark:border-gray-700">
+      <section v-if="licenseInfo" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-lg font-semibold mb-3">Licence</h4>
         <nav>
           <ul class="space-y-2">
@@ -1027,6 +1049,19 @@ onMounted(async () => {
             </li>
           </ul>
         </nav>
+      </section>
+      <section class="pt-6 border-t border-gray-200 dark:border-gray-700">
+        <ActionButton
+          variant="link"
+          size="sm"
+          :href="exposureIssueUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          content-section="Exposure Detail"
+        >
+          <BugIcon class="w-4 h-4" />
+          <span>Report a problem with this {{ props.file ? 'resource' : 'exposure'}}</span>
+        </ActionButton>
       </section>
     </aside>
   </div>
