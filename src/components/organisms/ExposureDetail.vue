@@ -229,17 +229,11 @@ const exposureIssueUrl = computed(() => {
     return `${GITHUB_ISSUES_URL}/new`
   }
 
-  let exposureUrl = `${window.location.origin}/exposure/${props.alias}`
-
-  if (props.file) {
-    exposureUrl += `/${props.file}`
-  }
-
   const params = new URLSearchParams({
-    labels: 'exposure, preview-feedback',
+    labels: 'exposure,preview-feedback',
     template: 'exposure.yml',
-    title: `[Exposure]: ${error?.value ? error.value.title : exposureTitle.value}`,
-    'exposure-url': exposureUrl,
+    title: `[Exposure]: ${error.value ? error.value.title : exposureTitle.value}`,
+    'exposure-url': citationUrl.value,
   })
 
   return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
