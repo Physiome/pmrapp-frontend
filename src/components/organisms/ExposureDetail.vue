@@ -813,7 +813,7 @@ onMounted(async () => {
           :options="mathFormatOptions"
           @update:options="mathFormatOptions = $event"
         />
-        <div class="p-4">
+        <div class="p-4 pt-0">
           <p v-if="!mathsJSON.length" class="text-sm text-gray-500 dark:text-gray-400">No mathematics content available.</p>
           <template v-else>
             <div v-for="value in mathsJSON" :key="value[0]"
