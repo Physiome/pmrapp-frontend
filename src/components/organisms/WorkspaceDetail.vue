@@ -210,10 +210,9 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
         </div>
       </div>
 
-      <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2">
-        <span class="font-bold text-gray-600 dark:text-gray-400">Report issue:</span>
+      <div class="flex flex-row justify-end">
         <ActionButton
-          variant="secondary"
+          variant="link"
           size="sm"
           :href="workspaceIssueUrl"
           target="_blank"
@@ -221,7 +220,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
           content-section="Workspace Detail"
         >
           <BugIcon class="w-4 h-4" />
-          <span>Report issue</span>
+          <span>Report a problem with this workspace</span>
         </ActionButton>
       </div>
     </div>
