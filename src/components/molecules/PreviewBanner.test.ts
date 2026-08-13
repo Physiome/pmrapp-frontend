@@ -40,9 +40,13 @@ describe('PreviewBanner', () => {
 
     const buttons = wrapper.findAll('a')
     expect(buttons).toHaveLength(2)
-    expect(buttons[0].text()).toBe('Go back to production')
+
+    expect(buttons[0].text()).toContain('Go back to production')
+    expect(buttons[0].text()).toContain('Production')
     expect(buttons[0].attributes('href')).toBe(PMR2_URL)
-    expect(buttons[1].text()).toBe('Feature comparison')
+
+    expect(buttons[1].text()).toContain('Feature comparison')
+    expect(buttons[1].text()).toContain('Features')
     expect(buttons[1].attributes('data-to')).toBe('/feature-comparison')
   })
 })

@@ -2,8 +2,8 @@ import { mount, RouterLinkStub } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { reactive } from 'vue'
-import Header from '@/components/organisms/Header.vue'
 import UserDropdown from '@/components/molecules/UserDropdown.vue'
+import Header from '@/components/organisms/Header.vue'
 
 const route = reactive({
   name: 'home',
