@@ -757,17 +757,6 @@ onMounted(async () => {
           >
             Go to exposure
           </ActionButton>
-          <ActionButton
-            variant="link"
-            size="sm"
-            :href="exposureIssueUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            content-section="Exposure Detail"
-          >
-            <BugIcon class="w-4 h-4" />
-            <span>Report a problem with this resource</span>
-          </ActionButton>
         </template>
       </WarningBlock>
 
