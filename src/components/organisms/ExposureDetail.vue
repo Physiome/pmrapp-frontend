@@ -224,13 +224,6 @@ const pageTitle = computed(() => {
   return exposureTitle.value
 })
 
-const fileNotFoundMessage = computed(() => {
-  return `
-    The file '${props.file}' does not exist in this exposure.
-    The information shown on this page relates to the exposure itself, not to this file.
-  `
-})
-
 const exposureIssueUrl = computed(() => {
   if (!props.alias) {
     return `${GITHUB_ISSUES_URL}/new`
@@ -740,27 +733,34 @@ onMounted(async () => {
       <WarningBlock
         v-if="isFileNotFound"
         title="File not found"
-        :message="fileNotFoundMessage"
       >
-        <ActionButton
-          variant="primary"
-          size="sm"
-          :to="`/exposures/${props.alias}`"
-          content-section="Exposure Detail"
-        >
-          Go to exposure
-        </ActionButton>
-        <ActionButton
-          variant="link"
-          size="sm"
-          :href="exposureIssueUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          content-section="Exposure Detail"
-        >
-          <BugIcon class="w-4 h-4" />
-          <span>Report a problem with this resource</span>
-        </ActionButton>
+        <template #content>
+          <p class="text-sm">
+            The file <strong>{{ props.file }}</strong> does not exist in this exposure.
+            The information shown on this page relates to the exposure itself, not to this file.
+          </p>
+        </template>
+        <template #footer>
+          <ActionButton
+            variant="primary"
+            size="sm"
+            :to="`/exposures/${props.alias}`"
+            content-section="Exposure Detail"
+          >
+            Go to exposure
+          </ActionButton>
+          <ActionButton
+            variant="link"
+            size="sm"
+            :href="exposureIssueUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            content-section="Exposure Detail"
+          >
+            <BugIcon class="w-4 h-4" />
+            <span>Report a problem with this resource</span>
+          </ActionButton>
+        </template>
       </WarningBlock>
 
       <div v-else-if="props.view === 'cellml_codegen'" class="relative">

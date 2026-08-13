@@ -2,11 +2,11 @@
 @reference "./main.css";
 
 .warning-box {
-  @apply text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-4;
+  @apply bg-amber-50 border border-amber-200 rounded-lg p-4;
 }
 
 @media (prefers-color-scheme: dark) {
   .warning-box {
-    @apply text-amber-200 bg-amber-900/20 border-amber-900;
+    @apply text-white bg-amber-900/20 border-amber-900;
   }
 }

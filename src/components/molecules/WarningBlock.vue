@@ -1,7 +1,6 @@
 <script setup lang="ts">
 interface Props {
   title: string
-  message: string
 }
 
 defineProps<Props>()
@@ -10,9 +9,9 @@ defineProps<Props>()
 <template>
   <div class="warning-box">
     <h3 class="font-semibold mb-2">{{ title }}</h3>
-    <p class="text-sm">{{ message }}</p>
-    <div v-if="$slots.default" class="mt-4 flex flex-wrap gap-2">
-      <slot />
+    <slot name="content" />
+    <div v-if="$slots.footer" class="mt-4 flex flex-wrap gap-4">
+      <slot name="footer" />
     </div>
   </div>
 </template>
