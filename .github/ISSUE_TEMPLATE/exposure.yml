@@ -17,20 +17,6 @@ body:
     validations:
       required: true
 
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: Which browser(s) were you using when you encountered the issue?
-      multiple: true
-      options:
-        - Chrome
-        - Firefox
-        - Microsoft Edge
-        - Safari
-        - Other
-    validations:
-      required: false
-
   - type: textarea
     id: exposure-issue
     attributes:
@@ -44,6 +30,20 @@ body:
         - The link above results in a "We’re sorry, but there seems to be an error…" message.
     validations:
       required: true
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Which browser(s) were you using when you encountered the issue?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Safari
+        - Other
+    validations:
+      required: false
 
   - type: input
     id: contact
