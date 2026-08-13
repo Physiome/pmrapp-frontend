@@ -6,7 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for reporting an issue with an exposure. Please include the exposure URL, the browser(s) you were using, and the details of the problem you encountered.
+        Thank you for reporting an issue with an exposure.
+        Please include the exposure URL, the browser(s) you were using, and the details of the problem you encountered.
 
   - type: input
     id: exposure-url

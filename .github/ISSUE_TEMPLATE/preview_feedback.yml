@@ -6,7 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for helping us improve the preview site. Please tell us where the issue occurred and what you expected to happen.
+        Thank you for helping us improve the preview site.
+        Please include the page URL, the browser(s) you were using, the details of the problem you encountered, and what you expected to happen.
 
   - type: input
     id: page-url
