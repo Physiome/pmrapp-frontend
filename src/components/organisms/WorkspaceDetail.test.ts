@@ -69,7 +69,7 @@ describe('WorkspaceDetail', () => {
     expect(issueLink.attributes('href')).toContain('labels=workspace')
     expect(issueLink.attributes('href')).toContain('title=%5BWorkspace%5D%3A+')
     expect(issueLink.attributes('href')).toContain(
-      `workspace-url=${encodeURIComponent(mockWorkspaceInfo.workspace.url)}`,
+      `workspace-url=${encodeURIComponent(`${window.location.origin}/workspace/test-alias`)}`,
     )
   })
 })
