@@ -735,10 +735,10 @@ onMounted(async () => {
         title="File not found"
       >
         <template #content>
-          <p class="text-sm">
-            The file <strong>{{ props.file }}</strong> does not exist in this exposure.
-            The information shown on this page relates to the exposure itself, not to this file.
-          </p>
+          <div class="text-sm">
+            <p>The file <strong>{{ props.file }}</strong> does not exist in this exposure.</p>
+            <p class="mt-1">The information shown on this page relates to the exposure itself, not to this file.</p>
+          </div>
         </template>
         <template #footer>
           <ActionButton
