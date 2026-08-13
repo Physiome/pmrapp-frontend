@@ -709,6 +709,7 @@ onMounted(async () => {
       size="sm"
       :href="exposureIssueUrl"
       target="_blank"
+      rel="noopener noreferrer"
       content-section="Exposure Detail"
     >
       <BugIcon class="w-4 h-4" />
