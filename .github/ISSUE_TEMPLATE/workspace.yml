@@ -1,26 +1,41 @@
-name: Issue with a PMR workspace
-description: Use this form to report any issue or problems encountered with a workspace on PMR
+name: Issue with a workspace
+description: Use this form to report an issue with a workspace on this site.
 title: "[Workspace]: "
-labels: [workspace]
-assignees: []
+labels: ["workspace", "preview-feedback"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for reporting an issue with a workspace on PMR. Please fill out the following details.
+        Thank you for reporting an issue with a workspace. Please include the workspace URL, the browser you were using, and the details of the problem you encountered.
+
   - type: input
     id: workspace-url
     attributes:
       label: URI of the workspace
-      description: This typically take the form of https[]()://models.physiomeproject.org/workspace/{workspace_id}.
-      placeholder: https://models.physiomeproject.org/workspace/...
+      description: This usually takes the form of https://https://preview.models.physiomeproject.org/workspace/{workspace_id}.
+      placeholder: https://https://preview.models.physiomeproject.org/workspace/...
     validations:
       required: true
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Which browser(s) were you using when you encountered the issue?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Safari
+        - Other
+    validations:
+      required: false
+
   - type: textarea
     id: workspace-issue
     attributes:
       label: The issue encountered with the workspace
-      description: Describe the issue you have encountered with the workspace specified above; please also include what you were trying to do, if applicable.
+      description: Describe the issue you encountered with the workspace specified above, including what you were trying to do and what happened instead.
       placeholder: |
         - Interaction via git (e.g. `git clone`, `git pull`) does not work.
         - Latest exposure to the workspace is out of date.
@@ -28,13 +43,12 @@ body:
         - The link above results in a "We’re sorry, but there seems to be an error…" message.
     validations:
       required: true
-  - type: dropdown
-    id: browsers
+
+  - type: input
+    id: contact
     attributes:
-      label: Which browser(s) were you using when you encountered the above issue?
-      multiple: true
-      options:
-        - Chrome
-        - Firefox
-        - Microsoft Edge
-        - Safari
+      label: Contact Details
+      description: How can we contact you if we need more information?
+      placeholder: ex. email@example.com or GitHub username
+    validations:
+      required: false

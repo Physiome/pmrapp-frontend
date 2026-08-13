@@ -1,41 +1,55 @@
-name: Issue with a PMR exposure
-description: Use this form to report any issue or problems encountered with an exposure resource on PMR
+name: Issue with an exposure
+description: Use this form to report an issue with an exposure on this site.
 title: "[Exposure]: "
-labels: [exposure]
-assignees: []
+labels: ["exposure", "preview-feedback"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for reporting an issue with an exposure on PMR. Please fill out the following details.
+        Thank you for reporting an issue with an exposure. Please include the exposure URL, the browser you were using, and the details of the problem you encountered.
+
   - type: input
     id: exposure-url
     attributes:
       label: URI of the exposure
-      description: This typically take the form of https[]()://models.physiomeproject.org/e/{exposure_id}; do feel free to point to a specific file subpath within.
-      placeholder: https://models.physiomeproject.org/e/1
+      description: This usually takes the form of https://https://preview.models.physiomeproject.org/e/{exposure_id}. You can also point to a specific file or subpath within the exposure.
+      placeholder: https://https://preview.models.physiomeproject.org/e/1
     validations:
       required: true
-  - type: textarea
-    id: exposure-issue
-    attributes:
-      label: The issue encountered with the exposure
-      description: Describe the issue you have encountered with the exposure specified above; please also include what you were trying to do, if applicable.
-      placeholder: |
-        - Archive download is corrupted/missing files.
-        - Math in the model does not match the paper.
-        - Metadata is incomplete/missing/wrong.
-        - Simulation does not run correctly.
-        - The link above results in a "We’re sorry, but there seems to be an error…" message.
-    validations:
-      required: true
+
   - type: dropdown
     id: browsers
     attributes:
-      label: Which browser(s) were you using when you encountered the above issue?
+      label: Which browser(s) were you using when you encountered the issue?
       multiple: true
       options:
         - Chrome
         - Firefox
         - Microsoft Edge
         - Safari
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: exposure-issue
+    attributes:
+      label: The issue encountered with the exposure
+      description: Describe the issue you encountered with the exposure specified above, including what you were trying to do and what happened instead.
+      placeholder: |
+        - Archive download is corrupted or missing files.
+        - Math in the model does not match the paper.
+        - Metadata is incomplete, missing, or incorrect.
+        - Simulation does not run correctly.
+        - The link above results in a "We’re sorry, but there seems to be an error…" message.
+    validations:
+      required: true
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we contact you if we need more information?
+      placeholder: ex. email@example.com or GitHub username
+    validations:
+      required: false
