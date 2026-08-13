@@ -90,11 +90,20 @@ const workspaceIssueUrl = computed(() => {
     return `${GITHUB_ISSUES_URL}/new`
   }
 
-  const workspaceUrl = `${window.location.origin}/workspace/${props.alias}`
+  const resolved = router.resolve(
+    props.commitId && props.path
+      ? {
+        name: 'workspace-file-detail',
+        params: { alias: props.alias, commitId: props.commitId, path: props.path },
+      }
+      : { name: 'workspace-detail', params: { alias: props.alias } },
+   )
+  const decodedHref = decodeURIComponent(resolved.href)
+  const workspaceUrl = new URL(decodedHref, window.location.origin).toString()
   const params = new URLSearchParams({
-    labels: 'workspace, preview-feedback',
+    labels: 'workspace,preview-feedback',
     template: 'workspace.yml',
-    title: `[Workspace]: ${error?.value ? error.value.title : pageTitle.value}`,
+    title: `[Workspace]: ${error.value ? error.value.title : pageTitle.value}`,
     'workspace-url': workspaceUrl,
   })
 
