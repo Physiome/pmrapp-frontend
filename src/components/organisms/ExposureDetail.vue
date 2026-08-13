@@ -691,11 +691,24 @@ onMounted(async () => {
 </script>
 
 <template>
-  <BackButton
-    :label="backButtonLabel"
-    content-section="Exposure Detail"
-    :on-click="goBack"
-  />
+  <div class="flex justify-between mb-6 action-toolbar-width">
+    <BackButton
+      :label="backButtonLabel"
+      content-section="Exposure Detail"
+      :on-click="goBack"
+    />
+    <ActionButton
+      variant="link"
+      size="md"
+      :href="exposureIssueUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      content-section="Exposure Detail"
+    >
+      <BugIcon class="w-4 h-4" />
+      <span>Report a problem with this {{ props.file ? 'resource' : 'exposure'}}</span>
+    </ActionButton>
+  </div>
 
   <ErrorBlock
     v-if="error"
@@ -835,7 +848,7 @@ onMounted(async () => {
         :on-path-change="handleFileBrowserPathChange"
       />
     </article>
-    <aside class="w-full lg:w-70 xl:w-80 lg:flex-shrink-0">
+    <aside class="w-full lg:w-72 xl:w-80 lg:flex-shrink-0">
       <section class="pb-6">
         <h4 class="text-lg font-semibold mb-3">Source</h4>
         <div class="text-sm leading-relaxed">
@@ -1088,7 +1101,7 @@ onMounted(async () => {
           </dl>
         </div>
       </section>
-      <section v-if="licenseInfo" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+      <section v-if="licenseInfo" class="pt-6 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-lg font-semibold mb-3">Licence</h4>
         <nav>
           <ul class="space-y-2">
@@ -1100,19 +1113,6 @@ onMounted(async () => {
           </ul>
         </nav>
       </section>
-      <section class="pt-6 border-t border-gray-200 dark:border-gray-700">
-        <ActionButton
-          variant="link"
-          size="sm"
-          :href="exposureIssueUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          content-section="Exposure Detail"
-        >
-          <BugIcon class="w-4 h-4" />
-          <span>Report a problem with this {{ props.file ? 'resource' : 'exposure'}}</span>
-        </ActionButton>
-      </section>
     </aside>
   </div>
 </template>
@@ -1120,6 +1120,10 @@ onMounted(async () => {
 <style scoped>
 @import '@/assets/text-link.css';
 @import '@/assets/box.css';
+
+.action-toolbar-width {
+  @apply w-full lg:w-[calc(100%-theme(spacing.72)-theme(spacing.8))] xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))];
+}
 
 .code-inline {
   display: inline-block;

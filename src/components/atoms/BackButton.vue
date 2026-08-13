@@ -20,16 +20,14 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div class="mb-4">
-    <ActionButton
-      variant="link"
-      :content-section="contentSection"
-      @click="handleClick"
-      class="back-button"
-    >
-      {{ label }}
-    </ActionButton>
-  </div>
+  <ActionButton
+    variant="link"
+    :content-section="contentSection"
+    @click="handleClick"
+    class="back-button"
+  >
+    {{ label }}
+  </ActionButton>
 </template>
 
 <style scoped>
