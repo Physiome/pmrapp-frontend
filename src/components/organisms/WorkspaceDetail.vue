@@ -86,16 +86,15 @@ const pageTitle = computed(() => {
 })
 
 const workspaceIssueUrl = computed(() => {
-  const workspaceUrl = workspaceInfo.value?.workspace.url
-
-  if (!workspaceUrl) {
+  if (!props.alias) {
     return `${GITHUB_ISSUES_URL}/new`
   }
 
+  const workspaceUrl = window.location.origin + `/workspace/${props.alias}`
   const params = new URLSearchParams({
-    labels: 'workspace',
+    labels: 'workspace, preview-feedback',
     template: 'workspace.yml',
-    title: '[Workspace]: ',
+    title: `[Workspace]: ${pageTitle.value}`,
     'workspace-url': workspaceUrl,
   })
 
