@@ -38,8 +38,18 @@ const handleResize = () => {
   }
 }
 
+const updateResizeHandler = () => {
+  if (isVisible.value) {
+    window.addEventListener('resize', handleResize)
+    handleResize()
+  } else {
+    window.removeEventListener('resize', handleResize)
+  }
+}
+
 watch(isVisible, () => {
   updateNotificationBarHeight()
+  updateResizeHandler()
 })
 
 onMounted(async () => {
@@ -47,9 +57,11 @@ onMounted(async () => {
   if (dismissed === 'true') {
     isVisible.value = false
   }
+})
+
+onMounted(() => {
   updateNotificationBarHeight()
-  window.addEventListener('resize', handleResize)
-  handleResize()
+  updateResizeHandler()
 })
 
 onBeforeUnmount(() => {
