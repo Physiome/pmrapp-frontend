@@ -17,6 +17,7 @@ This document covers deployment to production environments other than GitHub Pag
   - `VITE_DOWNLOAD_API`;
   - `VITE_GITHUB_CLIENT_ID`;
   - `VITE_GITHUB_AUTH_API`;
+  - `VITE_GITHUB_ISSUES_URL`;
   - `VITE_GA_MEASUREMENT_ID`;
   - `VITE_BASE_PATH`;
   - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`;
@@ -44,6 +45,7 @@ The API and download URLs are required for their respective features, and the Gi
 
 ### Optional or Deployment-Specific Variables
 
+- `VITE_GITHUB_ISSUES_URL`: Optional GitHub issues URL for reporting bugs or providing feedback. Leave it unset or set it to your repository's issues page to override the default value.
 - `VITE_GA_MEASUREMENT_ID`: Google Analytics 4 measurement ID. Set it to a value such as `G-ABC123DEFG` to enable analytics; leave it unset to disable analytics.
 - `VITE_BASE_PATH`: Deployment path used for generated asset and router URLs. Use `/` for a root-domain deployment. It defaults to `/` when omitted. GitHub Pages project deployments instead use a repository path, such as `/pmrapp-frontend/`.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`: Enables the GitHub Pages query-string redirect helper. It defaults to `false`. Set it to `true` only for GitHub Pages project deployments; use `false` for Nginx, S3/CloudFront, and other standard hosts with SPA rewrite rules.
@@ -57,6 +59,7 @@ VITE_API_BASE_URL=https://api.pmrapp.com
 VITE_DOWNLOAD_API=https://downloads.pmrapp.com
 VITE_GITHUB_CLIENT_ID=Ov23liExampleClientId
 VITE_GITHUB_AUTH_API=https://auth.pmrapp.com
+VITE_GITHUB_ISSUES_URL=https://github.com/Physiome/pmrapp-frontend/issues
 VITE_GA_MEASUREMENT_ID=G-ABC123DEFG
 VITE_BASE_PATH=/
 VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false

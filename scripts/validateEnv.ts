@@ -99,6 +99,15 @@ export function validateRequiredEnv(env: Record<string, string | undefined>): En
     })
   }
 
+  // Feedback URL is optional, but when it is set it must be an absolute http(s) URL.
+  const githubIssuesUrl = env.VITE_GITHUB_ISSUES_URL
+  if (isPresent(githubIssuesUrl) && !isValidHttpUrl(githubIssuesUrl)) {
+    problems.push({
+      name: 'VITE_GITHUB_ISSUES_URL',
+      reason: `expected an absolute http(s) URL but got "${githubIssuesUrl}" (optional; leave unset to use the default issues link)`,
+    })
+  }
+
   return { problems }
 }
 
