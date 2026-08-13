@@ -229,7 +229,7 @@ const exposureIssueUrl = computed(() => {
     return `${GITHUB_ISSUES_URL}/new`
   }
 
-  let exposureUrl = window.location.origin + `/exposure/${props.alias}`
+  let exposureUrl = `${window.location.origin}/exposure/${props.alias}`
 
   if (props.file) {
     exposureUrl += `/${props.file}`

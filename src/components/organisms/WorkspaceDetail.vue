@@ -90,7 +90,7 @@ const workspaceIssueUrl = computed(() => {
     return `${GITHUB_ISSUES_URL}/new`
   }
 
-  const workspaceUrl = window.location.origin + `/workspace/${props.alias}`
+  const workspaceUrl = `${window.location.origin}/workspace/${props.alias}`
   const params = new URLSearchParams({
     labels: 'workspace, preview-feedback',
     template: 'workspace.yml',
