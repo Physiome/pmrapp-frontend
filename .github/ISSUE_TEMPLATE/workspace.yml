@@ -24,10 +24,9 @@ body:
       label: The issue encountered with the workspace
       description: Describe the issue you encountered with the workspace specified above, including what you were trying to do and what happened instead.
       placeholder: |
-        - Interaction via git (e.g. `git clone`, `git pull`) does not work.
+        - Interaction via Git (e.g., `git clone`, `git pull`) does not work.
         - Latest exposure to the workspace is out of date.
         - Problems downloading a file.
-        - The link above results in a "We’re sorry, but there seems to be an error…" message.
     validations:
       required: true
 

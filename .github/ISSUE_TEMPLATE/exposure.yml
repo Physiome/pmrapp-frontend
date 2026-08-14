@@ -28,7 +28,6 @@ body:
         - Math in the model does not match the paper.
         - Metadata is incomplete, missing, or incorrect.
         - Simulation does not run correctly.
-        - The link above results in a "We’re sorry, but there seems to be an error…" message.
     validations:
       required: true
 
