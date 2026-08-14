@@ -40,7 +40,15 @@ body:
         - Firefox
         - Microsoft Edge
         - Safari
-        - Other
+        - Other (please specify)
+    validations:
+      required: false
+
+  - type: input
+    id: browser-other
+    attributes:
+      label: If you selected "Other", which browser were you using?
+      placeholder: e.g. Brave
     validations:
       required: false
 
