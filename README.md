@@ -66,6 +66,7 @@ cp .env.example .env
 - `VITE_DOWNLOAD_HOST` - Optional base URL used for workspace archive links when the site and download API are hosted on different origins. If unset, the app uses the current host. Not required for same-origin production deployments.
 - `VITE_GITHUB_CLIENT_ID` - Public client ID of the GitHub OAuth application used for sign-in.
 - `VITE_GITHUB_AUTH_API` - Base URL of the backend endpoint that completes GitHub OAuth authentication.
+- `VITE_GITHUB_ISSUES_URL` - Optional GitHub issues URL for reporting bugs or providing feedback. Leave it unset or set it to your repository's issues page to override the default value.
 - `VITE_GA_MEASUREMENT_ID` - Google Analytics 4 measurement ID. Leave unset to disable analytics.
 - `VITE_BASE_PATH` - Deployment path used for generated asset and router URLs.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT` - Enables GitHub Pages redirect helper when set to `true`.

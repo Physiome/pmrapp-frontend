@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import { COOKIE } from '@/constants/global'
 import { Cookie } from '@/utils/cookie'
@@ -38,8 +38,18 @@ const handleResize = () => {
   }
 }
 
+const updateResizeHandler = () => {
+  if (isVisible.value) {
+    window.addEventListener('resize', handleResize)
+    handleResize()
+  } else {
+    window.removeEventListener('resize', handleResize)
+  }
+}
+
 watch(isVisible, () => {
   updateNotificationBarHeight()
+  updateResizeHandler()
 })
 
 onMounted(async () => {
@@ -47,9 +57,11 @@ onMounted(async () => {
   if (dismissed === 'true') {
     isVisible.value = false
   }
+})
+
+onMounted(() => {
   updateNotificationBarHeight()
-  window.addEventListener('resize', handleResize)
-  handleResize()
+  updateResizeHandler()
 })
 
 onBeforeUnmount(() => {

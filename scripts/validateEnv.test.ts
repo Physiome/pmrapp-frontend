@@ -67,6 +67,24 @@ describe('validateRequiredEnv', () => {
     expect(validateRequiredEnv(env).problems).toEqual([])
   })
 
+  it('accepts a valid GitHub issues URL using HTTPS', () => {
+    const env = { ...validEnv, VITE_GITHUB_ISSUES_URL: 'https://github.com/Physiome/pmrapp-frontend/issues' }
+    expect(validateRequiredEnv(env).problems).toEqual([])
+  })
+
+  it('rejects a GitHub issues URL that is not HTTPS', () => {
+    const { problems } = validateRequiredEnv({
+      ...validEnv,
+      VITE_GITHUB_ISSUES_URL: 'http://github.com/Physiome/pmrapp-frontend/issues',
+    })
+    expect(problems.some((problem) => problem.name === 'VITE_GITHUB_ISSUES_URL')).toBe(true)
+  })
+
+  it('rejects an invalid GitHub issues URL', () => {
+    const { problems } = validateRequiredEnv({ ...validEnv, VITE_GITHUB_ISSUES_URL: 'not a url' })
+    expect(problems.some((problem) => problem.name === 'VITE_GITHUB_ISSUES_URL')).toBe(true)
+  })
+
   it('rejects a GA measurement ID that is not GA4 format', () => {
     const { problems } = validateRequiredEnv({ ...validEnv, VITE_GA_MEASUREMENT_ID: 'UA-12345-1' })
     expect(problems.some((problem) => problem.name === 'VITE_GA_MEASUREMENT_ID')).toBe(true)

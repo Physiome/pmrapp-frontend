@@ -5,10 +5,12 @@ import ActionButton from '@/components/atoms/ActionButton.vue'
 import BackButton from '@/components/atoms/BackButton.vue'
 import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
+import BugIcon from '@/components/icons/BugIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
+import { GITHUB_ISSUES_URL } from '@/constants/global'
 import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { ErrorInfo } from '@/types/error'
@@ -83,6 +85,31 @@ const pageTitle = computed(() => {
   )
 })
 
+const workspaceIssueUrl = computed(() => {
+  if (!props.alias) {
+    return `${GITHUB_ISSUES_URL}/new`
+  }
+
+  const resolved = router.resolve(
+    props.commitId && props.path
+      ? {
+        name: 'workspace-file-detail',
+        params: { alias: props.alias, commitId: props.commitId, path: props.path },
+      }
+      : { name: 'workspace-detail', params: { alias: props.alias } },
+   )
+  const decodedHref = decodeURIComponent(resolved.href)
+  const workspaceUrl = new URL(decodedHref, window.location.origin).toString()
+  const params = new URLSearchParams({
+    labels: 'workspace,preview-feedback',
+    template: 'workspace.yml',
+    title: `[Workspace]: ${error.value ? error.value.title : pageTitle.value}`,
+    'workspace-url': workspaceUrl,
+  })
+
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
+})
+
 const loadWorkspaceInfo = async () => {
   isLoading.value = true
   error.value = null
@@ -129,11 +156,24 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 </script>
 
 <template>
-  <BackButton
-    :label="backButtonText"
-    content-section="Workspace Detail"
-    :on-click="goBack"
-  />
+  <div class="flex flex-wrap gap-2 justify-between mb-6">
+    <BackButton
+      :label="backButtonText"
+      content-section="Workspace Detail"
+      :on-click="goBack"
+    />
+    <ActionButton
+      variant="link"
+      size="md"
+      :href="workspaceIssueUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      content-section="Workspace Detail"
+    >
+      <BugIcon class="w-4 h-4" />
+      <span>Report a problem with this workspace</span>
+    </ActionButton>
+  </div>
 
   <ErrorBlock
     v-if="error"
