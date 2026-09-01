@@ -49,10 +49,10 @@ export const getQueryTextFromRouteQuery = (query: LocationQuery): string => {
     const firstValue = value.find(
       (item): item is string => typeof item === 'string' && item.trim().length > 0,
     )
-    return firstValue ?? ''
+    return firstValue?.trim() ?? ''
   }
 
-  return typeof value === 'string' ? value : ''
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 export const buildQuerySearchQuery = (
