@@ -283,9 +283,18 @@ describe('getQueryTextFromRouteQuery', () => {
     expect(getQueryTextFromRouteQuery({ query: 'heart' })).toBe('heart')
   })
 
+  it('trims the canonical query param', () => {
+    expect(getQueryTextFromRouteQuery({ query: '  heart  ' })).toBe('heart')
+  })
+
   it('falls back to legacy SearchableText when present', () => {
     expect(getQueryTextFromRouteQuery({ SearchableText: 'heart' })).toBe('heart')
     expect(getQueryTextFromRouteQuery({ SearchableText: ['heart', 'cardiac'] })).toBe('heart')
+  })
+
+  it('trims legacy SearchableText and ignores whitespace-only values', () => {
+    expect(getQueryTextFromRouteQuery({ SearchableText: '  heart  ' })).toBe('heart')
+    expect(getQueryTextFromRouteQuery({ SearchableText: '   ' })).toBe('')
   })
 })
 
