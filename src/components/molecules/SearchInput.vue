@@ -132,6 +132,10 @@ const toggleAdvancedSearch = () => {
   showAdvancedSearch.value = !showAdvancedSearch.value
 }
 
+const showBackdrop = computed(() => {
+  return showAdvancedSearch.value && !props.inOverlay
+})
+
 const handleBackdropClick = () => {
   searchInputRef.value?.inputRef?.blur()
   isSearchFocused.value = false
@@ -171,14 +175,17 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="`relative ${isSearchFocused ? 'z-100' : ''}`">
+  <div class="relative">
     <!-- Backdrop overlay (only when not in SearchOverlay). -->
     <div
-      v-if="showAdvancedSearch && !props.inOverlay"
+      v-if="showBackdrop"
       class="fixed inset-0 bg-gray-300/75 dark:bg-gray-700/75 md:bg-gray-600/75 md:dark:bg-gray-900/75 backdrop-blur-sm z-100"
       @click="handleBackdropClick"
     ></div>
-    <div class="flex flex-col md:flex-row items-center md:justify-between gap-2 w-full transition-all relative z-[99]">
+    <div
+      class="flex flex-col md:flex-row items-center md:justify-between gap-2 w-full transition-all relative"
+      :class="{'z-200': showBackdrop}"
+    >
       <SearchField
         ref="searchInputRef"
         v-model="searchInput"
