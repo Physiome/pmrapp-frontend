@@ -50,6 +50,10 @@ describe('KeywordBrowser', () => {
 
     // Initialise the search store.
     searchStore = useSearchStore()
+
+    // Stub fetchCategories so KeywordBrowser's onMounted hook never makes a
+    // real network call, which is flaky/unavailable in CI environments.
+    vi.spyOn(searchStore, 'fetchCategories').mockResolvedValue(undefined)
   })
 
   const createWrapper = (props = {}) => {
