@@ -57,7 +57,7 @@ describe('KeywordBrowser', () => {
     })
   }
 
-  it('renders loading state when categories are being fetched', () => {
+  it('renders the loading state while categories are being fetched', () => {
     searchStore.isLoading = true
     searchStore.categories = []
 
@@ -66,7 +66,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('renders error state when search store has an error', () => {
+  it('renders the error state when the search store has an error', () => {
     searchStore.isLoading = false
     searchStore.error = 'Failed to load categories'
     searchStore.categories = []
@@ -76,7 +76,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('displays title when inSidebar is false', () => {
+  it('displays the title when inSidebar is false', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = []
@@ -86,7 +86,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('does not display title when inSidebar is true', () => {
+  it('does not display the title when inSidebar is true', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = []
@@ -96,7 +96,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('displays keywords section header when inSidebar is true', () => {
+  it('displays the keywords section header when inSidebar is true', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -115,7 +115,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('renders categories with filter field', () => {
+  it('renders the category filter field', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -172,7 +172,7 @@ describe('KeywordBrowser', () => {
     ]
 
     wrapper = createWrapper()
-    // Update the filter to match no terms.
+    // Set the filter to match no terms.
     const searchField = wrapper.findComponent({ name: 'SearchField' })
     await searchField.vm.$emit('update:modelValue', 'nonexistent')
     await wrapper.vm.$nextTick()
@@ -181,7 +181,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('filters terms based on search input', async () => {
+  it('filters terms based on the search input', async () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -209,7 +209,7 @@ describe('KeywordBrowser', () => {
 
 
 
-  it('renders category error state', () => {
+  it('renders the category error state', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -226,7 +226,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('renders category loading state', () => {
+  it('renders the category loading state', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -243,7 +243,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('applies correct input class when inSidebar is true', () => {
+  it('applies the correct input class when inSidebar is true', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -263,7 +263,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('applies correct input class when inSidebar is false', () => {
+  it('applies the correct input class when inSidebar is false', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = [
@@ -314,7 +314,7 @@ describe('KeywordBrowser', () => {
     wrapper.unmount()
   })
 
-  it('does not apply box styling to root when inSidebar is false', () => {
+  it('does not apply box styling to the root element when inSidebar is false', () => {
     searchStore.isLoading = false
     searchStore.error = null
     searchStore.categories = []
