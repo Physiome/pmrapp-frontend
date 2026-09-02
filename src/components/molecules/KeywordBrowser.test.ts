@@ -171,7 +171,6 @@ describe('KeywordBrowser', () => {
     ]
 
     wrapper = createWrapper()
-    // Set the filter to match no terms.
     const searchField = wrapper.findComponent({ name: 'SearchField' })
     await searchField.vm.$emit('update:modelValue', 'nonexistent')
     await wrapper.vm.$nextTick()
