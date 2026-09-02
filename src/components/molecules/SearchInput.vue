@@ -178,7 +178,7 @@ defineExpose({
       class="fixed inset-0 bg-gray-300/75 dark:bg-gray-700/75 md:bg-gray-600/75 md:dark:bg-gray-900/75 backdrop-blur-sm z-100"
       @click="handleBackdropClick"
     ></div>
-    <div class="flex flex-col md:flex-row items-center md:justify-between gap-2 w-full transition-all relative z-200">
+    <div class="flex flex-col md:flex-row items-center md:justify-between gap-2 w-full transition-all relative z-[99]">
       <SearchField
         ref="searchInputRef"
         v-model="searchInput"
