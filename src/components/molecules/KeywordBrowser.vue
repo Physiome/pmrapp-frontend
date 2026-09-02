@@ -20,6 +20,13 @@ const cellmlKeywordCategory = computed(() =>
   searchStore.categories.filter((cat) => cat.kind === cellmlKeywordKind),
 )
 
+const filteredKeywordCategories = computed(() =>
+  cellmlKeywordCategory.value.map((category) => ({
+    ...category,
+    filteredTerms: getFilteredTerms(category.kindInfo?.terms, category.kind),
+  })),
+)
+
 onMounted(async () => {
   if (!searchStore.isLoading && searchStore.categories.length === 0) {
     await searchStore.fetchCategories([cellmlKeywordKind])
@@ -51,7 +58,7 @@ const updateFilter = (kind: string, value: string) => {
 }
 
 const searchFieldInputClass = computed(() => {
-  const baseClass = 'input-field input-field-sm'
+  const baseClass = 'input-field input-field-sm pr-10!'
   if (props.inSidebar) {
     return `${baseClass} w-full`
   }
@@ -76,7 +83,7 @@ const searchFieldInputClass = computed(() => {
     <div v-else class="space-y-4">
       <h3 v-if="inSidebar" class="font-semibold">Keywords</h3>
       <div
-        v-for="category in cellmlKeywordCategory"
+        v-for="category in filteredKeywordCategories"
         :key="category.kind"
         class="p-4!"
         :class="{ 'box': !inSidebar }"
@@ -108,12 +115,17 @@ const searchFieldInputClass = computed(() => {
           class="flex flex-wrap gap-2 overflow-y-auto border border-gray-200 dark:border-gray-700 p-2 rounded-md scrollbar-thin"
           :class="inSidebar ? 'max-h-[300px]' : 'max-h-40'"
         >
-          <TermButton
-            v-for="term in getFilteredTerms(category.kindInfo.terms, category.kind)"
-            :key="term"
-            :term="term"
-            @click="handleTermClick(category.kind, term)"
-          />
+          <template v-if="category.filteredTerms.length">
+            <TermButton
+              v-for="term in category.filteredTerms"
+              :key="term"
+              :term="term"
+              @click="handleTermClick(category.kind, term)"
+            />
+          </template>
+          <p v-else class="p-2 text-sm text-gray-500 dark:text-gray-400">
+            No matching keywords found.
+          </p>
         </div>
       </div>
     </div>
