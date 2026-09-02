@@ -1,14 +1,21 @@
-import { mount, VueWrapper } from '@vue/test-utils'
+import { mount, type VueWrapper } from '@vue/test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import KeywordBrowser from '@/components/molecules/KeywordBrowser.vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { useSearchStore } from '@/stores/search'
+import type { IndexKindResponse } from '@/types/search'
+
+const createKindInfo = (terms: string[]): IndexKindResponse => ({
+  kind: { id: 1, description: 'CellML keyword' },
+  terms,
+})
 
 // Mock child components.
 vi.mock('@/components/atoms/SearchField.vue', () => ({
   default: {
     name: 'SearchField',
-    template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    template:
+      '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue', 'placeholder', 'ariaLabel', 'inputClass'],
     emits: ['update:modelValue'],
   },
@@ -34,8 +41,8 @@ vi.mock('@/utils/search', () => ({
 }))
 
 describe('KeywordBrowser', () => {
-  let wrapper: VueWrapper<any>
-  let searchStore: any
+  let wrapper: VueWrapper
+  let searchStore: ReturnType<typeof useSearchStore>
 
   beforeEach(() => {
     // Create a fresh Pinia instance for each test.
@@ -102,9 +109,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['term1', 'term2'],
-        },
+        kindInfo: createKindInfo(['term1', 'term2']),
         loading: false,
         error: null,
       },
@@ -121,9 +126,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['action_potential', 'activation', 'binding'],
-        },
+        kindInfo: createKindInfo(['action_potential', 'activation', 'binding']),
         loading: false,
         error: null,
       },
@@ -140,9 +143,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['action_potential', 'activation', 'binding'],
-        },
+        kindInfo: createKindInfo(['action_potential', 'activation', 'binding']),
         loading: false,
         error: null,
       },
@@ -163,9 +164,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['action_potential', 'activation'],
-        },
+        kindInfo: createKindInfo(['action_potential', 'activation']),
         loading: false,
         error: null,
       },
@@ -187,9 +186,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['action_potential', 'activation', 'binding'],
-        },
+        kindInfo: createKindInfo(['action_potential', 'activation', 'binding']),
         loading: false,
         error: null,
       },
@@ -206,8 +203,6 @@ describe('KeywordBrowser', () => {
     expect(termButtons[1].props('term')).toBe('activation')
     wrapper.unmount()
   })
-
-
 
   it('renders the category error state', () => {
     searchStore.isLoading = false
@@ -249,9 +244,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['term1'],
-        },
+        kindInfo: createKindInfo(['term1']),
         loading: false,
         error: null,
       },
@@ -269,9 +262,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['term1'],
-        },
+        kindInfo: createKindInfo(['term1']),
         loading: false,
         error: null,
       },
@@ -290,8 +281,9 @@ describe('KeywordBrowser', () => {
       {
         kind: 'cellml_keyword',
         kindInfo: {
+          kind: { id: 1, description: 'CellML keyword' },
           terms: null,
-        },
+        } as unknown as IndexKindResponse,
         loading: false,
         error: null,
       },
@@ -330,9 +322,7 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['Action_Potential', 'activation'],
-        },
+        kindInfo: createKindInfo(['Action_Potential', 'activation']),
         loading: false,
         error: null,
       },
@@ -355,17 +345,13 @@ describe('KeywordBrowser', () => {
     searchStore.categories = [
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['term1', 'term2'],
-        },
+        kindInfo: createKindInfo(['term1', 'term2']),
         loading: false,
         error: null,
       },
       {
         kind: 'cellml_keyword',
-        kindInfo: {
-          terms: ['term3', 'term4'],
-        },
+        kindInfo: createKindInfo(['term3', 'term4']),
         loading: false,
         error: null,
       },
