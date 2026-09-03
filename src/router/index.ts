@@ -1,13 +1,8 @@
-import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { LOGIN_DISABLED } from '@/constants/auth'
 import { TITLE } from '@/constants/global'
 import { useAuthStore } from '@/stores/auth'
-import { useExposureStore } from '@/stores/exposure'
-import { useSearchStore } from '@/stores/search'
-import { useWorkspaceStore } from '@/stores/workspace'
 import { isJwtExpired } from '@/utils/auth'
-import { generateExposureTitle, resolveExposureFileTitle } from '@/utils/exposure'
-import { generateWorkspaceTitle } from '@/utils/workspace'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
 import ExposureView from '@/views/ExposureView.vue'
 import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
@@ -19,108 +14,17 @@ import SearchView from '@/views/SearchView.vue'
 import WorkspaceDetailView from '@/views/WorkspaceDetailView.vue'
 import WorkspaceView from '@/views/WorkspaceView.vue'
 
-const workspaceAliasBases = ['/workspace']
-const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias/@@file']
-const workspaceFileRouteSuffixes = [
-  '/:alias/file/:commitId/:path(.+)',
-  '/:alias/file/:commitId',
-  '/:alias/@@file/:commitId/:path(.+)',
-  '/:alias/@@file/:commitId',
-]
-const exposureAliasBases = ['/exposure', '/e']
-const exposureFileRouteSuffixes = [
-  '/:alias/:file',
-  '/:alias/experiments/cell/:file',
-  '/:alias/experiments/channel/:file',
-  '/:alias/models/channels/:file',
-  '/:alias/models/:file',
-]
-const exposureFileViewRouteSuffixes = [
-  '/:alias/:file/:view',
-  '/:alias/experiments/cell/:file/:view',
-  '/:alias/experiments/channel/:file/:view',
-  '/:alias/models/channels/:file/:view',
-  '/:alias/models/:file/:view',
-]
-
-const createAliases = (bases: string[], ...suffixes: string[]) =>
-  bases.flatMap((base) => suffixes.map((suffix) => `${base}${suffix}`))
-
-const createPluralRouteAliases = (pluralBase: string, aliasBases: string[], suffixes: string[]) => [
-  ...suffixes.slice(1).map((suffix) => `${pluralBase}${suffix}`),
-  ...createAliases(aliasBases, ...suffixes),
-]
-
-const resolveExposureTitle = async (to: RouteLocationNormalized) => {
-  const alias = to.params?.alias as string | undefined
-  if (!alias) {
-    return
-  }
-
-  const fileParam = to.params?.file
-  const file = typeof fileParam === 'string' ? fileParam : undefined
-  if (file) {
-    try {
-      const fileTitle = await resolveExposureFileTitle(alias, file, useSearchStore().searchQuery)
-      if (fileTitle) {
-        return fileTitle
-      }
-    } catch (error) {
-      console.error(`Error fetching exposure file title for alias ${alias}:`, error)
-    }
-  }
-
-  try {
-    const exposureInfo = await useExposureStore().getExposureInfo(alias)
-
-    return generateExposureTitle(
-      exposureInfo?.exposure?.description,
-      exposureInfo?.exposure?.id,
-      true,
-    )
-  } catch (error) {
-    console.error(`Error fetching exposure info for alias ${alias}:`, error)
-  }
-}
-
-const resolveWorkspaceTitle = async (to: RouteLocationNormalized) => {
-  const alias = to.params?.alias as string | undefined
-  if (!alias) {
-    return
-  }
-
-  try {
-    const commitIdParam = to.params?.commitId
-    const pathParam = to.params?.path
-    const commitId = typeof commitIdParam === 'string' ? commitIdParam : ''
-    const path = typeof pathParam === 'string' ? pathParam : ''
-    const workspaceInfo = await useWorkspaceStore().getWorkspaceInfo(alias, commitId, path)
-
-    return generateWorkspaceTitle(
-      workspaceInfo?.workspace?.description,
-      workspaceInfo?.workspace?.id,
-      commitId,
-      path,
-      true,
-    )
-  } catch (error) {
-    console.error(`Error fetching workspace info for alias ${alias}:`, error)
-  }
-}
-
-const resolveRouteTitle = async (to: RouteLocationNormalized) => {
-  const currentTitle = to.meta.title as string | undefined
-
-  if (to.name?.toString().startsWith('exposure')) {
-    return (await resolveExposureTitle(to)) || currentTitle
-  }
-
-  if (to.name?.toString().startsWith('workspace')) {
-    return (await resolveWorkspaceTitle(to)) || currentTitle
-  }
-
-  return currentTitle
-}
+import {
+  createAliases,
+  createPluralRouteAliases,
+  workspaceAliasBases,
+  workspaceDetailRouteSuffixes,
+  workspaceFileRouteSuffixes,
+  exposureAliasBases,
+  exposureFileRouteSuffixes,
+  exposureFileViewRouteSuffixes
+} from '@/router/routeAliases'
+import { resolveRouteTitle } from '@/router/routeResolvers'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
