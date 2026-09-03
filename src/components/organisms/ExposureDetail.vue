@@ -157,10 +157,18 @@ const fileBrowserPath = computed(() => {
 // Generates a citation URL from the current route, excluding query parameters and the hash.
 // It resolves the application's base path from vite.config to construct the complete URL.
 // It also maintains reactivity for navigations.
+// Params are built from props rather than route.params because the :file(.+) route param
+// captures a trailing slash inconsistently depending on which route alias was matched.
 const citationUrl = computed(() => {
-  const resolved = router.resolve({ name: route.name, params: route.params })
-  const resolvedURL = new URL(resolved.href, window.location.origin)
-  const decodedHref = decodeURIComponent(resolved.href)
+  const params: Record<string, string> = { alias: props.alias }
+  if (props.file) params.file = props.file
+  if (props.view) params.view = props.view
+
+  const resolved = router.resolve({ name: route.name, params })
+  // File-only routes need a trailing slash so production's raw-file server serves the page instead of downloading the file.
+  const href = props.file && !props.view ? `${resolved.href}/` : resolved.href
+  const resolvedURL = new URL(href, window.location.origin)
+  const decodedHref = decodeURIComponent(href)
 
   return resolvedURL.origin + decodedHref
 })
