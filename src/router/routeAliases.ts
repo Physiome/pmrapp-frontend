@@ -11,8 +11,6 @@ export const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias
 export const workspaceDetailCommitSuffixes = ['/:alias/file/:commitId', '/:alias/@@file/:commitId']
 export const workspaceFileRouteSuffixes = [
   '/:alias/file/:commitId/:path(.+)',
-  '/:alias/file/:commitId/:path(.+)',
-  '/:alias/@@file/:commitId/:path(.+)',
   '/:alias/@@file/:commitId/:path(.+)',
 ]
 
