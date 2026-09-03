@@ -38,3 +38,14 @@ export function resolveHtmlPaths(html: string, baseUrl: string, routePath: strin
 
   return result
 }
+
+/**
+ * Ensures that a URL path ends with a single trailing slash.
+ * If the path is empty, returns an empty string.
+ * Multiple consecutive trailing slashes are collapsed into a single slash.
+ */
+export const ensureTrailingSlash = (path: string): string => {
+  const trimmed = path.trim()
+  if (!trimmed) return ''
+  return `${trimmed.replace(/\/+$/, '')}/`
+}

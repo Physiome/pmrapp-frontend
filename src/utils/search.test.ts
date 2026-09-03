@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { exposures, workspaces } from '@/mocks/search'
+import type { SearchResult } from '@/types/search'
+import { ensureTrailingSlash } from './path'
 import {
   buildQuerySearchQuery,
   buildSearchQuery,
   filterItemsByQuery,
+  getSearchResultLink,
   highlightTokens,
   isValidTerm,
   normaliseSearchText,
@@ -335,5 +338,99 @@ describe('buildQuerySearchQuery', () => {
       {},
     )
     expect(result).toEqual({ cellml_keyword: 'cardiac' })
+  })
+})
+
+describe('ensureTrailingSlash', () => {
+  it('returns empty string for empty input', () => {
+    expect(ensureTrailingSlash('')).toBe('')
+    expect(ensureTrailingSlash('   ')).toBe('')
+  })
+
+  it('appends a trailing slash when missing', () => {
+    expect(ensureTrailingSlash('/exposure/123/file.cellml')).toBe('/exposure/123/file.cellml/')
+    expect(ensureTrailingSlash('/e/abc/file.cellml')).toBe('/e/abc/file.cellml/')
+  })
+
+  it('preserves single trailing slash without producing double slashes', () => {
+    expect(ensureTrailingSlash('/exposure/123/file.cellml/')).toBe('/exposure/123/file.cellml/')
+    expect(ensureTrailingSlash('/e/abc/file.cellml/')).toBe('/e/abc/file.cellml/')
+  })
+
+  it('collapses multiple trailing slashes into a single slash', () => {
+    expect(ensureTrailingSlash('/exposure/123/file.cellml//')).toBe('/exposure/123/file.cellml/')
+    expect(ensureTrailingSlash('/exposure/123/file.cellml///')).toBe('/exposure/123/file.cellml/')
+  })
+
+  it('handles root slashes properly', () => {
+    expect(ensureTrailingSlash('/file.cellml')).toBe('/file.cellml/')
+    expect(ensureTrailingSlash('/file.cellml///')).toBe('/file.cellml/')
+  })
+})
+
+describe('getSearchResultLink', () => {
+  const createSearchResult = (
+    overrides: Partial<SearchResult['data']> & { resource_path?: string } = {},
+  ): SearchResult => ({
+    resource_path: overrides.resource_path ?? '/exposure/1/file.cellml',
+    data: {
+      aliased_uri: overrides.aliased_uri ?? [],
+      cellml_keyword: overrides.cellml_keyword ?? [],
+      commit_authored_ts: overrides.commit_authored_ts ?? [],
+      created_ts: overrides.created_ts ?? [],
+      description: overrides.description ?? [],
+      exposure_alias: overrides.exposure_alias ?? [],
+      citation_author_family_name: overrides.citation_author_family_name ?? [],
+      citation_id: overrides.citation_id ?? [],
+      model_author: overrides.model_author ?? [],
+      _title: overrides._title,
+      _brief: overrides._brief,
+    },
+  })
+
+  it('appends trailing slash when aliased_uri does not end with a slash', () => {
+    const item = createSearchResult({ aliased_uri: ['/e/210f6601f6461be8443592ff071d2592/file.cellml'] })
+    expect(getSearchResultLink(item)).toBe('/e/210f6601f6461be8443592ff071d2592/file.cellml/')
+  })
+
+  it('does not produce double slashes when aliased_uri already ends with a slash', () => {
+    const item = createSearchResult({ aliased_uri: ['/exposure/123/file.cellml/'] })
+    expect(getSearchResultLink(item)).toBe('/exposure/123/file.cellml/')
+  })
+
+  it('handles multiple trailing slashes in aliased_uri', () => {
+    const item = createSearchResult({ aliased_uri: ['/workspace/my-model/file.cellml//'] })
+    expect(getSearchResultLink(item)).toBe('/workspace/my-model/file.cellml/')
+  })
+
+  it('trims whitespace in aliased_uri', () => {
+    const item = createSearchResult({ aliased_uri: ['  /e/abc/file.cellml  '] })
+    expect(getSearchResultLink(item)).toBe('/e/abc/file.cellml/')
+  })
+
+  it('falls back to exposure_alias when aliased_uri is empty', () => {
+    const item = createSearchResult({
+      aliased_uri: [],
+      exposure_alias: ['210f6601f6461be8443592ff071d2592'],
+    })
+    expect(getSearchResultLink(item)).toBe('/exposure/210f6601f6461be8443592ff071d2592/')
+  })
+
+  it('returns empty string when aliased_uri and exposure_alias are empty', () => {
+    const item = createSearchResult({
+      aliased_uri: [],
+      exposure_alias: [],
+      resource_path: '/exposure/99/model.cellml',
+    })
+    expect(getSearchResultLink(item)).toBe('')
+  })
+
+  it('does not produce "undefined/" when aliased_uri is empty array', () => {
+    const item = createSearchResult({
+      aliased_uri: [],
+    })
+    const link = getSearchResultLink(item)
+    expect(link).not.toContain('undefined')
+    expect(link).not.toBe('undefined/')
   })
 })
