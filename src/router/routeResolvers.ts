@@ -12,7 +12,7 @@ const resolveExposureTitle = async (to: RouteLocationNormalized) => {
   }
 
   const fileParam = to.params?.file
-  const file = typeof fileParam === 'string' ? fileParam : undefined
+  const file = typeof fileParam === 'string' ? fileParam.replace(/\/+$/, '') : undefined
   if (file) {
     try {
       const fileTitle = await resolveExposureFileTitle(alias, file, useSearchStore().searchQuery)
