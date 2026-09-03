@@ -64,7 +64,7 @@ const isIdActive = (ids: string[] | undefined) => {
           v-for="item in results"
           :key="item.resource_path"
           :title="item.data._title?.[0] || item.data.description?.[0] || item.resource_path"
-          :link="item.data.aliased_uri?.[0] || ''"
+          :link="`${item.data.aliased_uri?.[0]}/` || ''"
         >
           <div class="text-gray-600 dark:text-gray-400">
             <small class="inline-flex items-center gap-1 flex-wrap">
