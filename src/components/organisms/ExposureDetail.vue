@@ -948,7 +948,7 @@ onMounted(async () => {
               class="text-sm"
             >
               <RouterLink
-                :to="`/exposures/${props.alias}/${entry[0]}`"
+                :to="`/exposures/${props.alias}/${entry[0]}/`"
                 class="inline-flex items-center gap-2 break-all transition-colors"
                 :class="
                   props.file === entry[0]
