@@ -17,9 +17,15 @@ This document covers deployment to production environments other than GitHub Pag
   - `VITE_DOWNLOAD_API`;
   - `VITE_GITHUB_CLIENT_ID`;
   - `VITE_GITHUB_AUTH_API`;
+  - `VITE_GITHUB_ISSUES_URL`;
   - `VITE_GA_MEASUREMENT_ID`;
-  - `VITE_BASE_PATH`; and
-  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`.
+  - `VITE_BASE_PATH`;
+  - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`;
+  - `VITE_FEATURE_COMPARISON_SHEET_CSV_URL`; and
+  - `VITE_LOGIN_DISABLED`.
+
+- Optional when the app host and download API host differ:
+  - `VITE_DOWNLOAD_HOST`.
 
 ## Build-Time Environment Variables
 
@@ -33,14 +39,18 @@ Set these environment variables in your CI/CD configuration or shell before runn
 - `VITE_DOWNLOAD_API`: Base URL of the service that provides COMBINE and workspace archive downloads. _(This will be removed after all download APIs are available on PMR3.)_
 - `VITE_GITHUB_CLIENT_ID`: Public client ID of the GitHub OAuth application used for sign-in. Example: `Ov23liExampleClientId`.
 - `VITE_GITHUB_AUTH_API`: Base URL of the backend endpoint that completes GitHub OAuth authentication. _(This is used for GitHub login.)_ Example: `https://auth.[example-pmrapp-dev].com`.
+- `VITE_FEATURE_COMPARISON_SHEET_CSV_URL`: CSV file URL for the feature comparison page. Example: `https://example.com/feature-comparison.csv`.
 
 The API and download URLs are required for their respective features, and the GitHub OAuth values are required for GitHub login option. `vite build` fails if any required variable is missing or invalid.
 
 ### Optional or Deployment-Specific Variables
 
+- `VITE_GITHUB_ISSUES_URL`: Optional GitHub issues URL for reporting bugs or providing feedback. Leave it unset or set it to your repository's issues page to override the default value.
 - `VITE_GA_MEASUREMENT_ID`: Google Analytics 4 measurement ID. Set it to a value such as `G-ABC123DEFG` to enable analytics; leave it unset to disable analytics.
 - `VITE_BASE_PATH`: Deployment path used for generated asset and router URLs. Use `/` for a root-domain deployment. It defaults to `/` when omitted. GitHub Pages project deployments instead use a repository path, such as `/pmrapp-frontend/`.
 - `VITE_ENABLE_GH_PAGES_SPA_REDIRECT`: Enables the GitHub Pages query-string redirect helper. It defaults to `false`. Set it to `true` only for GitHub Pages project deployments; use `false` for Nginx, S3/CloudFront, and other standard hosts with SPA rewrite rules.
+- `VITE_DOWNLOAD_HOST`: Optional base URL for workspace archive links when download routes are served from a different origin than the app. If unset, the app uses the current host. Not required for same-origin production deployments.
+- `VITE_LOGIN_DISABLED`: Optional flag that disables login and hides the login button. Set it to `true` to disable login; leave it unset to show login by default.
 
 For example, a standard root-domain production environment can use:
 
@@ -49,9 +59,11 @@ VITE_API_BASE_URL=https://api.pmrapp.com
 VITE_DOWNLOAD_API=https://downloads.pmrapp.com
 VITE_GITHUB_CLIENT_ID=Ov23liExampleClientId
 VITE_GITHUB_AUTH_API=https://auth.pmrapp.com
+VITE_GITHUB_ISSUES_URL=https://github.com/Physiome/pmrapp-frontend/issues
 VITE_GA_MEASUREMENT_ID=G-ABC123DEFG
 VITE_BASE_PATH=/
 VITE_ENABLE_GH_PAGES_SPA_REDIRECT=false
+VITE_FEATURE_COMPARISON_SHEET_CSV_URL=https://example.com/feature-comparison.csv
 ```
 
 ## Production Build

@@ -6,6 +6,7 @@ const validEnv = {
   VITE_DOWNLOAD_API: 'https://downloads.example.com',
   VITE_GITHUB_CLIENT_ID: 'Ov23liExampleClientId',
   VITE_GITHUB_AUTH_API: 'https://auth.example.com',
+  VITE_FEATURE_COMPARISON_SHEET_CSV_URL: 'https://example.com/features.csv',
 }
 
 describe('validateRequiredEnv', () => {
@@ -20,6 +21,7 @@ describe('validateRequiredEnv', () => {
       'VITE_DOWNLOAD_API',
       'VITE_GITHUB_CLIENT_ID',
       'VITE_GITHUB_AUTH_API',
+      'VITE_FEATURE_COMPARISON_SHEET_CSV_URL',
     ])
   })
 
@@ -35,7 +37,10 @@ describe('validateRequiredEnv', () => {
   })
 
   it('rejects non-http(s) protocols', () => {
-    const { problems } = validateRequiredEnv({ ...validEnv, VITE_DOWNLOAD_API: 'ftp://example.com' })
+    const { problems } = validateRequiredEnv({
+      ...validEnv,
+      VITE_DOWNLOAD_API: 'ftp://example.com',
+    })
     expect(problems.some((problem) => problem.name === 'VITE_DOWNLOAD_API')).toBe(true)
   })
 
@@ -60,6 +65,24 @@ describe('validateRequiredEnv', () => {
   it('accepts a valid GA4 measurement ID', () => {
     const env = { ...validEnv, VITE_GA_MEASUREMENT_ID: 'G-ABC123DEFG' }
     expect(validateRequiredEnv(env).problems).toEqual([])
+  })
+
+  it('accepts a valid GitHub issues URL using HTTPS', () => {
+    const env = { ...validEnv, VITE_GITHUB_ISSUES_URL: 'https://github.com/Physiome/pmrapp-frontend/issues' }
+    expect(validateRequiredEnv(env).problems).toEqual([])
+  })
+
+  it('rejects a GitHub issues URL that is not HTTPS', () => {
+    const { problems } = validateRequiredEnv({
+      ...validEnv,
+      VITE_GITHUB_ISSUES_URL: 'http://github.com/Physiome/pmrapp-frontend/issues',
+    })
+    expect(problems.some((problem) => problem.name === 'VITE_GITHUB_ISSUES_URL')).toBe(true)
+  })
+
+  it('rejects an invalid GitHub issues URL', () => {
+    const { problems } = validateRequiredEnv({ ...validEnv, VITE_GITHUB_ISSUES_URL: 'not a url' })
+    expect(problems.some((problem) => problem.name === 'VITE_GITHUB_ISSUES_URL')).toBe(true)
   })
 
   it('rejects a GA measurement ID that is not GA4 format', () => {

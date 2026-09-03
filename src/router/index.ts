@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
+import { LOGIN_DISABLED } from '@/constants/auth'
 import { TITLE } from '@/constants/global'
 import { useAuthStore } from '@/stores/auth'
 import { useExposureStore } from '@/stores/exposure'
@@ -6,9 +7,11 @@ import { useSearchStore } from '@/stores/search'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { isJwtExpired } from '@/utils/auth'
 import { generateExposureTitle, resolveExposureFileTitle } from '@/utils/exposure'
+import { getQueryTextFromRouteQuery } from '@/utils/search'
 import { generateWorkspaceTitle } from '@/utils/workspace'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
 import ExposureView from '@/views/ExposureView.vue'
+import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
@@ -212,16 +215,24 @@ const router = createRouter({
       meta: { title: `Search Results – ${TITLE}` },
     },
     {
+      path: '/feature-comparison',
+      name: 'feature-comparison',
+      component: FeatureComparisonView,
+      meta: { title: `Feature Comparison – ${TITLE}` },
+    },
+    {
       path: '/login',
       name: 'login',
-      component: LoginView,
-      meta: { title: `Login – ${TITLE}` },
+      component: LOGIN_DISABLED ? NotFoundView : LoginView,
+      meta: LOGIN_DISABLED ? { title: `Page Not Found – ${TITLE}` } : { title: `Login – ${TITLE}` },
     },
     {
       path: '/profile',
       name: 'profile',
-      component: ProfileView,
-      meta: { title: `Profile – ${TITLE}`, requiresAuth: true },
+      component: LOGIN_DISABLED ? NotFoundView : ProfileView,
+      meta: LOGIN_DISABLED
+        ? { title: `Page Not Found – ${TITLE}` }
+        : { title: `Profile – ${TITLE}`, requiresAuth: true },
     },
     {
       path: '/:pathMatch(.*)*',
@@ -233,6 +244,17 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
+  if (to.path === '/search' && to.query.SearchableText !== undefined && to.query.query === undefined) {
+    const legacyQuery = getQueryTextFromRouteQuery(to.query)
+
+    if (legacyQuery) {
+      const nextQuery = { ...to.query }
+      delete nextQuery.SearchableText
+      nextQuery.query = legacyQuery
+      return { path: to.path, query: nextQuery, replace: true }
+    }
+  }
+
   const authStore = useAuthStore()
   const storedToken = localStorage.getItem('auth_token')
   const authMethod = localStorage.getItem('auth_method') as 'password' | 'github' | null

@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig, loadEnv } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { formatEnvValidationProblems, validateRequiredEnv } from './scripts/validateEnv'
+import { formatEnvValidationProblems, validateRequiredEnv } from './scripts/validateEnv.ts'
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {

@@ -53,9 +53,12 @@ jobs:
           VITE_DOWNLOAD_API: ${{ secrets.VITE_DOWNLOAD_API }}
           VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
           VITE_GITHUB_AUTH_API: ${{ secrets.VITE_GITHUB_AUTH_API }}
+          VITE_GITHUB_ISSUES_URL: ${{ vars.VITE_GITHUB_ISSUES_URL }}
+          VITE_FEATURE_COMPARISON_SHEET_CSV_URL: ${{ secrets.VITE_FEATURE_COMPARISON_SHEET_CSV_URL }}
+          VITE_LOGIN_DISABLED: ${{ vars.VITE_LOGIN_DISABLED || '' }}
 
       - name: Upload production artefact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pmrapp-frontend-dist
           path: ./dist
@@ -69,7 +72,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_deploy == 'true'
     steps:
       - name: Download production artefact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: pmrapp-frontend-dist
           path: ./dist

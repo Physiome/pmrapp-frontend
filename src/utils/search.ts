@@ -42,6 +42,19 @@ export const buildSearchQuery = (
   return buildQuerySearchQuery('', [{ kind, term }], currentQuery)
 }
 
+export const getQueryTextFromRouteQuery = (query: LocationQuery): string => {
+  const value = query.query ?? query.SearchableText
+
+  if (Array.isArray(value)) {
+    const firstValue = value.find(
+      (item): item is string => typeof item === 'string' && item.trim().length > 0,
+    )
+    return firstValue?.trim() ?? ''
+  }
+
+  return typeof value === 'string' ? value.trim() : ''
+}
+
 export const buildQuerySearchQuery = (
   queryText: string,
   filters: SearchFilter[],

@@ -1,6 +1,15 @@
 import { downloadFileFromBlob } from '@/utils/download'
 
 const DOWNLOAD_API = import.meta.env.VITE_DOWNLOAD_API
+const DOWNLOAD_HOST = (import.meta.env.VITE_DOWNLOAD_HOST || '').trim().replace(/\/\/+$/, '')
+
+export const getWorkspaceArchiveUrl = (alias: string, commitId: string): string => {
+  return `${DOWNLOAD_HOST}/workspace/${alias}/archive/${commitId}/`
+}
+
+export const getWorkspaceFileUrl = (alias: string, commitId: string, path: string): string => {
+  return `${DOWNLOAD_HOST}/workspace/${alias}/rawfile/${commitId}/${path}`
+}
 
 export const downloadWorkspaceArchive = async (
   url: string,

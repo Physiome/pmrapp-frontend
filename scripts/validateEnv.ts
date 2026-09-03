@@ -52,6 +52,11 @@ const REQUIRED_VARS: RequiredVarSpec[] = [
     description: 'base URL of the GitHub OAuth authentication API',
     type: 'url',
   },
+  {
+    name: 'VITE_FEATURE_COMPARISON_SHEET_CSV_URL',
+    description: 'CSV file URL for the feature comparison page',
+    type: 'url',
+  },
 ]
 
 /** GA4 measurement IDs look like `G-XXXXXXXXXX`. */
@@ -94,6 +99,15 @@ export function validateRequiredEnv(env: Record<string, string | undefined>): En
     })
   }
 
+  // Feedback URL is optional, but when it is set it must be an absolute HTTPS URL.
+  const githubIssuesUrl = env.VITE_GITHUB_ISSUES_URL
+  if (isPresent(githubIssuesUrl) && !isValidHttpsUrl(githubIssuesUrl)) {
+    problems.push({
+      name: 'VITE_GITHUB_ISSUES_URL',
+      reason: `expected an absolute HTTPS URL but got "${githubIssuesUrl}" (optional; leave unset to use the default issues link)`,
+    })
+  }
+
   return { problems }
 }
 
@@ -123,6 +137,15 @@ function isValidHttpUrl(value: string): boolean {
   try {
     const url = new URL(value)
     return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+function isValidHttpsUrl(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:'
   } catch {
     return false
   }

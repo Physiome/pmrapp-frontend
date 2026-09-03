@@ -3,6 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.vue'
 import BackToTop from './components/atoms/BackToTop.vue'
 
+vi.mock('vue-router', () => ({
+  useRoute: () => ({
+    name: 'home',
+    path: '/',
+    fullPath: '/',
+  }),
+}))
+
 describe('App', () => {
   beforeEach(() => {
     // Reset all mocks before each test.
