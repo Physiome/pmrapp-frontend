@@ -8,11 +8,12 @@ export const createPluralRouteAliases = (pluralBase: string, aliasBases: string[
 
 export const workspaceAliasBases = ['/workspace']
 export const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias/@@file']
+export const workspaceDetailCommitSuffixes = ['/:alias/file/:commitId', '/:alias/@@file/:commitId']
 export const workspaceFileRouteSuffixes = [
   '/:alias/file/:commitId/:path(.+)',
-  '/:alias/file/:commitId',
+  '/:alias/file/:commitId/:path(.+)',
   '/:alias/@@file/:commitId/:path(.+)',
-  '/:alias/@@file/:commitId',
+  '/:alias/@@file/:commitId/:path(.+)',
 ]
 
 export const exposureAliasBases = ['/exposure', '/e']

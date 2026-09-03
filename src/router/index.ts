@@ -22,7 +22,8 @@ import {
   workspaceFileRouteSuffixes,
   exposureAliasBases,
   exposureFileRouteSuffixes,
-  exposureFileViewRouteSuffixes
+  exposureFileViewRouteSuffixes,
+  workspaceDetailCommitSuffixes
 } from '@/router/routeAliases'
 import { resolveRouteTitle } from '@/router/routeResolvers'
 
@@ -59,6 +60,17 @@ const router = createRouter({
         '/workspaces',
         workspaceAliasBases,
         workspaceDetailRouteSuffixes,
+      ),
+      meta: { title: `Workspace Detail – ${TITLE}` },
+    },
+    {
+      path: '/workspaces/:alias/file/:commitId',
+      name: 'workspace-detail-alias-commit',
+      component: WorkspaceDetailView,
+      alias: createPluralRouteAliases(
+        '/workspaces',
+        workspaceAliasBases,
+        workspaceDetailCommitSuffixes,
       ),
       meta: { title: `Workspace Detail – ${TITLE}` },
     },
