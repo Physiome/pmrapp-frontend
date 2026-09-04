@@ -8,7 +8,7 @@ import ListItem from '@/components/molecules/ListItem.vue'
 import type { SearchFilter, SearchResult } from '@/types/search'
 import { getExposureIdFromResourcePath } from '@/utils/exposure'
 import { formatDate } from '@/utils/format'
-import { buildSearchQuery, isValidTerm } from '@/utils/search'
+import { buildSearchQuery, getSearchResultLink, isValidTerm } from '@/utils/search'
 
 interface Props {
   results: SearchResult[]
@@ -64,7 +64,7 @@ const isIdActive = (ids: string[] | undefined) => {
           v-for="item in results"
           :key="item.resource_path"
           :title="item.data._title?.[0] || item.data.description?.[0] || item.resource_path"
-          :link="item.data.aliased_uri?.[0] || ''"
+          :link="getSearchResultLink(item)"
         >
           <div class="text-gray-600 dark:text-gray-400">
             <small class="inline-flex items-center gap-1 flex-wrap">
