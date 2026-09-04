@@ -42,8 +42,8 @@ src/
 
 ### Prerequisites
 
-- Node.js 22.12+ (LTS recommended, for compatibility)
-- [Bun](https://bun.sh/) 1.3.3 (latest recommended)
+- Node.js 24.20+ (LTS recommended, for compatibility)
+- [Bun](https://bun.sh/) 1.4+ (latest recommended)
 
 ### Installation
 
