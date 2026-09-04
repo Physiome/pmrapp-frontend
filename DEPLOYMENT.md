@@ -10,8 +10,8 @@ This document covers deployment to production environments other than GitHub Pag
 
 ## Prerequisites
 
-- Node.js: `>=22.12.0` (see [package.json](package.json)).
-- [Bun](https://bun.sh/) `>=1.3.3` (used for install/build commands in this repository).
+- Node.js: `>=24.20.0` (see [package.json](package.json)).
+- [Bun](https://bun.sh/) `>=1.4.0` (used for install/build commands in this repository).
 - Environment variables configured for your production API/auth endpoints:
   - `VITE_API_BASE_URL`;
   - `VITE_DOWNLOAD_API`;
