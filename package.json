@@ -35,7 +35,7 @@
     "@biomejs/biome": "2.5.11",
     "@tsconfig/node24": "^24.0.5",
     "@types/jsdom": "^30.0.0",
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.4.0",
     "@types/papaparse": "^5.5.2",
     "@types/prismjs": "^1.26.6",
     "@vitejs/plugin-vue": "^6.0.8",
