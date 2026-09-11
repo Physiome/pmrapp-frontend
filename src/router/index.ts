@@ -24,6 +24,7 @@ import {
   exposureAliasBases,
   exposureFileRouteSuffixes,
   exposureFileViewRouteSuffixes,
+  exposureFileViewLangRouteSuffixes,
   workspaceDetailCommitSuffixes
 } from '@/router/routeAliases'
 import { resolveRouteTitle } from '@/router/routeResolvers'
@@ -99,6 +100,18 @@ const router = createRouter({
       component: ExposureDetailView,
       alias: createAliases(exposureAliasBases, '/:alias', '/:alias/view'),
       meta: { title: `Exposure Detail – ${TITLE}` },
+    },
+    {
+      path: '/exposures/:alias/:file(.+)/:view([^./]+)/:lang([^./]+)',
+      name: 'exposure-file-detail-view-lang',
+      component: ExposureDetailView,
+      // biome-ignore format: keep the formatting for readability
+      alias: createPluralRouteAliases(
+        '/exposures',
+        exposureAliasBases,
+        exposureFileViewLangRouteSuffixes
+      ),
+      meta: { title: `Exposure File – ${TITLE}` },
     },
     {
       path: '/exposures/:alias/:file(.+)/:view([^./]+)',

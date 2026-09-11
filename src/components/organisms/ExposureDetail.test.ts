@@ -8,13 +8,20 @@ import { mockExposureInfo, mockGeneratedCode, mockMetadata } from '@/mocks/expos
 import { useExposureStore } from '@/stores/exposure'
 import { useSearchStore } from '@/stores/search'
 
+const { mockRouterPush, mockRouterReplace } = vi.hoisted(() => ({
+  mockRouterPush: vi.fn(),
+  mockRouterReplace: vi.fn(),
+}))
+
 // Mock Vue Router.
 vi.mock('vue-router', () => ({
   useRoute: () => ({
     query: {},
+    path: '/exposures/test-alias',
   }),
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockRouterPush,
+    replace: mockRouterReplace,
     back: vi.fn(),
     resolve: vi.fn(() => ({ href: '/exposures/test-alias' })),
     options: {
@@ -59,6 +66,7 @@ describe('ExposureDetail', () => {
       alias: string
       file: string
       view: string
+      lang: string
     }>
     stubs?: Record<string, unknown>
     generatedCode?: string
@@ -77,7 +85,7 @@ describe('ExposureDetail', () => {
       async (_id, _fileId, _view, filename) => {
         if (filename === 'cmeta.json') return JSON.stringify(mockMetadata)
         if (filename === 'math.json') return mathsJSON
-        if (filename === 'code.C.c') return generatedCode
+        if (filename.startsWith('code.')) return generatedCode
         return ''
       },
     )
@@ -342,6 +350,114 @@ describe('ExposureDetail', () => {
     expect(srOnlyText.exists()).toBe(true)
     expect(downloadButton.attributes('aria-label')).toBe(srOnlyText.text())
     expect(srOnlyText.text()).toContain('Download')
+  })
+
+  it('loads generated code for a non-default language from the URL lang param', async () => {
+    const wrapper = await mountComponent({
+      props: {
+        view: 'cellml_codegen',
+        lang: 'Python',
+      },
+      generatedCode: mockGeneratedCode,
+      stubs: {
+        CodeBlock: {
+          name: 'CodeBlock',
+          props: ['code', 'filename'],
+          template: '<div class="code-block-stub" />',
+        },
+      },
+    })
+
+    expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
+      mockExposureInfo.exposure.id,
+      mockExposureInfo.exposure.files?.[0]?.id ?? 598,
+      'cellml_codegen',
+      'code.Python.py',
+    )
+    expect(exposureStore.getExposureRawContent).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      'cellml_codegen',
+      'code.C.c',
+    )
+
+    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' })
+    expect(codeBlock.exists()).toBe(true)
+    expect(codeBlock.props('code')).toBe(mockGeneratedCode)
+    expect(codeBlock.props('filename')).toBe('code.py')
+
+    const pythonButton = wrapper
+      .findAllComponents({ name: 'ActionButton' })
+      .find((button) => button.text().trim() === 'Python')
+    expect(pythonButton?.props('variant')).toBe('primary')
+
+    expect(mockRouterReplace).toHaveBeenCalledWith({
+      name: 'exposure-file-detail-view-lang',
+      params: {
+        alias: mockExposureInfo.exposure_alias,
+        file: '',
+        view: 'cellml_codegen',
+        lang: 'Python',
+      },
+      query: {},
+    })
+  })
+
+  it('navigates and fetches code when a language button is clicked', async () => {
+    const wrapper = await mountComponent({
+      props: {
+        view: 'cellml_codegen',
+      },
+      generatedCode: mockGeneratedCode,
+      stubs: {
+        CodeBlock: {
+          name: 'CodeBlock',
+          props: ['code', 'filename'],
+          template: '<div class="code-block-stub" />',
+        },
+      },
+    })
+
+    expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
+      mockExposureInfo.exposure.id,
+      mockExposureInfo.exposure.files?.[0]?.id ?? 598,
+      'cellml_codegen',
+      'code.C.c',
+    )
+
+    const pythonButton = wrapper
+      .findAllComponents({ name: 'ActionButton' })
+      .find((button) => button.text().trim() === 'Python')
+    expect(pythonButton).toBeDefined()
+
+    await pythonButton?.trigger('click')
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      name: 'exposure-file-detail-view-lang',
+      params: {
+        alias: mockExposureInfo.exposure_alias,
+        file: '',
+        view: 'cellml_codegen',
+        lang: 'Python',
+      },
+      query: {},
+    })
+
+    // Simulate the route param update that follows a successful navigation.
+    await wrapper.setProps({ lang: 'Python' })
+    await flushPromises()
+    await nextTick()
+
+    expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
+      mockExposureInfo.exposure.id,
+      mockExposureInfo.exposure.files?.[0]?.id ?? 598,
+      'cellml_codegen',
+      'code.Python.py',
+    )
+
+    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' })
+    expect(codeBlock.props('filename')).toBe('code.py')
+    expect(pythonButton?.props('variant')).toBe('primary')
   })
 
   it('toggles wrap active state when clicking the wrap button in codegen view', async () => {

@@ -1,4 +1,15 @@
+import type { MathMLFormatOptions } from '@/types/mathml'
+
 export const MATH_FORMAT_OPTIONS_STORAGE_KEY = 'math_format_options_v1'
+
+/**
+ * Default formatting options applied to MathML output.
+ */
+export const DEFAULT_MATH_FORMAT_OPTIONS: Required<MathMLFormatOptions> = {
+  digitGrouping: false,
+  greekSymbols: false,
+  subscripts: false,
+}
 
 export const MATHML_FORMAT_OPTIONS = [
   {
