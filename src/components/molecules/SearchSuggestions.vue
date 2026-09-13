@@ -36,6 +36,12 @@ const clearAllButtonRef = ref<HTMLButtonElement | null>(null)
 const MAX_TERMS_PER_CATEGORY = 10
 const selectedFilters = ref<SearchFilter[]>(props.initialFilters ? [...props.initialFilters] : [])
 
+const resultGroupClass = computed(() => [
+  'hover:bg-gray-50 dark:hover:bg-gray-900',
+  'border-b last:border-0 border-gray-200 dark:border-gray-700',
+  'transition-all group-hover/results:opacity-75 hover:!opacity-100'
+])
+
 watch(
   () => props.initialFilters,
   (newFilters) => {
@@ -397,9 +403,9 @@ const handleClearAllFilters = (): void => {
           <div
             v-for="(categoryGroup, groupIndex) in filteredSearchTermsByCategory"
             :key="categoryGroup.kind"
-            class="result-group"
+            :class="resultGroupClass"
           >
-            <div class="mb-3 flex items-start justify-between gap-3">
+            <div class="p-4 flex items-start justify-between gap-3 sticky top-0 z-1 bg-background">
               <h4 class="font-semibold text-gray-700 dark:text-gray-300">
                 {{ categoryGroup.label }}
               </h4>
@@ -415,7 +421,7 @@ const handleClearAllFilters = (): void => {
                 {{ categoryGroup.isExpanded ? 'Show less' : '... more' }}
               </button>
             </div>
-            <div class="flex flex-row items-start justify-start flex-wrap gap-2">
+            <div class="p-4 pt-0 flex flex-row items-start justify-start flex-wrap gap-2">
               <TermButton
                 v-for="(term, termIndex) in categoryGroup.terms"
                 :key="term"
@@ -438,8 +444,4 @@ const handleClearAllFilters = (): void => {
 @import '@/assets/box.css';
 @import '@/assets/error-box.css';
 @import '@/assets/input.css';
-
-.result-group {
-  @apply hover:bg-gray-50 dark:hover:bg-gray-900 border-b last:border-0 border-gray-200 dark:border-gray-700 p-4 transition-all group-hover/results:opacity-75 hover:!opacity-100;
-}
 </style>
