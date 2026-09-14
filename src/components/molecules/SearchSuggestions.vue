@@ -42,6 +42,18 @@ const resultGroupClass = computed(() => [
   'transition-all group-hover/results:opacity-75 hover:!opacity-100'
 ])
 
+const resultGroupHeaderClass = computed(() => [
+  'p-4 gap-3',
+  'flex items-start justify-between',
+  'sticky top-0 z-1',
+  'bg-background group-hover:bg-gray-50 dark:hover:bg-gray-900'
+])
+
+const resultGroupBodyClass = computed(() => [
+  'p-4 pt-0 gap-2',
+  'flex flex-row items-start justify-start flex-wrap'
+])
+
 watch(
   () => props.initialFilters,
   (newFilters) => {
@@ -405,7 +417,7 @@ const handleClearAllFilters = (): void => {
             :key="categoryGroup.kind"
             :class="resultGroupClass"
           >
-            <div class="p-4 flex items-start justify-between gap-3 sticky top-0 z-1 bg-background">
+            <div :class="resultGroupHeaderClass">
               <h4 class="font-semibold text-gray-700 dark:text-gray-300">
                 {{ categoryGroup.label }}
               </h4>
@@ -421,7 +433,7 @@ const handleClearAllFilters = (): void => {
                 {{ categoryGroup.isExpanded ? 'Show less' : '... more' }}
               </button>
             </div>
-            <div class="p-4 pt-0 flex flex-row items-start justify-start flex-wrap gap-2">
+            <div :class="resultGroupBodyClass">
               <TermButton
                 v-for="(term, termIndex) in categoryGroup.terms"
                 :key="term"
