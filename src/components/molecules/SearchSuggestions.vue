@@ -37,7 +37,6 @@ const MAX_TERMS_PER_CATEGORY = 10
 const selectedFilters = ref<SearchFilter[]>(props.initialFilters ? [...props.initialFilters] : [])
 
 const resultGroupClass = computed(() => [
-  'hover:bg-gray-50 dark:hover:bg-gray-900',
   'border-b last:border-0 border-gray-200 dark:border-gray-700',
   'transition-all group-hover/results:opacity-75 hover:!opacity-100'
 ])
@@ -46,12 +45,12 @@ const resultGroupHeaderClass = computed(() => [
   'p-4 gap-3',
   'flex items-start justify-between',
   'sticky top-0 z-1',
-  'bg-background group-hover:bg-gray-50 dark:hover:bg-gray-900'
+  'bg-background'
 ])
 
 const resultGroupBodyClass = computed(() => [
   'p-4 pt-0 gap-2',
-  'flex flex-row items-start justify-start flex-wrap'
+  'flex flex-row items-start justify-start flex-wrap',
 ])
 
 watch(
