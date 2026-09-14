@@ -42,10 +42,15 @@ const resultGroupClass = computed(() => [
 ])
 
 const resultGroupHeaderClass = computed(() => [
+  'sticky-container',
+  'sticky top-0 z-1',
+])
+
+const resultGroupHeaderInnerClass = computed(() => [
+  'sticky-container-inner',
   'p-4 gap-3',
   'flex items-start justify-between',
-  'sticky top-0 z-1',
-  'bg-background'
+  'bg-background transition-shadow',
 ])
 
 const resultGroupBodyClass = computed(() => [
@@ -417,20 +422,22 @@ const handleClearAllFilters = (): void => {
             :class="resultGroupClass"
           >
             <div :class="resultGroupHeaderClass">
-              <h4 class="font-semibold text-gray-700 dark:text-gray-300">
-                {{ categoryGroup.label }}
-              </h4>
-              <button
-                v-if="categoryGroup.totalCount > MAX_TERMS_PER_CATEGORY"
-                type="button"
-                :ref="(el) => setToggleButtonRef(el, groupIndex)"
-                class="px-3 py-1 text-sm rounded-md transition-colors relative focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-900 cursor-pointer text-primary hover:text-primary-hover bg-transparent"
-                :aria-expanded="categoryGroup.isExpanded"
-                @click="handleToggleTerms(categoryGroup.kind)"
-                @keydown="handleToggleButtonKeyDown($event, categoryGroup.kind, groupIndex)"
-              >
-                {{ categoryGroup.isExpanded ? 'Show less' : '... more' }}
-              </button>
+              <div :class="resultGroupHeaderInnerClass">
+                <h4 class="font-semibold text-gray-700 dark:text-gray-300">
+                  {{ categoryGroup.label }}
+                </h4>
+                <button
+                  v-if="categoryGroup.totalCount > MAX_TERMS_PER_CATEGORY"
+                  type="button"
+                  :ref="(el) => setToggleButtonRef(el, groupIndex)"
+                  class="px-3 py-1 text-sm rounded-md transition-colors relative focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-900 cursor-pointer text-primary hover:text-primary-hover bg-transparent"
+                  :aria-expanded="categoryGroup.isExpanded"
+                  @click="handleToggleTerms(categoryGroup.kind)"
+                  @keydown="handleToggleButtonKeyDown($event, categoryGroup.kind, groupIndex)"
+                >
+                  {{ categoryGroup.isExpanded ? 'Show less' : '... more' }}
+                </button>
+              </div>
             </div>
             <div :class="resultGroupBodyClass">
               <TermButton
@@ -452,7 +459,18 @@ const handleClearAllFilters = (): void => {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
 @import '@/assets/box.css';
 @import '@/assets/error-box.css';
 @import '@/assets/input.css';
+
+.sticky-container {
+  container-type: scroll-state;
+}
+
+@container scroll-state(stuck: top) {
+  .sticky-container-inner {
+    @apply shadow-sm dark:shadow-gray-900;
+  }
+}
 </style>
