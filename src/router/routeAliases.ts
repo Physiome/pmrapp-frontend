@@ -30,3 +30,11 @@ export const exposureFileViewRouteSuffixes = [
   '/:alias/models/channels/:file/:view',
   '/:alias/models/:file/:view',
 ]
+
+export const exposureFileViewLangRouteSuffixes = [
+  '/:alias/:file/:view/:lang',
+  '/:alias/experiments/cell/:file/:view/:lang',
+  '/:alias/experiments/channel/:file/:view/:lang',
+  '/:alias/models/channels/:file/:view/:lang',
+  '/:alias/models/:file/:view/:lang',
+]
