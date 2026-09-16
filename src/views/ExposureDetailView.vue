@@ -8,8 +8,9 @@ const alias = computed(() => route.params.alias as string)
 // The :file(.+) route param greedily captures a trailing slash, so strip it here.
 const file = computed(() => ((route.params.file as string) || '').replace(/\/+$/, ''))
 const view = computed(() => (route.params.view as string) || '')
+const lang = computed(() => (route.params.lang as string) || '')
 </script>
 
 <template>
-  <ExposureDetail :alias="alias" :file="file" :view="view" />
+  <ExposureDetail :alias="alias" :file="file" :view="view" :lang="lang" />
 </template>
