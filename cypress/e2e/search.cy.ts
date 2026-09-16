@@ -15,7 +15,8 @@ describe('Search page', () => {
     cy.get(selectors.resultItems).should('have.length', itemCount)
   }
 
-  const chooseAdvancedSearchTerm = (filter: string, optionLabel: string) => {
+  // TODO: disabled for new search UI
+  const _chooseAdvancedSearchTerm = (filter: string, optionLabel: string) => {
     cy.get(selectors.filterInput).clear().type(filter)
     cy.get(`button[aria-label="Search for ${optionLabel}"]`)
       .contains(optionLabel)
