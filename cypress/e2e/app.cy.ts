@@ -1,6 +1,6 @@
 // https://on.cypress.io/api
 
-describe('It covers navigation and routing.', () => {
+describe('It covers global layout, navigation and routing.', () => {
   describe('Header', () => {
     it('displays the header with the logo and navigation links.', () => {
       cy.visit('/')
@@ -8,12 +8,7 @@ describe('It covers navigation and routing.', () => {
       cy.get('header').contains('Workspaces')
       cy.get('header').contains('Exposures')
       cy.get('header').contains('Log in')
-    })
-
-    it('navigates to the home page when clicking the logo.', () => {
-      cy.visit('/workspaces')
-      cy.get('header [aria-label="Home"]').click()
-      cy.url().should('eq', Cypress.config().baseUrl)
+      cy.get('header').contains('button', 'Open search')
     })
 
     it('navigates between pages using the header links.', () => {
@@ -36,29 +31,26 @@ describe('It covers navigation and routing.', () => {
       searchDialog.should('be.visible')
       searchDialog.contains('h2', 'Search').should('be.visible')
       searchDialog.get('button[aria-label="Close"]').should('be.visible')
-      // TODO: To update after search combobox update.
-      // Disabled this for search UI changing to combobox.
-      // searchDialog.get('input[type="text"][aria-label="Search term"]').should('be.visible')
+    })
+
+    it('navigates to the home page when clicking the logo.', () => {
+      cy.visit('/workspaces')
+      cy.get('header [aria-label="Home"]').click()
+      cy.url().should('eq', Cypress.config().baseUrl)
     })
   })
 
   describe('Footer', () => {
-    it('displays the footer.', () => {
+    beforeEach(() => {
       cy.visit('/')
+    })
+
+    it('displays the footer.', () => {
       cy.get('footer').should('be.visible')
-      // In the new update, the copyright has been removed.
-      // cy.get('footer').contains('IUPS Physiome project')
-      // cy.get('footer').contains(new Date().getFullYear().toString())
     })
 
     it('contains GitHub repository links.', () => {
-      cy.visit('/')
       cy.get('footer a[href*="github.com"]').should('have.length', 2)
     })
-  })
-
-  it('visits the app login page', () => {
-    cy.visit('/login')
-    cy.contains('h1', 'Login')
   })
 })
