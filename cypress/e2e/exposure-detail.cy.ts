@@ -1,6 +1,19 @@
 describe('Exposure detail page', () => {
   beforeEach(() => {
     cy.visit('/exposures/da9')
+
+    // Clear the downloads folder before starting the test.
+    // Only for the GUI runner (`cypress open`)
+    // because the headless runner (`cypress run`) automatically clears
+    // the downloads folder before each test.
+    if (Cypress.config('isInteractive')) {
+      cy.task('clearDownloads')
+    }
+  })
+
+  after(() => {
+    // Clear the downloads folder after finishing the test.
+    cy.task('clearDownloads')
   })
 
   it('has the correct title.', () => {
@@ -40,6 +53,36 @@ describe('Exposure detail page', () => {
 
   it('renders the downloads section.', () => {
     cy.get('h4').contains('Downloads').should('exist')
+  })
+
+  it('downloads the Complete archive as a .zip file with the correct filename.', () => {
+    cy.get('[download="Noble, Denyer, Brown, DiFrancesco, 1992.zip"]').click()
+
+    const downloadsFolder = Cypress.config('downloadsFolder')
+    const expectedFileName = 'da8.zip' // "da8" is workspace's alias.
+    const filePath = `${downloadsFolder}/${expectedFileName}`
+
+    cy.readFile(filePath, { timeout: 10000 }).should('exist')
+  })
+
+  it('downloads the Complete archive as a .tgz file with the correct filename.', () => {
+    cy.get('[download="Noble, Denyer, Brown, DiFrancesco, 1992.tgz"]').click()
+
+    const downloadsFolder = Cypress.config('downloadsFolder')
+    const expectedFileName = 'da8.tgz' // "da8" is workspace's alias.
+    const filePath = `${downloadsFolder}/${expectedFileName}`
+
+    cy.readFile(filePath, { timeout: 10000 }).should('exist')
+  })
+
+  it('downloads the COMBINE archive file with the correct filename.', () => {
+    cy.get('aside').contains('button', 'COMBINE archive').click()
+
+    const downloadsFolder = Cypress.config('downloadsFolder')
+    const expectedFileName = 'Noble, Denyer, Brown, DiFrancesco, 1992.omex'
+    const filePath = `${downloadsFolder}/${expectedFileName}`
+
+    cy.readFile(filePath, { timeout: 10000 }).should('exist')
   })
 
   it('renders the licence section.', () => {
