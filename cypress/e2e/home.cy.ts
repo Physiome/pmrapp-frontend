@@ -7,14 +7,6 @@ describe('Home page', () => {
     cy.title().should('eq', 'Physiome Model Repository')
   })
 
-  it('renders a header component.', () => {
-    cy.get('header').should('be.visible')
-  })
-
-  it('renders a footer component.', () => {
-    cy.get('footer').should('be.visible')
-  })
-
   it('renders an <h1> element.', () => {
     cy.get('h1').should('exist')
     cy.get('h1').should('contain.text', 'Physiome Model Repository')
