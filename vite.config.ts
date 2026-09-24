@@ -35,13 +35,5 @@ export default defineConfig(({ command, mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    server: {
-      proxy: {
-        '/api': {
-          target: env.VITE_API_BASE_URL,
-          changeOrigin: true,
-        },
-      },
-    },
   }
 })
