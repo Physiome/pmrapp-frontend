@@ -39,16 +39,52 @@ describe('Exposure detail page', () => {
     cy.get('h4').contains('Source').should('exist')
   })
 
+  it('renders the source with workspace information.', () => {
+    cy.get('aside section').contains('Noble, Denyer, Brown, DiFrancesco, 1992').should('exist')
+    cy.get('aside section').contains('bd2816434c6b').should('exist')
+  })
+
   it('renders the citation section.', () => {
     cy.get('h4').contains('Citation').should('exist')
+  })
+
+  it('renders the citation with the correct information.', () => {
+    cy.get('aside section').contains('Noble, Denyer, Brown, DiFrancesco, 1992.').should('exist')
+    cy.get('aside section').contains('(2026). Physiome Model Repository.').should('exist')
+    cy.get('aside section').contains('/exposures/da9').should('exist')
   })
 
   it('renders the views available section.', () => {
     cy.get('h4').contains('Views available').should('exist')
   })
 
+  it('verifies the link to OpenCOR Web app.', () => {
+    cy.get('aside section').contains('a', "Open with OpenCOR's Web app")
+      .should('have.attr', 'href')
+      .and('include', '//opencor.ws/app/?opencor://openFiles/')
+      .and('include', 'https://models.physiomeproject.org/workspace/da8/')
+      .and('include', 'rawfile/bd2816434c6beff84e7a76b34249861086cff35b/noble_denyer_brown_difrancesco_1992.cellml')
+      .and('include', '%7Chttps://models.physiomeproject.org/workspace/da8/rawfile')
+      .and('include', '/bd2816434c6beff84e7a76b34249861086cff35b/noble_denyer_brown_difrancesco_1992.sedml')
+  })
+
+  it('verifies the link to generate code.', () => {
+    cy.get('aside section').contains('a', 'Generate code').click()
+    cy.url().should('include', '/cellml_codegen/C')
+  })
+
+  it('verifies the link to the Mathematics section.', () => {
+    cy.get('aside section').contains('a', 'Mathematics').click()
+    cy.url().should('include', '/cellml_math')
+  })
+
   it('renders the navigation section.', () => {
     cy.get('h4').contains('Navigation').should('exist')
+  })
+
+  it('renders the navigation link for the CellML file.', () => {
+    cy.get('aside section a').contains('a', 'noble_denyer_brown_difrancesco_1992.cellml')
+      .should('exist')
   })
 
   it('renders the downloads section.', () => {
@@ -97,5 +133,12 @@ describe('Exposure detail page', () => {
 
   it('renders the licence section.', () => {
     cy.get('h4').contains('Licence').should('exist')
+  })
+
+  it('renders the licence information with the correct link.', () => {
+    cy.get('aside section a').contains('CC BY 3.0')
+      .should('exist')
+      .and('have.attr', 'href')
+      .and('include', 'https://creativecommons.org/licenses/by/3.0/')
   })
 })
