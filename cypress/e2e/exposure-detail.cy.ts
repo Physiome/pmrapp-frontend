@@ -83,7 +83,7 @@ describe('Exposure detail page', () => {
   })
 
   it('renders the navigation link for the CellML file.', () => {
-    cy.get('aside section a').contains('a', 'noble_denyer_brown_difrancesco_1992.cellml')
+    cy.get('aside section a').contains('noble_denyer_brown_difrancesco_1992.cellml')
       .should('exist')
   })
 
