@@ -15,6 +15,9 @@ jobs:
       SKIP_ENV_VALIDATION: 'true'
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL_PROXY || 'https://pmr3.demo.physiomeproject.org' }}
       VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
+      # Workspace archive (.zip/.tgz) links point at this host.
+      # Without it they fall back to the local preview server, which cannot serve archives.
+      VITE_DOWNLOAD_HOST: ${{ vars.VITE_DOWNLOAD_HOST || 'https://pmr3.demo.physiomeproject.org' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
