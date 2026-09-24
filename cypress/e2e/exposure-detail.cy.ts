@@ -59,13 +59,20 @@ describe('Exposure detail page', () => {
   })
 
   it('verifies the link to OpenCOR Web app.', () => {
-    cy.get('aside section').contains('a', "Open with OpenCOR's Web app")
+    cy.get('aside section')
+      .contains('a', "Open with OpenCOR's Web app")
       .should('have.attr', 'href')
       .and('include', '//opencor.ws/app/?opencor://openFiles/')
       .and('include', 'https://models.physiomeproject.org/workspace/da8/')
-      .and('include', 'rawfile/bd2816434c6beff84e7a76b34249861086cff35b/noble_denyer_brown_difrancesco_1992.cellml')
+      .and(
+        'include',
+        'rawfile/bd2816434c6beff84e7a76b34249861086cff35b/noble_denyer_brown_difrancesco_1992.cellml',
+      )
       .and('include', '%7Chttps://models.physiomeproject.org/workspace/da8/rawfile')
-      .and('include', '/bd2816434c6beff84e7a76b34249861086cff35b/noble_denyer_brown_difrancesco_1992.sedml')
+      .and(
+        'include',
+        '/bd2816434c6beff84e7a76b34249861086cff35b/noble_denyer_brown_difrancesco_1992.sedml',
+      )
   })
 
   it('verifies the link to generate code.', () => {
@@ -83,8 +90,7 @@ describe('Exposure detail page', () => {
   })
 
   it('renders the navigation link for the CellML file.', () => {
-    cy.get('aside section a').contains('noble_denyer_brown_difrancesco_1992.cellml')
-      .should('exist')
+    cy.get('aside section a').contains('noble_denyer_brown_difrancesco_1992.cellml').should('exist')
   })
 
   it('renders the downloads section.', () => {
@@ -136,7 +142,8 @@ describe('Exposure detail page', () => {
   })
 
   it('renders the licence information with the correct link.', () => {
-    cy.get('aside section a').contains('CC BY 3.0')
+    cy.get('aside section a')
+      .contains('CC BY 3.0')
       .should('exist')
       .and('have.attr', 'href')
       .and('include', 'https://creativecommons.org/licenses/by/3.0/')

@@ -11,9 +11,12 @@ describe('Workspace detail page', () => {
 
     cy.get('a.text-link').contains('README.md').should('exist')
     // The link is sometimes covered by the cookie banner.
-    cy.get('a.text-link').contains('README.md').click({force: true})
+    cy.get('a.text-link').contains('README.md').click({ force: true })
 
-    cy.url().should('include', '/workspaces/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md')
+    cy.url().should(
+      'include',
+      '/workspaces/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md',
+    )
   })
 
   it('renders the file view page with action buttons', () => {
