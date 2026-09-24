@@ -85,6 +85,16 @@ describe('Exposure detail page', () => {
     cy.readFile(filePath, { timeout: 10000 }).should('exist')
   })
 
+  it('downloads the individual CellML file with the correct filename.', () => {
+    cy.get('.box ul li a[download="noble_denyer_brown_difrancesco_1992.cellml"]').click()
+
+    const downloadsFolder = Cypress.config('downloadsFolder')
+    const expectedFileName = 'noble_denyer_brown_difrancesco_1992.cellml'
+    const filePath = `${downloadsFolder}/${expectedFileName}`
+
+    cy.readFile(filePath, { timeout: 10000 }).should('exist')
+  })
+
   it('renders the licence section.', () => {
     cy.get('h4').contains('Licence').should('exist')
   })
