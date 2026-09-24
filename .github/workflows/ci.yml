@@ -15,6 +15,7 @@ jobs:
       SKIP_ENV_VALIDATION: 'true'
       VITE_API_BASE_URL: 'https://pmr3.demo.physiomeproject.org'
       VITE_BASE_PATH: '/'
+      VITE_DOWNLOAD_API: 'https://pmr3.demo.physiomeproject.org'
       VITE_DOWNLOAD_HOST: 'https://pmr3.demo.physiomeproject.org'
     steps:
       - name: Checkout
