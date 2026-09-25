@@ -93,6 +93,12 @@ const isCitationDetailsOpen = ref(false)
 const hasOtherRelatedModels = ref(false)
 const isDownloadingCOMBINE = ref(false)
 const isFileNotFound = ref(false)
+const isViewNotFound = ref(false)
+const isLangNotFound = ref(false)
+
+const hasPathError = computed(
+  () => isFileNotFound.value || isViewNotFound.value || isLangNotFound.value,
+)
 const loadedFileTitle = ref('')
 const { goBack } = useBackNavigation('/exposures')
 
@@ -126,7 +132,8 @@ const fileBrowserPath = computed(() => {
 const citationUrl = computed(() => {
   const params: Record<string, string> = { alias: props.alias }
   if (props.file) params.file = props.file
-  if (props.view) params.view = props.view
+  if (props.view && !isViewNotFound.value) params.view = props.view
+  if (props.lang && !isLangNotFound.value) params.lang = props.lang
 
   const resolved = router.resolve({ name: route.name, params })
   // File-only routes need a trailing slash so production's raw-file server serves the page instead of downloading the file.
@@ -178,7 +185,7 @@ const actionToolbarWidth = computed(() => {
   return [
     'w-full ',
     'lg:w-[calc(100%-theme(spacing.72)-theme(spacing.8))]',
-    'xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))]'
+    'xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))]',
   ]
 })
 
@@ -266,6 +273,18 @@ const workspaceArchiveUrlBase = computed(() => {
 const extractLangPath = (path: string) => {
   return path.split('.')[1]
 }
+
+const defaultLangKey = extractLangPath(CODEGEN_LANGUAGES[0]?.path ?? 'code.C.c')
+
+const isKnownLang = (lang: string) =>
+  CODEGEN_LANGUAGES.some((l) => extractLangPath(l.path) === lang)
+
+const defaultFileViewTarget = computed(() => {
+  if (exposureFilePath.value) {
+    return `/exposures/${props.alias}/${exposureFilePath.value}`
+  }
+  return `/exposures/${props.alias}`
+})
 
 const handleDownloadCOMBINEArchive = async () => {
   const exposureAlias = props.alias
@@ -435,16 +454,41 @@ const loadDefaultView = async () => {
 const loadCodegenView = async () => {
   if (!exposureInfo.value) return
 
-  // Resolve the active language: prefer the lang route param (matched against the path segment,
-  // e.g. 'C_IDA' from 'code.C_IDA.c'), fall back to the first entry.
-  const activeLang =
-    CODEGEN_LANGUAGES.find((l) => extractLangPath(l.path) === props.lang) ?? CODEGEN_LANGUAGES[0]
+  // When no language is specified in the URL, redirect to the default language (C).
+  if (!props.lang) {
+    const defaultLang = CODEGEN_LANGUAGES[0]
+    if (!defaultLang) return
 
-  if (!activeLang) return
+    isLangNotFound.value = false
+    await generateCode(defaultLang.path, defaultLang.fileName)
 
+    // Reflect the default language in the URL (replace so it does not pollute browser history).
+    if (props.view === 'cellml_codegen') {
+      router.replace({
+        name: 'exposure-file-detail-view-lang',
+        params: {
+          alias: props.alias,
+          file: props.file,
+          view: 'cellml_codegen',
+          lang: extractLangPath(defaultLang.path),
+        },
+        query: route.query,
+      })
+    }
+    return
+  }
+
+  // When a language is specified in the URL, verify that it is supported.
+  const activeLang = CODEGEN_LANGUAGES.find((l) => extractLangPath(l.path) === props.lang)
+  if (!activeLang) {
+    isLangNotFound.value = true
+    return
+  }
+
+  isLangNotFound.value = false
   await generateCode(activeLang.path, activeLang.fileName)
 
-  // Reflect the active language in the URL (replace so it doesn't pollute browser history).
+  // Reflect the active language in the URL (replace so it does not pollute browser history).
   if (props.view === 'cellml_codegen') {
     router.replace({
       name: 'exposure-file-detail-view-lang',
@@ -466,7 +510,7 @@ const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
       alias: props.alias,
       file: props.file,
       view: 'cellml_codegen',
-      lang: extractLangPath(lang.path)
+      lang: extractLangPath(lang.path),
     },
     query: route.query,
   })
@@ -478,9 +522,7 @@ const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
 // (and triggers loadCodegenView via the props.view or props.lang watch).
 const viewButtonTarget = (viewKey: string) => {
   if (viewKey === 'cellml_codegen') {
-    const activeLangPath =
-      props.lang ||
-      extractLangPath(CODEGEN_LANGUAGES[0]?.path ?? 'code.C.c')
+    const activeLangPath = isKnownLang(props.lang) ? props.lang : defaultLangKey
     return {
       name: 'exposure-file-detail-view-lang' as const,
       params: {
@@ -588,9 +630,51 @@ const resetState = () => {
   generatedCodeFilename.value = ''
   hasOtherRelatedModels.value = false
   isFileNotFound.value = false
+  isViewNotFound.value = false
+  isLangNotFound.value = false
   licenseInfo.value = DEFAULT_LICENSE
   metadataJSON.value = {}
   rawMathsData.value = []
+}
+
+const loadCurrentView = async () => {
+  isViewNotFound.value = false
+  isLangNotFound.value = false
+
+  if (isFileNotFound.value) {
+    return
+  }
+
+  // If no view or default 'view' is requested.
+  if (!props.view || props.view === 'view') {
+    if (props.lang) {
+      isViewNotFound.value = true
+      return
+    }
+    await loadDefaultView()
+    return
+  }
+
+  // Check if the requested view is available for this file.
+  const isViewAvailable = availableViews.value.some((v) => v.view_key === props.view)
+  if (!isViewAvailable) {
+    isViewNotFound.value = true
+    return
+  }
+
+  if (props.view === 'cellml_codegen') {
+    await loadCodegenView()
+    return
+  }
+
+  if (props.view === 'cellml_math') {
+    if (props.lang) {
+      isViewNotFound.value = true
+      return
+    }
+    await generateMath()
+    return
+  }
 }
 
 const loadInitialView = async () => {
@@ -619,6 +703,9 @@ const loadInitialView = async () => {
       exposureInfo.value.files.some((entry) => entry[0] === props.file) ||
       exposureFiles.some((file) => file.workspace_file_path === props.file)
     isFileNotFound.value = Boolean(props.file) && !fileExists
+    if (fileExists && props.view) {
+      isViewNotFound.value = true
+    }
     return
   }
 
@@ -659,14 +746,7 @@ const loadInitialView = async () => {
     )
   }
 
-  // Load codegen view with default language.
-  if (props.view === 'cellml_codegen') {
-    await loadCodegenView()
-  }
-
-  if (props.view === 'cellml_math') {
-    await generateMath()
-  }
+  await loadCurrentView()
 }
 
 watch(detailHTML, async () => {
@@ -695,26 +775,21 @@ watch(
 
 watch(
   () => props.view,
-  async (newView) => {
-    if (newView === 'cellml_codegen') {
-      await loadCodegenView()
-    } else if (newView === 'cellml_math') {
-      await generateMath()
-    } else {
-      await loadDefaultView()
-    }
+  async (newView, oldView) => {
+    if (newView === oldView) return
+    await loadCurrentView()
   },
 )
 
 watch(
   () => props.lang,
   async (newLang, oldLang) => {
-    // Only react when we're on the codegen view and the lang segment actually changed.
-    if (props.view !== 'cellml_codegen' || newLang === oldLang) return
-    const activeLang =
-      CODEGEN_LANGUAGES.find((l) => extractLangPath(l.path) === newLang) ?? CODEGEN_LANGUAGES[0]
-    if (activeLang && generatedCodeFilename.value !== activeLang.fileName) {
-      await generateCode(activeLang.path, activeLang.fileName)
+    // Only react when the lang segment actually changed.
+    if (newLang === oldLang) return
+    if (props.view === 'cellml_codegen') {
+      await loadCodegenView()
+    } else {
+      await loadCurrentView()
     }
   },
 )
@@ -798,6 +873,48 @@ onMounted(async () => {
             content-section="Exposure Detail"
           >
             Go to exposure
+          </ActionButton>
+        </template>
+      </WarningBlock>
+
+      <WarningBlock
+        v-else-if="isViewNotFound"
+        title="View not available"
+      >
+        <template #content>
+          <div class="text-sm">
+            <p>The view <strong>{{ props.view }}</strong> is not available for this file.</p>
+          </div>
+        </template>
+        <template #footer>
+          <ActionButton
+            variant="primary"
+            size="sm"
+            :to="defaultFileViewTarget"
+            content-section="Exposure Detail"
+          >
+            {{ exposureFilePath ? 'Go to file' : 'Go to exposure' }}
+          </ActionButton>
+        </template>
+      </WarningBlock>
+
+      <WarningBlock
+        v-else-if="isLangNotFound"
+        title="Language not available"
+      >
+        <template #content>
+          <div class="text-sm">
+            <p>The code generation language <strong>{{ props.lang }}</strong> is not available.</p>
+          </div>
+        </template>
+        <template #footer>
+          <ActionButton
+            variant="primary"
+            size="sm"
+            :to="viewButtonTarget('cellml_codegen')"
+            content-section="Exposure Detail"
+          >
+            Go to default language
           </ActionButton>
         </template>
       </WarningBlock>
@@ -926,7 +1043,7 @@ onMounted(async () => {
           </div>
         </dl>
       </section>
-      <section v-if="!isFileNotFound" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+      <section v-if="!hasPathError" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
         <div class="flex flex-row justify-between mb-3">
           <h4 class="text-lg font-semibold">Citation</h4>
           <CopyButton

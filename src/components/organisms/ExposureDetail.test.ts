@@ -823,4 +823,148 @@ describe('ExposureDetail', () => {
       expect(wrapper.find('.html-view').exists()).toBe(false)
     })
   })
+
+  describe('route and path error handling', () => {
+    it('shows WarningBlock and hides citation when codegen language is unavailable', async () => {
+      const wrapper = await mountComponent({
+        props: {
+          file: 'baylor_hollingworth_chandler_2002_a.cellml',
+          view: 'cellml_codegen',
+          lang: 'CPP',
+        },
+      })
+
+      // Must not attempt to fetch code for an unsupported language or fallback.
+      expect(exposureStore.getExposureRawContent).not.toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        'cellml_codegen',
+        expect.anything(),
+      )
+
+      // Must not redirect back to default language 'C'.
+      expect(mockRouterReplace).not.toHaveBeenCalled()
+
+      // Warning block must be displayed.
+      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' })
+      expect(warningBlock.exists()).toBe(true)
+      expect(warningBlock.props('title')).toBe('Language not available')
+      expect(warningBlock.text()).toContain('The code generation language CPP is not available.')
+
+      // Action button to go to default language must be present.
+      const actionButton = warningBlock.findComponent({ name: 'ActionButton' })
+      expect(actionButton.exists()).toBe(true)
+      expect(actionButton.text()).toContain('Go to default language')
+      expect(actionButton.props('to')).toEqual({
+        name: 'exposure-file-detail-view-lang',
+        params: {
+          alias: mockExposureInfo.exposure_alias,
+          file: 'baylor_hollingworth_chandler_2002_a.cellml',
+          view: 'cellml_codegen',
+          lang: 'C',
+        },
+      })
+
+      // Citation section must not be shown.
+      const citationHeading = wrapper
+        .findAll('h4')
+        .find((heading) => heading.text().trim() === 'Citation')
+      expect(citationHeading).toBeUndefined()
+    })
+
+    it('shows WarningBlock and hides citation when view is unavailable', async () => {
+      const wrapper = await mountComponent({
+        props: {
+          file: 'baylor_hollingworth_chandler_2002_a.cellml',
+          view: 'cellml_codegen_x',
+        },
+      })
+
+      // Warning block must be displayed.
+      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' })
+      expect(warningBlock.exists()).toBe(true)
+      expect(warningBlock.props('title')).toBe('View not available')
+      expect(warningBlock.text()).toContain(
+        'The view cellml_codegen_x is not available for this file.',
+      )
+
+      // Must not render base HTML view.
+      expect(wrapper.find('.html-view').exists()).toBe(false)
+
+      // Action button to go to file must be present.
+      const actionButton = warningBlock.findComponent({ name: 'ActionButton' })
+      expect(actionButton.exists()).toBe(true)
+      expect(actionButton.text()).toContain('Go to file')
+      expect(actionButton.props('to')).toBe(
+        `/exposures/${mockExposureInfo.exposure_alias}/baylor_hollingworth_chandler_2002_a.cellml`,
+      )
+
+      // Citation section must not be shown.
+      const citationHeading = wrapper
+        .findAll('h4')
+        .find((heading) => heading.text().trim() === 'Citation')
+      expect(citationHeading).toBeUndefined()
+    })
+
+    it('shows WarningBlock and hides citation when view does not accept language sub-paths', async () => {
+      const wrapper = await mountComponent({
+        props: {
+          file: 'baylor_hollingworth_chandler_2002_a.cellml',
+          view: 'cellml_math',
+          lang: 'Python',
+        },
+      })
+
+      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' })
+      expect(warningBlock.exists()).toBe(true)
+      expect(warningBlock.props('title')).toBe('View not available')
+
+      const citationHeading = wrapper
+        .findAll('h4')
+        .find((heading) => heading.text().trim() === 'Citation')
+      expect(citationHeading).toBeUndefined()
+    })
+
+    it('recovers from invalid language when switching to a valid language', async () => {
+      const wrapper = await mountComponent({
+        props: {
+          file: 'baylor_hollingworth_chandler_2002_a.cellml',
+          view: 'cellml_codegen',
+          lang: 'CPP',
+        },
+        generatedCode: mockGeneratedCode,
+        stubs: {
+          CodeBlock: {
+            name: 'CodeBlock',
+            props: ['code', 'filename'],
+            template: '<div class="code-block-stub" />',
+          },
+        },
+      })
+
+      expect(wrapper.findComponent({ name: 'WarningBlock' }).exists()).toBe(true)
+
+      // Switch to a valid language.
+      await wrapper.setProps({ lang: 'MATLAB' })
+      await flushPromises()
+      await nextTick()
+
+      // Warning block should now be gone.
+      expect(wrapper.findComponent({ name: 'WarningBlock' }).exists()).toBe(false)
+
+      // MATLAB code should be generated.
+      expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
+        mockExposureInfo.exposure.id,
+        mockExposureInfo.exposure.files?.[0]?.id ?? 598,
+        'cellml_codegen',
+        'code.MATLAB.m',
+      )
+
+      // Citation section should now be visible.
+      const citationHeading = wrapper
+        .findAll('h4')
+        .find((heading) => heading.text().trim() === 'Citation')
+      expect(citationHeading?.exists()).toBe(true)
+    })
+  })
 })
