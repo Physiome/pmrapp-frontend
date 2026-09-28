@@ -22,6 +22,7 @@ import {
   workspaceDetailRouteSuffixes,
   workspaceFileRouteSuffixes,
   exposureAliasBases,
+  exposureDetailRouteSuffixes,
   exposureFileRouteSuffixes,
   exposureFileViewRouteSuffixes,
   exposureFileViewLangRouteSuffixes,
@@ -98,7 +99,11 @@ const router = createRouter({
       path: '/exposures/:alias',
       name: 'exposure-detail',
       component: ExposureDetailView,
-      alias: createAliases(exposureAliasBases, '/:alias', '/:alias/view'),
+      alias: createPluralRouteAliases(
+        '/exposures',
+        exposureAliasBases,
+        exposureDetailRouteSuffixes,
+      ),
       meta: { title: `Exposure Detail – ${TITLE}` },
     },
     {
