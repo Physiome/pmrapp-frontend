@@ -1,21 +1,30 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch, type Component } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
 import Chip from '@/components/atoms/Chip.vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
-import SearchIcon from '@/components/icons/SearchIcon.vue'
-import UserIcon from '@/components/icons/UserIcon.vue'
+import Keycap from '@/components/atoms/Keycap.vue'
+import TermButton from '@/components/atoms/TermButton.vue'
 import CodeIcon from '@/components/icons/CodeIcon.vue'
 import FileIcon from '@/components/icons/FileIcon.vue'
+import SearchIcon from '@/components/icons/SearchIcon.vue'
+import UserIcon from '@/components/icons/UserIcon.vue'
 import { SEARCH_CATEGORIES, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
 import type { SearchFilter, SearchQueryRequest } from '@/types/search'
-import Keycap from '@/components/atoms/Keycap.vue'
+import { findMatchingTerms, highlightTokens } from '@/utils/search'
 
 interface FilterChip {
   id: string
   kind: string
   term: string
   displayLabel: string
+}
+
+interface SuggestionRow {
+  kind: string
+  label: string
+  icon: Component
+  terms: string[]
 }
 
 const props = withDefaults(
@@ -40,29 +49,25 @@ const searchStore = useSearchStore()
 
 const TEXT_QUERY_KIND = '_text_query'
 const TEXT_QUERY_LABEL = 'Free text'
+// Maximum number of candidate terms per category; only those that fit the dropdown width are shown.
+const MAX_TERMS_PER_CATEGORY = 20
 
 // ---- Refs ----
 const inputRef = ref<HTMLInputElement | null>(null)
 const wrapperRef = ref<HTMLDivElement | null>(null)
-const categoryMenuRef = ref<HTMLDivElement | null>(null)
-const termSuggestionsRef = ref<HTMLDivElement | null>(null)
-const freeTextHintRef = ref<HTMLDivElement | null>(null)
+const dropdownRef = ref<HTMLDivElement | null>(null)
 const chips = ref<FilterChip[]>([])
 const currentInput = ref('')
-const showCategoryMenu = ref(false)
-const selectedCategoryKind = ref<string | null>(null)
-const showTermSuggestions = ref(false)
-const termSuggestions = ref<string[]>([])
-const activeSuggestionIndex = ref(-1)
-const categoryMenuActiveIndex = ref(-1)
 const isFocused = ref(false)
+const dropdownDismissed = ref(false)
+// Number of terms per category row that fit the dropdown width (unset = render all candidates).
+const visibleCounts = ref<Record<string, number>>({})
 
-// Emits the current dropdown height whenever it changes (used by SearchOverlay to grow the dialog).
-function emitDropdownHeight() {
-  nextTick(() => {
-    const el = categoryMenuRef.value ?? termSuggestionsRef.value ?? freeTextHintRef.value
-    emit('dropdownHeightChange', el ? el.offsetHeight : 0)
-  })
+const categoryIcons: Record<string, Component> = {
+  citation_author_family_name: UserIcon,
+  model_author: UserIcon,
+  cellml_keyword: CodeIcon,
+  citation_id: FileIcon,
 }
 
 // ---- Computed ----
@@ -81,21 +86,17 @@ const mainSearchBarClass = computed(() => {
 })
 
 const dropdownMenuClass = [
-  'absolute z-50 left-0 mt-1 w-80 min-w-full bg-white dark:bg-gray-800',
+  'absolute z-50 left-0 mt-1 w-full bg-white dark:bg-gray-800',
   'rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'
 ]
 
-const categoryMenuClass = computed(() => [
-  ...dropdownMenuClass
-])
-
-const termSuggestionsClass = computed(() => [
-  ...dropdownMenuClass
-])
-
-const freeTextHintClass = computed(() => [
-  ...dropdownMenuClass
-])
+const suggestionButtonClass = [
+  'shrink-0 max-w-[16rem] truncate',
+  // Border keeps buttons distinguishable where their background matches the dropdown (dark mode).
+  'border border-gray-200 dark:border-gray-700',
+  // Inset ring: the row container clips overflow, which would hide an outer ring.
+  'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary'
+]
 
 const searchButtonClass = computed(() => {
   const baseClasses = [
@@ -119,105 +120,59 @@ const hasValues = computed(() => {
   return chips.value.length > 0 || currentInput.value.trim().length > 0
 })
 
-const categoryPrefix = computed(() => {
-  if (!selectedCategoryKind.value) return ''
-  if (selectedCategoryKind.value === TEXT_QUERY_KIND) return TEXT_QUERY_LABEL
-  return SEARCH_KIND_LABEL_SINGULAR_MAP[selectedCategoryKind.value] || selectedCategoryKind.value
-})
-
 const inputPlaceholder = computed(() => {
-  if (selectedCategoryKind.value && selectedCategoryKind.value !== TEXT_QUERY_KIND) {
-    return 'Type to filter...'
+  if (chips.value.length > 0) {
+    return 'Type to search or add more...'
   }
-
-  if (chips.value?.find(({kind}) => (kind === TEXT_QUERY_KIND))) {
-    return 'Type to replace search query or add a category below…'
-  }
-
-  if (showCategoryMenu.value) {
-    return 'Type to search or add a category below...'
-  }
-
   return 'Type to search...'
 })
 
-const helpText = computed(() => {
-  if (!isFocused.value && !props.inOverlay) return ''
-  if (selectedCategoryKind.value && selectedCategoryKind.value !== TEXT_QUERY_KIND) {
-    return 'Select or type a term from the suggestions below'
-  }
-  if (chips.value.length > 0) {
-    return 'Add another category filter below to narrow your search'
-  }
-  return 'Select a category filter below, or just type and press Enter to search'
-})
-
-const categoryMenuItems = computed(() => {
-  const input = currentInput.value.trim().toLowerCase()
-  let filtered = [...SEARCH_CATEGORIES]
-  if (input) {
-    filtered = filtered.filter(
-      (cat) => cat.label.toLowerCase().includes(input) || cat.value.toLowerCase().includes(input),
-    )
-  }
-  // Don't include TEXT_QUERY_KIND — free text is now always the implicit default.
-  return filtered
-})
-
-const hasCategoryMatches = computed(() => categoryMenuItems.value.length > 0)
-
-const showDropdown = computed(() => showCategoryMenu.value || showTermSuggestions.value)
-
-const noTermMatchesMessage = computed(() => {
-  const input = currentInput.value.trim()
-  const label = categoryPrefix.value || 'this category'
-  if (!input) return `No ${label} suggestions available`
-  return `No ${label} available for "${input}". Try a different term or press Escape to pick another category.`
-})
-
 /**
- * Show the free-text hint dropdown when the user has typed something and no
- * category or other dropdown is active.
+ * Rows shown in the dropdown for the current input: a free-text row first,
+ * followed by every category that has partially matching terms.
  */
-const showFreeTextHint = computed(() => {
+const suggestionRows = computed<SuggestionRow[]>(() => {
+  const input = currentInput.value.trim()
+  if (!input) return []
+
+  const rows: SuggestionRow[] = [
+    { kind: TEXT_QUERY_KIND, label: TEXT_QUERY_LABEL, icon: SearchIcon, terms: [input] },
+  ]
+
+  for (const category of SEARCH_CATEGORIES) {
+    const categoryData = searchStore.categories.find((c) => c.kind === category.value)
+    const selectedTerms = chips.value.filter((c) => c.kind === category.value).map((c) => c.term)
+    const terms = findMatchingTerms(
+      categoryData?.kindInfo?.terms ?? [],
+      input,
+      selectedTerms,
+      MAX_TERMS_PER_CATEGORY,
+    )
+
+    if (terms.length > 0) {
+      rows.push({
+        kind: category.value,
+        label: category.label,
+        icon: categoryIcons[category.value] ?? SearchIcon,
+        terms,
+      })
+    }
+  }
+
+  return rows
+})
+
+const showDropdown = computed(() => {
   return (
-    (props.inOverlay || isFocused.value) &&
-    !selectedCategoryKind.value &&
-    currentInput.value.trim().length > 0 &&
-    !showDropdown.value
+    suggestionRows.value.length > 0 &&
+    !dropdownDismissed.value &&
+    (props.inOverlay || isFocused.value)
   )
 })
 
-// Watch all dropdown visibility states; emit the active dropdown's height so
-// SearchOverlay can grow the dialog to fit it.
-watch([showCategoryMenu, showTermSuggestions, showFreeTextHint], emitDropdownHeight)
-
-const categoryIcons: Record<string, Component> = {
-  citation_author_family_name: UserIcon,
-  model_author: UserIcon,
-  cellml_keyword: CodeIcon,
-  citation_id: FileIcon,
-}
-
-// ---- Per-item class helpers (methods, not computed, because they take loop arguments) ----
-function getCategoryItemClass(_cat: { value: string }, index: number): string[] {
-  const baseClasses = ['w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors cursor-pointer focus:outline-none']
-  if (categoryMenuActiveIndex.value === index) {
-    baseClasses.push('bg-gray-100 dark:bg-gray-700')
-  } else {
-    baseClasses.push('hover:bg-gray-50 dark:hover:bg-gray-750')
-  }
-  return baseClasses
-}
-
-function getTermItemClass(index: number): string[] {
-  const baseClasses = ['w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer focus:outline-none flex items-center gap-2']
-  if (activeSuggestionIndex.value === index) {
-    baseClasses.push('bg-gray-100 dark:bg-gray-700')
-  } else {
-    baseClasses.push('hover:bg-gray-50 dark:hover:bg-gray-750')
-  }
-  return baseClasses
+function visibleTerms(row: SuggestionRow): string[] {
+  const count = visibleCounts.value[row.kind]
+  return count === undefined ? row.terms : row.terms.slice(0, count)
 }
 
 // ---- Helpers ----
@@ -225,6 +180,11 @@ function getDisplayLabel(kind: string, term: string): string {
   if (kind === TEXT_QUERY_KIND) return term
   const singularLabel = SEARCH_KIND_LABEL_SINGULAR_MAP[kind] || kind
   return `${singularLabel}: ${term}`
+}
+
+function getSuggestionAriaLabel(kind: string, term: string): string {
+  if (kind === TEXT_QUERY_KIND) return `Add free text: ${term}`
+  return `Add ${getDisplayLabel(kind, term)}`
 }
 
 function generateChipId(): string {
@@ -236,6 +196,88 @@ function focusInput() {
     inputRef.value?.focus()
   })
 }
+
+// ---- Dropdown sizing ----
+let measureToken = 0
+
+/**
+ * Renders every candidate term, then measures which ones fit on a single line
+ * of each row and hides the rest. Runs before paint, so there is no flicker.
+ */
+async function recomputeVisibleCounts() {
+  const token = ++measureToken
+  visibleCounts.value = {}
+  await nextTick()
+  if (token !== measureToken || !dropdownRef.value) return
+
+  const counts: Record<string, number> = {}
+  const containers = dropdownRef.value.querySelectorAll<HTMLElement>('[data-suggestion-row]')
+
+  for (const container of containers) {
+    const kind = container.dataset.suggestionRow
+    if (!kind) continue
+
+    const width = container.clientWidth
+    let count = 0
+    for (const child of Array.from(container.children) as HTMLElement[]) {
+      if (child.offsetLeft + child.offsetWidth > width) break
+      count += 1
+    }
+    counts[kind] = Math.max(1, count)
+  }
+
+  visibleCounts.value = counts
+  emitDropdownHeight()
+}
+
+// Emits the current dropdown height (used by SearchOverlay to grow the dialog).
+function emitDropdownHeight() {
+  nextTick(() => {
+    emit('dropdownHeightChange', dropdownRef.value ? dropdownRef.value.offsetHeight : 0)
+  })
+}
+
+let resizeObserver: ResizeObserver | null = null
+let lastDropdownWidth = 0
+
+watch(dropdownRef, (el) => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+  lastDropdownWidth = 0
+
+  if (!el) {
+    emitDropdownHeight()
+    return
+  }
+
+  if (typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      if (el.clientWidth !== lastDropdownWidth) {
+        lastDropdownWidth = el.clientWidth
+        recomputeVisibleCounts()
+      } else {
+        emitDropdownHeight()
+      }
+    })
+    resizeObserver.observe(el)
+  }
+})
+
+watch(suggestionRows, () => {
+  if (showDropdown.value) {
+    recomputeVisibleCounts()
+  }
+})
+
+watch(showDropdown, (show) => {
+  if (show) {
+    recomputeVisibleCounts()
+  }
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
 
 // ---- Initialisation ----
 function initialiseFromProps() {
@@ -263,12 +305,6 @@ onMounted(async () => {
   initialiseFromProps()
 
   if (props.inOverlay) {
-    if (selectedCategoryKind.value) {
-      filterTermSuggestions(currentInput.value)
-    } else if (!currentInput.value.trim()) {
-      showCategoryMenu.value = true
-      categoryMenuActiveIndex.value = -1
-    }
     focusInput()
   }
 
@@ -281,89 +317,28 @@ onMounted(async () => {
   }
 })
 
-// ---- Dropdown helpers ----
-function filterTermSuggestions(inputText: string) {
-  if (!selectedCategoryKind.value || selectedCategoryKind.value === TEXT_QUERY_KIND) {
-    termSuggestions.value = []
-    showTermSuggestions.value = false
-    return
+// ---- Selection ----
+function selectSuggestion(kind: string, term: string) {
+  if (kind === TEXT_QUERY_KIND) {
+    // Only one free-text query is supported; replace any existing one.
+    chips.value = chips.value.filter((c) => c.kind !== TEXT_QUERY_KIND)
+  } else {
+    // Prevent adding a duplicate term within the same category.
+    const alreadySelected = chips.value.some(
+      (chip) => chip.kind === kind && chip.term.toLowerCase() === term.toLowerCase(),
+    )
+    if (alreadySelected) return
   }
-
-  const category = searchStore.categories.find((c) => c.kind === selectedCategoryKind.value)
-  const terms = (category?.kindInfo?.terms || [])
-    .filter((t) => t.trim().length > 0)
-    .filter((t) => !chips.value.some((chip) => chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === t.toLowerCase()))
-
-  if (!inputText.trim()) {
-    termSuggestions.value = terms.slice(0, 50)
-    showTermSuggestions.value = true
-    activeSuggestionIndex.value = -1
-    return
-  }
-
-  const filtered = terms
-    .filter((t) => t.toLowerCase().includes(inputText.toLowerCase()))
-    .slice(0, 50)
-
-  termSuggestions.value = filtered
-  showTermSuggestions.value = true
-  activeSuggestionIndex.value = -1
-}
-
-// ---- Category selection ----
-function selectCategory(category: { value: string; label: string }) {
-  // All entries are real categories now — show term suggestions.
-  selectedCategoryKind.value = category.value
-  showCategoryMenu.value = false
-  currentInput.value = ''
-  termSuggestions.value = []
-  showTermSuggestions.value = true
-  activeSuggestionIndex.value = -1
-
-  // Populate initial suggestions
-  filterTermSuggestions('')
-
-  focusInput()
-}
-
-function handleCategoryClick(category: { value: string; label: string }) {
-  selectCategory(category)
-}
-
-function cancelCategorySelection() {
-  selectedCategoryKind.value = null
-  showTermSuggestions.value = false
-  termSuggestions.value = []
-  activeSuggestionIndex.value = -1
-  focusInput()
-}
-
-// ---- Term selection ----
-function selectTerm(term: string) {
-  if (!selectedCategoryKind.value) return
-
-  // Prevent adding a duplicate term within the same category.
-  const alreadySelected = chips.value.some(
-    (chip) => chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === term.toLowerCase(),
-  )
-  if (alreadySelected) return
 
   chips.value.push({
     id: generateChipId(),
-    kind: selectedCategoryKind.value,
+    kind,
     term,
-    displayLabel: getDisplayLabel(selectedCategoryKind.value, term),
+    displayLabel: getDisplayLabel(kind, term),
   })
 
-  selectedCategoryKind.value = null
-  showTermSuggestions.value = false
   currentInput.value = ''
-  termSuggestions.value = []
-  activeSuggestionIndex.value = -1
-
-  // Return to category menu so user can add another filter.
-  showCategoryMenu.value = true
-  categoryMenuActiveIndex.value = -1
+  dropdownDismissed.value = false
   focusInput()
 }
 
@@ -374,27 +349,10 @@ function removeChip(id: string) {
 
 // ---- Edit chip ----
 function editChip(chip: FilterChip) {
-  // Remove the chip from the list.
+  // Put the term back into the input; the dropdown shows its matches again.
   chips.value = chips.value.filter((c) => c.id !== chip.id)
-
-  if (chip.kind === TEXT_QUERY_KIND) {
-    // Free-text: put the term back in the input for editing (no category needed).
-    selectedCategoryKind.value = null
-    currentInput.value = chip.term
-    showTermSuggestions.value = false
-  } else {
-    // Real category: set the category and show term suggestions,
-    // pre-populated with the existing term so the user can edit it.
-    selectedCategoryKind.value = chip.kind
-    currentInput.value = chip.term
-    showTermSuggestions.value = false
-    // Re-open term suggestions for this category.
-    filterTermSuggestions(chip.term)
-    showTermSuggestions.value = termSuggestions.value.length > 0
-  }
-
-  showCategoryMenu.value = false
-  activeSuggestionIndex.value = -1
+  currentInput.value = chip.term
+  dropdownDismissed.value = false
   focusInput()
 }
 
@@ -402,10 +360,7 @@ function editChip(chip: FilterChip) {
 function clearAll() {
   chips.value = []
   currentInput.value = ''
-  selectedCategoryKind.value = null
-  showCategoryMenu.value = false
-  showTermSuggestions.value = false
-  termSuggestions.value = []
+  dropdownDismissed.value = false
   focusInput()
 }
 
@@ -426,9 +381,7 @@ function executeSearch() {
   }
 
   inputRef.value?.blur()
-  showCategoryMenu.value = false
-  showTermSuggestions.value = false
-  selectedCategoryKind.value = null
+  dropdownDismissed.value = true
 
   const request: SearchQueryRequest = {
     query: queryText || undefined,
@@ -438,55 +391,45 @@ function executeSearch() {
   emit('querySearch', request)
 }
 
-// ---- Event handlers ----
-function handleFocus() {
-  isFocused.value = true
-
-  if (selectedCategoryKind.value) {
-    // Category selected — show term suggestions.
-    filterTermSuggestions(currentInput.value)
-    showCategoryMenu.value = false
-    return
-  }
-
-  // No category selected — only show the category menu when the input is empty.
-  // If the user has already typed text, let them press Enter to search freely.
-  if (!currentInput.value.trim()) {
-    showCategoryMenu.value = true
-    categoryMenuActiveIndex.value = -1
-  }
+// ---- Suggestion focus helpers ----
+function getSuggestionButton(rowIndex: number, colIndex: number): HTMLElement | null {
+  return (
+    dropdownRef.value?.querySelector<HTMLElement>(`[data-suggestion="${rowIndex}:${colIndex}"]`) ??
+    null
+  )
 }
 
-function handleBlur(event: FocusEvent) {
+function visibleCountAt(rowIndex: number): number {
+  const row = suggestionRows.value[rowIndex]
+  return row ? visibleTerms(row).length : 0
+}
+
+function focusSuggestion(rowIndex: number, colIndex: number) {
+  getSuggestionButton(rowIndex, colIndex)?.focus()
+}
+
+function focusFirstSuggestion() {
+  focusSuggestion(0, 0)
+}
+
+// ---- Event handlers ----
+function handleFocusIn() {
+  isFocused.value = true
+}
+
+function handleFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as HTMLElement | null
-  // Keep dropdown open if focus moves inside the wrapper (e.g. clicking a dropdown item)
+  // Keep the dropdown open while focus moves between the input and suggestions.
   if (relatedTarget && wrapperRef.value?.contains(relatedTarget)) {
     return
   }
   isFocused.value = false
-  if (!props.inOverlay) {
-    showCategoryMenu.value = false
-    showTermSuggestions.value = false
-  }
 }
 
-function handleInput(_event: Event) {
-  const input = _event.target as HTMLInputElement
+function handleInput(event: Event) {
+  const input = event.target as HTMLInputElement
   currentInput.value = input.value
-
-  if (selectedCategoryKind.value) {
-    filterTermSuggestions(input.value)
-  } else {
-    // In free-text mode: hide the category menu while typing so the
-    // free-text hint can show instead.
-    if (input.value.trim()) {
-      showCategoryMenu.value = false
-    } else {
-      // Input cleared — show the category menu again.
-      showCategoryMenu.value = true
-      categoryMenuActiveIndex.value = -1
-    }
-  }
+  dropdownDismissed.value = false
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -494,16 +437,8 @@ function handleKeydown(event: KeyboardEvent) {
 
   // ---- Escape ----
   if (event.key === 'Escape') {
-    if (showTermSuggestions.value && selectedCategoryKind.value) {
-      // Go back to category menu.
-      cancelCategorySelection()
-      showCategoryMenu.value = true
-      categoryMenuActiveIndex.value = -1
-      event.preventDefault()
-      return
-    }
-    if (showCategoryMenu.value) {
-      showCategoryMenu.value = false
+    if (showDropdown.value) {
+      dropdownDismissed.value = true
       event.preventDefault()
       return
     }
@@ -511,90 +446,18 @@ function handleKeydown(event: KeyboardEvent) {
     return
   }
 
-  // ---- Tab ----
-  // If the user has typed free text (no category active), Tab commits it as a chip
-  // so they can continue adding category filters.
-  if (event.key === 'Tab' && !selectedCategoryKind.value && currentInput.value.trim()) {
-    const term = currentInput.value.trim()
-    chips.value = chips.value.filter((c) => c.kind !== TEXT_QUERY_KIND)
-    chips.value.push({
-      id: generateChipId(),
-      kind: TEXT_QUERY_KIND,
-      term,
-      displayLabel: getDisplayLabel(TEXT_QUERY_KIND, term),
-    })
-    currentInput.value = ''
-    showCategoryMenu.value = true
-    categoryMenuActiveIndex.value = -1
+  // ---- Tab / ArrowDown: move into the suggestions ----
+  if (
+    ((event.key === 'Tab' && !event.shiftKey) || event.key === 'ArrowDown') &&
+    showDropdown.value
+  ) {
     event.preventDefault()
-    focusInput()
-    return
-  }
-
-  // Close dropdowns on Tab (without consuming the event, so focus moves naturally).
-  if (event.key === 'Tab' && showDropdown.value) {
-    showCategoryMenu.value = false
-    showTermSuggestions.value = false
-    if (selectedCategoryKind.value) {
-      selectedCategoryKind.value = null
-    }
-    return
-  }
-
-  // ---- Arrow navigation ----
-  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-    if (showCategoryMenu.value) {
-      event.preventDefault()
-      const delta = event.key === 'ArrowDown' ? 1 : -1
-      const items = categoryMenuItems.value
-      const maxIndex = items.length - 1
-      const nextIndex = categoryMenuActiveIndex.value + delta
-      categoryMenuActiveIndex.value = nextIndex < 0 ? maxIndex : nextIndex > maxIndex ? 0 : nextIndex
-      return
-    }
-    if (showTermSuggestions.value && termSuggestions.value.length > 0) {
-      event.preventDefault()
-      const delta = event.key === 'ArrowDown' ? 1 : -1
-      const maxIndex = termSuggestions.value.length - 1
-      const nextIndex = activeSuggestionIndex.value + delta
-      activeSuggestionIndex.value = nextIndex < 0 ? maxIndex : nextIndex > maxIndex ? 0 : nextIndex
-      return
-    }
+    focusFirstSuggestion()
     return
   }
 
   // ---- Enter ----
   if (event.key === 'Enter') {
-    // Category menu open with an item highlighted — select that category.
-    if (showCategoryMenu.value && categoryMenuActiveIndex.value >= 0) {
-      event.preventDefault()
-      selectCategory(categoryMenuItems.value[categoryMenuActiveIndex.value])
-      return
-    }
-
-    // Term suggestions open with an item highlighted — select that term.
-    if (showTermSuggestions.value && activeSuggestionIndex.value >= 0) {
-      event.preventDefault()
-      selectTerm(termSuggestions.value[activeSuggestionIndex.value])
-      return
-    }
-
-    // Category selected but no item highlighted — try exact match, else fall to free-text search.
-    if (showTermSuggestions.value && selectedCategoryKind.value) {
-      event.preventDefault()
-      const term = currentInput.value.trim()
-      if (term && termSuggestions.value.some((t) => t.toLowerCase() === term.toLowerCase())) {
-        selectTerm(term)
-      } else {
-        // Cancel category, use input as free-text query.
-        cancelCategorySelection()
-        showCategoryMenu.value = false
-        executeSearch()
-      }
-      return
-    }
-
-    // ---- Default: free-text search (primary user journey) ----
     event.preventDefault()
     executeSearch()
     return
@@ -602,28 +465,88 @@ function handleKeydown(event: KeyboardEvent) {
 
   // ---- Backspace ----
   if (event.key === 'Backspace') {
-    // If cursor is at the very beginning and input is empty, remove last chip or cancel category
+    // If cursor is at the very beginning and input is empty, remove the last chip.
     if (input.selectionStart === 0 && input.selectionEnd === 0 && currentInput.value === '') {
-      if (selectedCategoryKind.value) {
-        cancelCategorySelection()
-      } else if (chips.value.length > 0) {
+      if (chips.value.length > 0) {
         chips.value.pop()
       }
       event.preventDefault()
+    }
+  }
+}
+
+function handleSuggestionKeydown(event: KeyboardEvent, rowIndex: number, colIndex: number) {
+  const rowCount = suggestionRows.value.length
+  const lastRowIndex = rowCount - 1
+
+  switch (event.key) {
+    case 'ArrowRight': {
+      event.preventDefault()
+      if (colIndex < visibleCountAt(rowIndex) - 1) {
+        focusSuggestion(rowIndex, colIndex + 1)
+      } else {
+        focusSuggestion(rowIndex < lastRowIndex ? rowIndex + 1 : 0, 0)
+      }
       return
     }
-    return
+    case 'ArrowLeft': {
+      event.preventDefault()
+      if (colIndex > 0) {
+        focusSuggestion(rowIndex, colIndex - 1)
+      } else if (rowIndex > 0) {
+        focusSuggestion(rowIndex - 1, visibleCountAt(rowIndex - 1) - 1)
+      } else {
+        focusInput()
+      }
+      return
+    }
+    case 'ArrowDown': {
+      event.preventDefault()
+      if (rowIndex < lastRowIndex) {
+        focusSuggestion(rowIndex + 1, Math.min(colIndex, visibleCountAt(rowIndex + 1) - 1))
+      }
+      return
+    }
+    case 'ArrowUp': {
+      event.preventDefault()
+      if (rowIndex > 0) {
+        focusSuggestion(rowIndex - 1, Math.min(colIndex, visibleCountAt(rowIndex - 1) - 1))
+      } else {
+        focusInput()
+      }
+      return
+    }
+    case 'Tab': {
+      const isFirst = rowIndex === 0 && colIndex === 0
+      const isLast = rowIndex === lastRowIndex && colIndex === visibleCountAt(rowIndex) - 1
+      if (event.shiftKey) {
+        event.preventDefault()
+        if (isFirst) {
+          focusInput()
+        } else if (colIndex > 0) {
+          focusSuggestion(rowIndex, colIndex - 1)
+        } else {
+          focusSuggestion(rowIndex - 1, visibleCountAt(rowIndex - 1) - 1)
+        }
+        return
+      }
+      event.preventDefault()
+      if (isLast) {
+        focusInput()
+      } else if (colIndex < visibleCountAt(rowIndex) - 1) {
+        focusSuggestion(rowIndex, colIndex + 1)
+      } else {
+        focusSuggestion(rowIndex + 1, 0)
+      }
+      return
+    }
+    case 'Escape': {
+      event.preventDefault()
+      dropdownDismissed.value = true
+      focusInput()
+      return
+    }
   }
-
-
-}
-
-function handleCategoryMouseEnter(index: number) {
-  categoryMenuActiveIndex.value = index
-}
-
-function handleTermMouseEnter(index: number) {
-  activeSuggestionIndex.value = index
 }
 
 defineExpose({
@@ -633,9 +556,14 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="wrapperRef" class="relative">
+  <div
+    ref="wrapperRef"
+    class="relative"
+    @focusin="handleFocusIn"
+    @focusout="handleFocusOut"
+  >
     <!--
-      Main search bar: chips + active category prefix + text input + clear button + search button
+      Main search bar: chips + text input + clear button + search button
     -->
     <div
       :class="mainSearchBarClass"
@@ -653,27 +581,18 @@ defineExpose({
           :on-click="() => editChip(chip)"
         />
 
-        <!-- Active category prefix label (non-editable) -->
-        <span
-          v-if="selectedCategoryKind"
-          class="text-sm font-medium text-gray-600 dark:text-gray-300 shrink-0 select-none"
-        >
-          {{ categoryPrefix }}:
-        </span>
-
         <!-- Text input -->
         <input
           ref="inputRef"
           :value="currentInput"
           type="text"
           aria-label="Search term"
+          :aria-expanded="showDropdown"
           class="flex-1 min-w-[120px] outline-none border-none bg-transparent px-1 py-1 text-sm"
-          :class="{ 'pl-0': selectedCategoryKind !== null || chips.length > 0 }"
+          :class="{ 'pl-0': chips.length > 0 }"
           :placeholder="inputPlaceholder"
           @input="handleInput"
           @keydown="handleKeydown"
-          @focus="handleFocus"
-          @blur="handleBlur"
         />
       </div>
 
@@ -698,99 +617,57 @@ defineExpose({
       </button>
     </div>
 
-    <!-- Category menu dropdown (shown when input is empty on focus, or after Tab) -->
+    <!-- Suggestions dropdown: matched categories with their matching terms -->
     <div
-      v-if="showCategoryMenu && categoryMenuItems.length > 0"
-      ref="categoryMenuRef"
-      :class="categoryMenuClass"
-      @mousedown.prevent="focusInput"
+      v-if="showDropdown"
+      ref="dropdownRef"
+      :class="dropdownMenuClass"
+      @mousedown.prevent
     >
-      <!-- <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          Filter by category
-        </div>
+      <div class="max-h-80 overflow-y-auto py-1">
         <div
-          v-if="helpText"
-          class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic"
+          v-for="(row, rowIndex) in suggestionRows"
+          :key="row.kind"
+          class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 px-3 py-2"
         >
-          {{ helpText }}
-        </div>
-      </div> -->
-      <div class="max-h-80 overflow-y-auto">
-        <div
-          v-if="!hasCategoryMatches"
-          class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
-        >
-          No matching category found. Press <strong>Enter</strong> to search as free text.
-        </div>
-        <button
-          v-for="(cat, index) in categoryMenuItems"
-          :key="cat.value"
-          type="button"
-          :class="getCategoryItemClass(cat, index)"
-          @click="handleCategoryClick(cat)"
-          @mouseenter="handleCategoryMouseEnter(index)"
-        >
-          <component :is="categoryIcons[cat.value]" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
-          <span class="font-medium text-gray-800 dark:text-gray-200 flex-1">{{ cat.label }}</span>
-          <Keycap v-if="categoryMenuActiveIndex === index" size="small">&crarr;</Keycap>
-        </button>
-      </div>
-    </div>
-
-    <!-- Term suggestions dropdown (shown when typing a filter value) -->
-    <div
-      v-if="showTermSuggestions"
-      ref="termSuggestionsRef"
-      :class="termSuggestionsClass"
-      @mousedown.prevent="focusInput"
-    >
-      <div class="max-h-80 overflow-y-auto">
-        <!-- <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-          <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            {{ categoryPrefix }} suggestions
+          <div class="sm:w-44 shrink-0 flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-200">
+            <component :is="row.icon" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
+            <span class="truncate">{{ row.label }}</span>
           </div>
-          <div v-if="termSuggestions.length > 0" class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic">
-            Select one from the list
+          <div
+            :data-suggestion-row="row.kind"
+            class="relative flex flex-nowrap gap-1.5 overflow-hidden min-w-0 flex-1"
+          >
+            <TermButton
+              v-for="(term, colIndex) in visibleTerms(row)"
+              :key="term"
+              :term="term"
+              :aria-label="getSuggestionAriaLabel(row.kind, term)"
+              :title="term"
+              :class="suggestionButtonClass"
+              :data-suggestion="`${rowIndex}:${colIndex}`"
+              @click="selectSuggestion(row.kind, term)"
+              @keydown="handleSuggestionKeydown($event, rowIndex, colIndex)"
+            >
+              <template
+                v-for="(segment, segmentIndex) in highlightTokens(term, [currentInput])"
+                :key="segmentIndex"
+              >
+                <strong v-if="segment.highlighted" class="font-semibold">{{ segment.text }}</strong>
+                <template v-else>{{ segment.text }}</template>
+              </template>
+            </TermButton>
           </div>
-        </div> -->
-        <div
-          v-if="termSuggestions.length === 0"
-          class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
-        >
-          {{ noTermMatchesMessage }}
         </div>
-        <button
-          v-for="(term, index) in termSuggestions"
-          :key="term"
-          type="button"
-          :class="getTermItemClass(index)"
-          @click="selectTerm(term)"
-          @mouseenter="handleTermMouseEnter(index)"
-        >
-          <span class="truncate flex-1">{{ term }}</span>
-          <Keycap v-if="activeSuggestionIndex === index" size="small">&crarr;</Keycap>
-        </button>
       </div>
-    </div>
-
-    <!-- Free-text hint (shown when user has typed text and no category/dropdown is active) -->
-    <div
-      v-if="showFreeTextHint"
-      ref="freeTextHintRef"
-      :class="freeTextHintClass"
-      @mousedown.prevent="focusInput"
-    >
-      <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1">
+      <div class="px-3 py-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1">
         <span>Press</span>
         <Keycap size="small">&crarr;</Keycap>
-        <span>
-          to search for
-          <strong class="text-gray-700 dark:text-gray-200">{{ currentInput }}</strong>,
-          or press
-        </span>
+        <span>to search, or</span>
         <Keycap size="small">Tab</Keycap>
-        <span>to add category filters</span>
+        <span>/</span>
+        <Keycap size="small">&darr;</Keycap>
+        <span>to choose a suggestion</span>
       </div>
     </div>
   </div>

@@ -20,6 +20,43 @@ export const isValidTerm = (term: string): boolean => {
 }
 
 /**
+ * Returns the terms that partially match `query` (case-insensitive substring).
+ * Terms starting with the query are listed first, then the remaining matches,
+ * each group keeping its original order. Invalid terms and `excluded` terms
+ * (compared case-insensitively) are skipped. At most `limit` terms are returned.
+ */
+export const findMatchingTerms = (
+  terms: string[],
+  query: string,
+  excluded: string[] = [],
+  limit = 20,
+): string[] => {
+  const needle = query.trim().toLowerCase()
+  if (!needle || limit <= 0) return []
+
+  const excludedSet = new Set(excluded.map((term) => term.toLowerCase()))
+  const prefixMatches: string[] = []
+  const otherMatches: string[] = []
+
+  for (const term of terms) {
+    if (prefixMatches.length >= limit) break
+    if (!isValidTerm(term)) continue
+
+    const lowerTerm = term.toLowerCase()
+    if (excludedSet.has(lowerTerm)) continue
+
+    const index = lowerTerm.indexOf(needle)
+    if (index === 0) {
+      prefixMatches.push(term)
+    } else if (index > 0 && otherMatches.length < limit) {
+      otherMatches.push(term)
+    }
+  }
+
+  return [...prefixMatches, ...otherMatches].slice(0, limit)
+}
+
+/**
  * Normalises a string for fuzzy search by replacing non-alphanumeric characters
  * (dashes, hyphens, single/double quotes, commas, parentheses, dots, etc.) with
  * spaces, then collapsing multiple consecutive spaces and trimming.

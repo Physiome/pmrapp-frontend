@@ -6,6 +6,7 @@ import {
   buildQuerySearchQuery,
   buildSearchQuery,
   filterItemsByQuery,
+  findMatchingTerms,
   getSearchResultLink,
   getQueryTextFromRouteQuery,
   highlightTokens,
@@ -453,5 +454,32 @@ describe('getSearchResultLink', () => {
     const link = getSearchResultLink(item)
     expect(link).not.toContain('undefined')
     expect(link).not.toBe('undefined/')
+  })
+})
+
+describe('findMatchingTerms', () => {
+  const terms = ['xyz', '123abc', 'ABCdef', 'abc', 'no match', 'zabcz']
+
+  it('returns partial, case-insensitive matches with prefix matches first', () => {
+    expect(findMatchingTerms(terms, 'abc')).toEqual(['ABCdef', 'abc', '123abc', 'zabcz'])
+  })
+
+  it('returns an empty list for an empty query', () => {
+    expect(findMatchingTerms(terms, '   ')).toEqual([])
+  })
+
+  it('skips excluded terms case-insensitively', () => {
+    expect(findMatchingTerms(terms, 'abc', ['abcdef', '123ABC'])).toEqual(['abc', 'zabcz'])
+  })
+
+  it('skips invalid terms', () => {
+    expect(findMatchingTerms(['unknown', 'unknown unknown', 'Unknownson'], 'unknown')).toEqual([
+      'Unknownson',
+    ])
+  })
+
+  it('limits the number of results', () => {
+    expect(findMatchingTerms(terms, 'abc', [], 2)).toEqual(['ABCdef', 'abc'])
+    expect(findMatchingTerms(['1abc', '2abc', '3abc'], 'abc', [], 2)).toEqual(['1abc', '2abc'])
   })
 })
