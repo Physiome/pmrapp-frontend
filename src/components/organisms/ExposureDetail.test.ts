@@ -854,7 +854,7 @@ describe('ExposureDetail', () => {
       // Action button to go to default language must be present.
       const actionButton = warningBlock.findComponent({ name: 'ActionButton' })
       expect(actionButton.exists()).toBe(true)
-      expect(actionButton.text()).toContain('Go to default language')
+      expect(actionButton.text()).toContain('Generate code for the default C language')
       expect(actionButton.props('to')).toEqual({
         name: 'exposure-file-detail-view-lang',
         params: {
