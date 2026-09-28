@@ -914,7 +914,7 @@ onMounted(async () => {
             :to="viewButtonTarget('cellml_codegen')"
             content-section="Exposure Detail"
           >
-            Go to default language
+            Generate code for the default C language
           </ActionButton>
         </template>
       </WarningBlock>
