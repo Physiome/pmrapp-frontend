@@ -8,25 +8,31 @@ import CodeIcon from '@/components/icons/CodeIcon.vue'
 import FileIcon from '@/components/icons/FileIcon.vue'
 import SearchIcon from '@/components/icons/SearchIcon.vue'
 import UserIcon from '@/components/icons/UserIcon.vue'
-import { SEARCH_CATEGORIES, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
+import {
+  SEARCH_CATEGORIES,
+  SEARCH_SUGGESTION_NAVIGATION_KEYS,
+  SEARCH_SUGGESTIONS_MAX_TERMS_PER_CATEGORY,
+  SEARCH_TEXT_QUERY_KIND,
+  SEARCH_TEXT_QUERY_LABEL,
+} from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
-import type { SearchFilter, SearchQueryRequest } from '@/types/search'
-import { findMatchingTerms, highlightTokens } from '@/utils/search'
+import type {
+  SearchFilter,
+  SearchFilterChip,
+  SearchQueryRequest,
+  SearchSuggestionRow,
+} from '@/types/search'
+import { countFittingChildren } from '@/utils/dom'
+import {
+  buildSearchQueryRequestFromChips,
+  createSearchChip,
+  findMatchingTerms,
+  getNextSearchSuggestionFocus,
+  getSearchSuggestionAriaLabel,
+  highlightTokens,
+} from '@/utils/search'
 
-interface FilterChip {
-  id: string
-  kind: string
-  term: string
-  displayLabel: string
-}
-
-interface SuggestionRow {
-  kind: string
-  label: string
-  icon: Component
-  terms: string[]
-}
-
+// ---- Props & emits ----
 const props = withDefaults(
   defineProps<{
     initialQuery?: string
@@ -45,45 +51,13 @@ const emit = defineEmits<{
   (e: 'dropdownHeightChange', height: number): void
 }>()
 
-const searchStore = useSearchStore()
-
-const TEXT_QUERY_KIND = '_text_query'
-const TEXT_QUERY_LABEL = 'Free text'
-// Maximum number of candidate terms per category; only those that fit the dropdown width are shown.
-const MAX_TERMS_PER_CATEGORY = 20
-
-// ---- Refs ----
-const inputRef = ref<HTMLInputElement | null>(null)
-const wrapperRef = ref<HTMLDivElement | null>(null)
-const dropdownRef = ref<HTMLDivElement | null>(null)
-const chips = ref<FilterChip[]>([])
-const currentInput = ref('')
-const isFocused = ref(false)
-const dropdownDismissed = ref(false)
-// Number of terms per category row that fit the dropdown width (unset = render all candidates).
-const visibleCounts = ref<Record<string, number>>({})
-
+// ---- Constants ----
 const categoryIcons: Record<string, Component> = {
   citation_author_family_name: UserIcon,
   model_author: UserIcon,
   cellml_keyword: CodeIcon,
   citation_id: FileIcon,
 }
-
-// ---- Computed ----
-const mainSearchBarClass = computed(() => {
-  const baseClasses = [
-    'flex items-center w-full border rounded-lg overflow-hidden transition-all bg-background',
-  ]
-
-  if (isFocused.value) {
-    baseClasses.push('ring-1 ring-primary border-primary')
-  } else {
-    baseClasses.push('border-gray-200 dark:border-gray-700')
-  }
-
-  return baseClasses
-})
 
 const dropdownMenuClass = [
   'absolute z-50 left-0 mt-1 w-full bg-white dark:bg-gray-800',
@@ -97,6 +71,45 @@ const suggestionButtonClass = [
   // Inset ring: the row container clips overflow, which would hide an outer ring.
   'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
 ]
+
+// ---- Store ----
+const searchStore = useSearchStore()
+
+// ---- Refs ----
+const inputRef = ref<HTMLInputElement | null>(null)
+const wrapperRef = ref<HTMLDivElement | null>(null)
+const dropdownRef = ref<HTMLDivElement | null>(null)
+const chips = ref<SearchFilterChip[]>([])
+const currentInput = ref('')
+const isFocused = ref(false)
+const dropdownDismissed = ref(false)
+// Number of terms per category row that fit the dropdown width (unset = render all candidates).
+const visibleCounts = ref<Record<string, number>>({})
+
+// ---- Non-reactive state ----
+// Incremented per measurement so a stale measurement can bail out.
+let measureToken = 0
+let resizeObserver: ResizeObserver | null = null
+let lastDropdownWidth = 0
+
+// ---- Computed ----
+const hasValues = computed(() => {
+  return chips.value.length > 0 || currentInput.value.trim().length > 0
+})
+
+const mainSearchBarClass = computed(() => {
+  const baseClasses = [
+    'flex items-center w-full border rounded-lg overflow-hidden transition-all bg-background',
+  ]
+
+  if (isFocused.value) {
+    baseClasses.push('ring-1 ring-primary border-primary')
+  } else {
+    baseClasses.push('border-gray-200 dark:border-gray-700')
+  }
+
+  return baseClasses
+})
 
 const searchButtonClass = computed(() => {
   const baseClasses = [
@@ -116,10 +129,6 @@ const searchButtonClass = computed(() => {
   return baseClasses
 })
 
-const hasValues = computed(() => {
-  return chips.value.length > 0 || currentInput.value.trim().length > 0
-})
-
 const inputPlaceholder = computed(() => {
   if (chips.value.length > 0) {
     return 'Type to search or add more...'
@@ -131,12 +140,12 @@ const inputPlaceholder = computed(() => {
  * Rows shown in the dropdown for the current input: a free-text row first,
  * followed by every category that has partially matching terms.
  */
-const suggestionRows = computed<SuggestionRow[]>(() => {
+const suggestionRows = computed<SearchSuggestionRow[]>(() => {
   const input = currentInput.value.trim()
   if (!input) return []
 
-  const rows: SuggestionRow[] = [
-    { kind: TEXT_QUERY_KIND, label: TEXT_QUERY_LABEL, icon: SearchIcon, terms: [input] },
+  const rows: SearchSuggestionRow[] = [
+    { kind: SEARCH_TEXT_QUERY_KIND, label: SEARCH_TEXT_QUERY_LABEL, terms: [input] },
   ]
 
   for (const category of SEARCH_CATEGORIES) {
@@ -146,16 +155,11 @@ const suggestionRows = computed<SuggestionRow[]>(() => {
       categoryData?.kindInfo?.terms ?? [],
       input,
       selectedTerms,
-      MAX_TERMS_PER_CATEGORY,
+      SEARCH_SUGGESTIONS_MAX_TERMS_PER_CATEGORY,
     )
 
     if (terms.length > 0) {
-      rows.push({
-        kind: category.value,
-        label: category.label,
-        icon: categoryIcons[category.value] ?? SearchIcon,
-        terms,
-      })
+      rows.push({ kind: category.value, label: category.label, terms })
     }
   }
 
@@ -170,36 +174,23 @@ const showDropdown = computed(() => {
   )
 })
 
-function visibleTerms(row: SuggestionRow): string[] {
-  const count = visibleCounts.value[row.kind]
-  return count === undefined ? row.terms : row.terms.slice(0, count)
-}
-
 // ---- Helpers ----
-function getDisplayLabel(kind: string, term: string): string {
-  if (kind === TEXT_QUERY_KIND) return term
-  const singularLabel = SEARCH_KIND_LABEL_SINGULAR_MAP[kind] || kind
-  return `${singularLabel}: ${term}`
-}
-
-function getSuggestionAriaLabel(kind: string, term: string): string {
-  if (kind === TEXT_QUERY_KIND) return `Add free text: ${term}`
-  return `Add ${getDisplayLabel(kind, term)}`
-}
-
-function generateChipId(): string {
-  return `${Date.now()}:${Math.random().toString(36).slice(2, 8)}`
-}
-
 function focusInput() {
   nextTick(() => {
     inputRef.value?.focus()
   })
 }
 
-// ---- Dropdown sizing ----
-let measureToken = 0
+function getRowIcon(kind: string): Component {
+  return categoryIcons[kind] ?? SearchIcon
+}
 
+function visibleTerms(row: SearchSuggestionRow): string[] {
+  const count = visibleCounts.value[row.kind]
+  return count === undefined ? row.terms : row.terms.slice(0, count)
+}
+
+// ---- Dropdown sizing ----
 /**
  * Renders every candidate term, then measures which ones fit on a single line
  * of each row and hides the rest. Runs before paint, so there is no flicker.
@@ -216,14 +207,8 @@ async function recomputeVisibleCounts() {
   for (const container of containers) {
     const kind = container.dataset.suggestionRow
     if (!kind) continue
-
-    const width = container.clientWidth
-    let count = 0
-    for (const child of Array.from(container.children) as HTMLElement[]) {
-      if (child.offsetLeft + child.offsetWidth > width) break
-      count += 1
-    }
-    counts[kind] = Math.max(1, count)
+    // Always show at least one term; a single long term is truncated.
+    counts[kind] = Math.max(1, countFittingChildren(container))
   }
 
   visibleCounts.value = counts
@@ -237,10 +222,7 @@ function emitDropdownHeight() {
   })
 }
 
-let resizeObserver: ResizeObserver | null = null
-let lastDropdownWidth = 0
-
-watch(dropdownRef, (el) => {
+function observeDropdown(el: HTMLDivElement | null) {
   resizeObserver?.disconnect()
   resizeObserver = null
   lastDropdownWidth = 0
@@ -261,67 +243,25 @@ watch(dropdownRef, (el) => {
     })
     resizeObserver.observe(el)
   }
-})
-
-watch(suggestionRows, () => {
-  if (showDropdown.value) {
-    recomputeVisibleCounts()
-  }
-})
-
-watch(showDropdown, (show) => {
-  if (show) {
-    recomputeVisibleCounts()
-  }
-})
-
-onBeforeUnmount(() => {
-  resizeObserver?.disconnect()
-})
+}
 
 // ---- Initialisation ----
 function initialiseFromProps() {
   if (props.initialFilters.length > 0) {
     chips.value = props.initialFilters
       .filter((f) => f.kind && f.term)
-      .map((f) => ({
-        id: generateChipId(),
-        kind: f.kind,
-        term: f.term,
-        displayLabel: getDisplayLabel(f.kind, f.term),
-      }))
+      .map((f) => createSearchChip(f.kind, f.term))
   }
   if (props.initialQuery) {
-    chips.value.push({
-      id: generateChipId(),
-      kind: TEXT_QUERY_KIND,
-      term: props.initialQuery,
-      displayLabel: getDisplayLabel(TEXT_QUERY_KIND, props.initialQuery),
-    })
+    chips.value.push(createSearchChip(SEARCH_TEXT_QUERY_KIND, props.initialQuery))
   }
 }
 
-onMounted(async () => {
-  initialiseFromProps()
-
-  if (props.inOverlay) {
-    focusInput()
-  }
-
-  // Pre-fetch categories for term suggestions
-  try {
-    const validKinds = SEARCH_CATEGORIES.map((c) => c.value)
-    await searchStore.fetchCategories(validKinds)
-  } catch (err) {
-    console.error('Failed to fetch search categories:', err)
-  }
-})
-
-// ---- Selection ----
+// ---- Chip actions ----
 function selectSuggestion(kind: string, term: string) {
-  if (kind === TEXT_QUERY_KIND) {
+  if (kind === SEARCH_TEXT_QUERY_KIND) {
     // Only one free-text query is supported; replace any existing one.
-    chips.value = chips.value.filter((c) => c.kind !== TEXT_QUERY_KIND)
+    chips.value = chips.value.filter((c) => c.kind !== SEARCH_TEXT_QUERY_KIND)
   } else {
     // Prevent adding a duplicate term within the same category.
     const alreadySelected = chips.value.some(
@@ -330,12 +270,7 @@ function selectSuggestion(kind: string, term: string) {
     if (alreadySelected) return
   }
 
-  chips.value.push({
-    id: generateChipId(),
-    kind,
-    term,
-    displayLabel: getDisplayLabel(kind, term),
-  })
+  chips.value.push(createSearchChip(kind, term))
 
   currentInput.value = ''
   dropdownDismissed.value = false
@@ -347,8 +282,7 @@ function removeChip(id: string) {
   focusInput()
 }
 
-// ---- Edit chip ----
-function editChip(chip: FilterChip) {
+function editChip(chip: SearchFilterChip) {
   // Put the term back into the input; the dropdown shows its matches again.
   chips.value = chips.value.filter((c) => c.id !== chip.id)
   currentInput.value = chip.term
@@ -356,7 +290,6 @@ function editChip(chip: FilterChip) {
   focusInput()
 }
 
-// ---- Clear ----
 function clearAll() {
   chips.value = []
   currentInput.value = ''
@@ -366,16 +299,9 @@ function clearAll() {
 
 // ---- Search ----
 function executeSearch() {
-  // Priority: whatever the user has typed right now, then fall back to an existing free-text chip.
-  const inputText = currentInput.value.trim()
-  const existingTextChip = chips.value.find((c) => c.kind === TEXT_QUERY_KIND)
-  const queryText = inputText || existingTextChip?.term || ''
+  const request = buildSearchQueryRequestFromChips(chips.value, currentInput.value)
 
-  const filters: SearchFilter[] = chips.value
-    .filter((c) => c.kind !== TEXT_QUERY_KIND)
-    .map((c) => ({ kind: c.kind, term: c.term }))
-
-  if (!queryText && filters.length === 0) {
+  if (!request) {
     focusInput()
     return
   }
@@ -383,33 +309,14 @@ function executeSearch() {
   inputRef.value?.blur()
   dropdownDismissed.value = true
 
-  const request: SearchQueryRequest = {
-    query: queryText || undefined,
-    filters: filters.length > 0 ? filters : undefined,
-  }
-
   emit('querySearch', request)
 }
 
-// ---- Suggestion focus helpers ----
-function getSuggestionButton(rowIndex: number, colIndex: number): HTMLElement | null {
-  return (
-    dropdownRef.value?.querySelector<HTMLElement>(`[data-suggestion="${rowIndex}:${colIndex}"]`) ??
-    null
-  )
-}
-
-function visibleCountAt(rowIndex: number): number {
-  const row = suggestionRows.value[rowIndex]
-  return row ? visibleTerms(row).length : 0
-}
-
+// ---- Suggestion focus ----
 function focusSuggestion(rowIndex: number, colIndex: number) {
-  getSuggestionButton(rowIndex, colIndex)?.focus()
-}
-
-function focusFirstSuggestion() {
-  focusSuggestion(0, 0)
+  dropdownRef.value
+    ?.querySelector<HTMLElement>(`[data-suggestion="${rowIndex}:${colIndex}"]`)
+    ?.focus()
 }
 
 // ---- Event handlers ----
@@ -452,7 +359,7 @@ function handleKeydown(event: KeyboardEvent) {
     showDropdown.value
   ) {
     event.preventDefault()
-    focusFirstSuggestion()
+    focusSuggestion(0, 0)
     return
   }
 
@@ -476,79 +383,68 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 function handleSuggestionKeydown(event: KeyboardEvent, rowIndex: number, colIndex: number) {
-  const rowCount = suggestionRows.value.length
-  const lastRowIndex = rowCount - 1
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    dropdownDismissed.value = true
+    focusInput()
+    return
+  }
 
-  switch (event.key) {
-    case 'ArrowRight': {
-      event.preventDefault()
-      if (colIndex < visibleCountAt(rowIndex) - 1) {
-        focusSuggestion(rowIndex, colIndex + 1)
-      } else {
-        focusSuggestion(rowIndex < lastRowIndex ? rowIndex + 1 : 0, 0)
-      }
-      return
-    }
-    case 'ArrowLeft': {
-      event.preventDefault()
-      if (colIndex > 0) {
-        focusSuggestion(rowIndex, colIndex - 1)
-      } else if (rowIndex > 0) {
-        focusSuggestion(rowIndex - 1, visibleCountAt(rowIndex - 1) - 1)
-      } else {
-        focusInput()
-      }
-      return
-    }
-    case 'ArrowDown': {
-      event.preventDefault()
-      if (rowIndex < lastRowIndex) {
-        focusSuggestion(rowIndex + 1, Math.min(colIndex, visibleCountAt(rowIndex + 1) - 1))
-      }
-      return
-    }
-    case 'ArrowUp': {
-      event.preventDefault()
-      if (rowIndex > 0) {
-        focusSuggestion(rowIndex - 1, Math.min(colIndex, visibleCountAt(rowIndex - 1) - 1))
-      } else {
-        focusInput()
-      }
-      return
-    }
-    case 'Tab': {
-      const isFirst = rowIndex === 0 && colIndex === 0
-      const isLast = rowIndex === lastRowIndex && colIndex === visibleCountAt(rowIndex) - 1
-      if (event.shiftKey) {
-        event.preventDefault()
-        if (isFirst) {
-          focusInput()
-        } else if (colIndex > 0) {
-          focusSuggestion(rowIndex, colIndex - 1)
-        } else {
-          focusSuggestion(rowIndex - 1, visibleCountAt(rowIndex - 1) - 1)
-        }
-        return
-      }
-      event.preventDefault()
-      if (isLast) {
-        focusInput()
-      } else if (colIndex < visibleCountAt(rowIndex) - 1) {
-        focusSuggestion(rowIndex, colIndex + 1)
-      } else {
-        focusSuggestion(rowIndex + 1, 0)
-      }
-      return
-    }
-    case 'Escape': {
-      event.preventDefault()
-      dropdownDismissed.value = true
-      focusInput()
-      return
-    }
+  if (!SEARCH_SUGGESTION_NAVIGATION_KEYS.includes(event.key)) return
+
+  event.preventDefault()
+  const rowLengths = suggestionRows.value.map((row) => visibleTerms(row).length)
+  const target = getNextSearchSuggestionFocus(
+    event.key,
+    event.shiftKey,
+    { rowIndex, colIndex },
+    rowLengths,
+  )
+
+  if (target === 'input') {
+    focusInput()
+  } else if (target) {
+    focusSuggestion(target.rowIndex, target.colIndex)
   }
 }
 
+// ---- Watchers ----
+watch(dropdownRef, observeDropdown)
+
+watch(suggestionRows, () => {
+  if (showDropdown.value) {
+    recomputeVisibleCounts()
+  }
+})
+
+watch(showDropdown, (show) => {
+  if (show) {
+    recomputeVisibleCounts()
+  }
+})
+
+// ---- Lifecycle ----
+onMounted(async () => {
+  initialiseFromProps()
+
+  if (props.inOverlay) {
+    focusInput()
+  }
+
+  // Pre-fetch categories for term suggestions
+  try {
+    const validKinds = SEARCH_CATEGORIES.map((c) => c.value)
+    await searchStore.fetchCategories(validKinds)
+  } catch (err) {
+    console.error('Failed to fetch search categories:', err)
+  }
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
+
+// ---- Expose ----
 defineExpose({
   inputRef,
   focusInput,
@@ -631,7 +527,7 @@ defineExpose({
           class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 px-3 py-2"
         >
           <div class="sm:w-44 shrink-0 flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-200">
-            <component :is="row.icon" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
+            <component :is="getRowIcon(row.kind)" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
             <span class="truncate">{{ row.label }}</span>
           </div>
           <div
@@ -642,7 +538,7 @@ defineExpose({
               v-for="(term, colIndex) in visibleTerms(row)"
               :key="term"
               :term="term"
-              :aria-label="getSuggestionAriaLabel(row.kind, term)"
+              :aria-label="getSearchSuggestionAriaLabel(row.kind, term)"
               :title="term"
               :class="suggestionButtonClass"
               :data-suggestion="`${rowIndex}:${colIndex}`"
