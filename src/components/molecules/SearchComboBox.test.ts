@@ -61,7 +61,11 @@ describe('SearchComboBox.vue – type-first suggestions', () => {
     const wrapper = mountComboBox()
     await typeInto(wrapper, 'abc')
 
-    expect(rowLabels(wrapper)).toEqual(['_text_query', 'citation_author_family_name', 'cellml_keyword'])
+    expect(rowLabels(wrapper)).toEqual([
+      '_text_query',
+      'citation_author_family_name',
+      'cellml_keyword',
+    ])
     expect(wrapper.text()).toContain('Free text')
     expect(wrapper.text()).toContain('Publication authors')
     expect(wrapper.text()).toContain('CellML keywords')

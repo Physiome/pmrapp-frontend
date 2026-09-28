@@ -73,7 +73,7 @@ const categoryIcons: Record<string, Component> = {
 // ---- Computed ----
 const mainSearchBarClass = computed(() => {
   const baseClasses = [
-    'flex items-center w-full border rounded-lg overflow-hidden transition-all bg-background'
+    'flex items-center w-full border rounded-lg overflow-hidden transition-all bg-background',
   ]
 
   if (isFocused.value) {
@@ -87,7 +87,7 @@ const mainSearchBarClass = computed(() => {
 
 const dropdownMenuClass = [
   'absolute z-50 left-0 mt-1 w-full bg-white dark:bg-gray-800',
-  'rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'
+  'rounded-lg shadow-lg border border-gray-200 dark:border-gray-700',
 ]
 
 const suggestionButtonClass = [
@@ -95,7 +95,7 @@ const suggestionButtonClass = [
   // Border keeps buttons distinguishable where their background matches the dropdown (dark mode).
   'border border-gray-200 dark:border-gray-700',
   // Inset ring: the row container clips overflow, which would hide an outer ring.
-  'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary'
+  'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
 ]
 
 const searchButtonClass = computed(() => {
@@ -104,7 +104,7 @@ const searchButtonClass = computed(() => {
     'border-l border-gray-200 dark:border-gray-700',
     'bg-gray-200 dark:bg-gray-700',
     'transition duration-200 ease-linear',
-    'focus-visible:ring-2 focus-visible:ring-primary focus:outline-none'
+    'focus-visible:ring-2 focus-visible:ring-primary focus:outline-none',
   ]
 
   if (hasValues.value) {

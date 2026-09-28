@@ -25,7 +25,7 @@ import {
   exposureFileRouteSuffixes,
   exposureFileViewRouteSuffixes,
   exposureFileViewLangRouteSuffixes,
-  workspaceDetailCommitSuffixes
+  workspaceDetailCommitSuffixes,
 } from '@/router/routeAliases'
 import { resolveRouteTitle } from '@/router/routeResolvers'
 
@@ -173,7 +173,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if (to.path === '/search' && to.query.SearchableText !== undefined && to.query.query === undefined) {
+  if (
+    to.path === '/search' &&
+    to.query.SearchableText !== undefined &&
+    to.query.query === undefined
+  ) {
     const legacyQuery = getQueryTextFromRouteQuery(to.query)
 
     if (legacyQuery) {

@@ -1,7 +1,10 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  size?: 'small' | 'default'
-}>(), { size: 'default' })
+const props = withDefaults(
+  defineProps<{
+    size?: 'small' | 'default'
+  }>(),
+  { size: 'default' },
+)
 
 const keycapCLasses = [
   'inline-flex items-center justify-center',

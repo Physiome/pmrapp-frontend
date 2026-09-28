@@ -178,7 +178,7 @@ const actionToolbarWidth = computed(() => {
   return [
     'w-full ',
     'lg:w-[calc(100%-theme(spacing.72)-theme(spacing.8))]',
-    'xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))]'
+    'xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))]',
   ]
 })
 
@@ -466,7 +466,7 @@ const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
       alias: props.alias,
       file: props.file,
       view: 'cellml_codegen',
-      lang: extractLangPath(lang.path)
+      lang: extractLangPath(lang.path),
     },
     query: route.query,
   })
@@ -478,9 +478,7 @@ const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
 // (and triggers loadCodegenView via the props.view or props.lang watch).
 const viewButtonTarget = (viewKey: string) => {
   if (viewKey === 'cellml_codegen') {
-    const activeLangPath =
-      props.lang ||
-      extractLangPath(CODEGEN_LANGUAGES[0]?.path ?? 'code.C.c')
+    const activeLangPath = props.lang || extractLangPath(CODEGEN_LANGUAGES[0]?.path ?? 'code.C.c')
     return {
       name: 'exposure-file-detail-view-lang' as const,
       params: {

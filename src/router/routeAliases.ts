@@ -1,7 +1,11 @@
 export const createAliases = (bases: string[], ...suffixes: string[]) =>
   bases.flatMap((base) => suffixes.map((suffix) => `${base}${suffix}`))
 
-export const createPluralRouteAliases = (pluralBase: string, aliasBases: string[], suffixes: string[]) => [
+export const createPluralRouteAliases = (
+  pluralBase: string,
+  aliasBases: string[],
+  suffixes: string[],
+) => [
   ...suffixes.slice(1).map((suffix) => `${pluralBase}${suffix}`),
   ...createAliases(aliasBases, ...suffixes),
 ]
