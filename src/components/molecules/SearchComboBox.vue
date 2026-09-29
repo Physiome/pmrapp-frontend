@@ -9,6 +9,7 @@ import FileIcon from '@/components/icons/FileIcon.vue'
 import { SEARCH_CATEGORIES, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
 import type { SearchFilter, SearchQueryRequest } from '@/types/search'
+import { isValidTerm } from '@/utils/search'
 import Keycap from '@/components/atoms/Keycap.vue'
 
 interface FilterChip {
@@ -317,21 +318,11 @@ function filterTermSuggestions(inputText: string) {
 
   const category = searchStore.categories.find((c) => c.kind === selectedCategoryKind.value)
   const terms = (category?.kindInfo?.terms || [])
-    .filter((t) => t.trim().length > 0)
+    .filter(isValidTerm)
     .filter((t) => !chips.value.some((chip) => chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === t.toLowerCase()))
 
-  if (!inputText.trim()) {
-    termSuggestions.value = terms.slice(0, 50)
-    showTermSuggestions.value = true
-    activeSuggestionIndex.value = -1
-    return
-  }
-
-  const filtered = terms
-    .filter((t) => t.toLowerCase().includes(inputText.toLowerCase()))
-    .slice(0, 50)
-
-  termSuggestions.value = filtered
+  const query = inputText.trim().toLowerCase()
+  termSuggestions.value = query ? terms.filter((t) => t.toLowerCase().includes(query)) : terms
   showTermSuggestions.value = true
   activeSuggestionIndex.value = -1
 }
