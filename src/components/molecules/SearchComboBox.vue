@@ -372,32 +372,6 @@ function removeChip(id: string) {
   focusInput()
 }
 
-// ---- Edit chip ----
-function editChip(chip: FilterChip) {
-  // Remove the chip from the list.
-  chips.value = chips.value.filter((c) => c.id !== chip.id)
-
-  if (chip.kind === TEXT_QUERY_KIND) {
-    // Free-text: put the term back in the input for editing (no category needed).
-    selectedCategoryKind.value = null
-    currentInput.value = chip.term
-    showTermSuggestions.value = false
-  } else {
-    // Real category: set the category and show term suggestions,
-    // pre-populated with the existing term so the user can edit it.
-    selectedCategoryKind.value = chip.kind
-    currentInput.value = chip.term
-    showTermSuggestions.value = false
-    // Re-open term suggestions for this category.
-    filterTermSuggestions(chip.term)
-    showTermSuggestions.value = termSuggestions.value.length > 0
-  }
-
-  showCategoryMenu.value = false
-  activeSuggestionIndex.value = -1
-  focusInput()
-}
-
 // ---- Clear ----
 function clearAll() {
   chips.value = []
@@ -650,7 +624,6 @@ defineExpose({
           :label="chip.displayLabel"
           :removable="true"
           :on-remove="() => removeChip(chip.id)"
-          :on-click="() => editChip(chip)"
         />
 
         <!-- Active category prefix label (non-editable) -->
