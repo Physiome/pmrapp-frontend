@@ -823,7 +823,7 @@ defineExpose({
       </div> -->
       <div
         v-if="!hasCategoryMatches"
-        class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
+        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
       >
         No matching category found. Press <strong>Enter</strong> to search as free text.
       </div>
@@ -869,7 +869,7 @@ defineExpose({
       </div> -->
       <div
         v-if="termSuggestions.length === 0"
-        class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
+        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
       >
         {{ noTermMatchesMessage }}
       </div>
