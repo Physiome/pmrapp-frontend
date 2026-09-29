@@ -10,6 +10,7 @@ import SearchIcon from '@/components/icons/SearchIcon.vue'
 import UserIcon from '@/components/icons/UserIcon.vue'
 import {
   SEARCH_CATEGORIES,
+  SEARCH_KIND_LABEL_SINGULAR_MAP,
   SEARCH_SUGGESTION_NAVIGATION_KEYS,
   SEARCH_SUGGESTIONS_MAX_TERMS_PER_CATEGORY,
   SEARCH_TEXT_QUERY_KIND,
@@ -89,9 +90,9 @@ const chips = ref<SearchFilterChip[]>([])
 const currentInput = ref('')
 const isFocused = ref(false)
 const dropdownDismissed = ref(false)
-// Suggestion terms under the mouse / keyboard focus, previewed in the dropdown footer.
-const hoveredSuggestionTerm = ref<string | null>(null)
-const focusedSuggestionTerm = ref<string | null>(null)
+// Suggestions under the mouse / keyboard focus, previewed in the dropdown footer.
+const hoveredSuggestion = ref<SearchFilter | null>(null)
+const focusedSuggestion = ref<SearchFilter | null>(null)
 // Number of terms per category row that fit the dropdown width (unset = render all candidates).
 const visibleCounts = ref<Record<string, number>>({})
 
@@ -176,8 +177,15 @@ const suggestionRows = computed<SearchSuggestionRow[]>(() => {
 })
 
 // The term whose "add" action is previewed in the footer (mouse hover takes priority).
-const previewedSuggestionTerm = computed(() => {
-  return hoveredSuggestionTerm.value ?? focusedSuggestionTerm.value
+const previewedSuggestion = computed(() => {
+  return hoveredSuggestion.value ?? focusedSuggestion.value
+})
+
+// Category label (with colon) shown before the previewed term, e.g. "Model author:"; free text has none.
+const previewedSuggestionCategoryLabel = computed(() => {
+  const suggestion = previewedSuggestion.value
+  if (!suggestion || suggestion.kind === SEARCH_TEXT_QUERY_KIND) return ''
+  return `${SEARCH_KIND_LABEL_SINGULAR_MAP[suggestion.kind] || suggestion.kind}:`
 })
 
 const showDropdown = computed(() => {
@@ -427,8 +435,8 @@ watch(dropdownRef, observeDropdown)
 
 watch(suggestionRows, () => {
   // Buttons may be replaced without firing mouseleave/blur, so drop any stale preview.
-  hoveredSuggestionTerm.value = null
-  focusedSuggestionTerm.value = null
+  hoveredSuggestion.value = null
+  focusedSuggestion.value = null
 
   if (showDropdown.value) {
     recomputeVisibleCounts()
@@ -439,8 +447,8 @@ watch(showDropdown, (show) => {
   if (show) {
     recomputeVisibleCounts()
   } else {
-    hoveredSuggestionTerm.value = null
-    focusedSuggestionTerm.value = null
+    hoveredSuggestion.value = null
+    focusedSuggestion.value = null
   }
 })
 
@@ -565,10 +573,10 @@ defineExpose({
               :data-suggestion="`${rowIndex}:${colIndex}`"
               @click="selectSuggestion(row.kind, term)"
               @keydown="handleSuggestionKeydown($event, rowIndex, colIndex)"
-              @mouseenter="hoveredSuggestionTerm = term"
-              @mouseleave="hoveredSuggestionTerm = null"
-              @focus="focusedSuggestionTerm = term"
-              @blur="focusedSuggestionTerm = null"
+              @mouseenter="hoveredSuggestion = { kind: row.kind, term }"
+              @mouseleave="hoveredSuggestion = null"
+              @focus="focusedSuggestion = { kind: row.kind, term }"
+              @blur="focusedSuggestion = null"
             >
               <template
                 v-for="(segment, segmentIndex) in highlightTokens(term, [currentInput])"
@@ -587,9 +595,9 @@ defineExpose({
           The `py-0.5` is used to make the label same height as the keycaps to avoid layout shifts
           when the label is shown/hidden.
         -->
-        <span v-if="previewedSuggestionTerm" class="py-0.5">
-          Add
-          <strong class="text-gray-700 dark:text-gray-200">{{ previewedSuggestionTerm }}</strong>
+        <span v-if="previewedSuggestion" class="py-0.5">
+          Add {{ previewedSuggestionCategoryLabel }}
+          <strong class="text-gray-700 dark:text-gray-200">{{ previewedSuggestion.term }}</strong>
           to the search
         </span>
         <template v-else>
