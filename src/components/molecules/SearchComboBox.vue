@@ -72,6 +72,12 @@ const suggestionButtonClass = [
   'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
 ]
 
+const dropdownFooterClass = [
+  'flex items-center flex-wrap gap-x-1.5 gap-y-1 px-3 py-2',
+  'border-t border-gray-100 dark:border-gray-700',
+  'text-xs text-gray-500 dark:text-gray-400',
+]
+
 // ---- Store ----
 const searchStore = useSearchStore()
 
@@ -83,6 +89,9 @@ const chips = ref<SearchFilterChip[]>([])
 const currentInput = ref('')
 const isFocused = ref(false)
 const dropdownDismissed = ref(false)
+// Suggestion terms under the mouse / keyboard focus, previewed in the dropdown footer.
+const hoveredSuggestionTerm = ref<string | null>(null)
+const focusedSuggestionTerm = ref<string | null>(null)
 // Number of terms per category row that fit the dropdown width (unset = render all candidates).
 const visibleCounts = ref<Record<string, number>>({})
 
@@ -131,7 +140,7 @@ const searchButtonClass = computed(() => {
 
 const inputPlaceholder = computed(() => {
   if (chips.value.length > 0) {
-    return 'Type to search or add more...'
+    return 'Type to add another term, or press Enter to search'
   }
   return 'Type to search...'
 })
@@ -164,6 +173,11 @@ const suggestionRows = computed<SearchSuggestionRow[]>(() => {
   }
 
   return rows
+})
+
+// The term whose "add" action is previewed in the footer (mouse hover takes priority).
+const previewedSuggestionTerm = computed(() => {
+  return hoveredSuggestionTerm.value ?? focusedSuggestionTerm.value
 })
 
 const showDropdown = computed(() => {
@@ -412,6 +426,10 @@ function handleSuggestionKeydown(event: KeyboardEvent, rowIndex: number, colInde
 watch(dropdownRef, observeDropdown)
 
 watch(suggestionRows, () => {
+  // Buttons may be replaced without firing mouseleave/blur, so drop any stale preview.
+  hoveredSuggestionTerm.value = null
+  focusedSuggestionTerm.value = null
+
   if (showDropdown.value) {
     recomputeVisibleCounts()
   }
@@ -420,6 +438,9 @@ watch(suggestionRows, () => {
 watch(showDropdown, (show) => {
   if (show) {
     recomputeVisibleCounts()
+  } else {
+    hoveredSuggestionTerm.value = null
+    focusedSuggestionTerm.value = null
   }
 })
 
@@ -544,6 +565,10 @@ defineExpose({
               :data-suggestion="`${rowIndex}:${colIndex}`"
               @click="selectSuggestion(row.kind, term)"
               @keydown="handleSuggestionKeydown($event, rowIndex, colIndex)"
+              @mouseenter="hoveredSuggestionTerm = term"
+              @mouseleave="hoveredSuggestionTerm = null"
+              @focus="focusedSuggestionTerm = term"
+              @blur="focusedSuggestionTerm = null"
             >
               <template
                 v-for="(segment, segmentIndex) in highlightTokens(term, [currentInput])"
@@ -556,14 +581,26 @@ defineExpose({
           </div>
         </div>
       </div>
-      <div class="px-3 py-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1">
-        <span>Press</span>
-        <Keycap size="small">&crarr;</Keycap>
-        <span>to search, or</span>
-        <Keycap size="small">Tab</Keycap>
-        <span>/</span>
-        <Keycap size="small">&darr;</Keycap>
-        <span>to choose a suggestion</span>
+      <div :class="dropdownFooterClass">
+        <!--
+          Clarify that choosing a suggestion adds it to the search rather than searching directly.
+          The `py-0.5` is used to make the label same height as the keycaps to avoid layout shifts
+          when the label is shown/hidden.
+        -->
+        <span v-if="previewedSuggestionTerm" class="py-0.5">
+          Add
+          <strong class="text-gray-700 dark:text-gray-200">{{ previewedSuggestionTerm }}</strong>
+          to the search
+        </span>
+        <template v-else>
+          <span>Press</span>
+          <Keycap size="small">&crarr;</Keycap>
+          <span>to search, or</span>
+          <Keycap size="small">Tab</Keycap>
+          <span>/</span>
+          <Keycap size="small">&darr;</Keycap>
+          <span>to choose a suggestion</span>
+        </template>
       </div>
     </div>
   </div>
