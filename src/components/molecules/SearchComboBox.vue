@@ -581,10 +581,9 @@ function handleKeydown(event: KeyboardEvent) {
   // ---- Escape ----
   if (event.key === 'Escape') {
     if (showTermSuggestions.value && selectedCategoryKind.value) {
-      // Go back to category menu.
+      // Go back to the full category menu, discarding the partial term.
+      currentInput.value = ''
       cancelCategorySelection()
-      showCategoryMenu.value = true
-      categoryMenuActiveIndex.value = -1
       event.preventDefault()
       return
     }
