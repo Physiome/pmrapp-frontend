@@ -69,7 +69,7 @@ function emitDropdownHeight() {
 // ---- Computed ----
 const mainSearchBarClass = computed(() => {
   const baseClasses = [
-    'flex items-center w-full border rounded-lg overflow-hidden transition-all bg-background'
+    'flex items-center w-full border rounded-lg overflow-hidden transition-all bg-background',
   ]
 
   if (isFocused.value) {
@@ -83,20 +83,14 @@ const mainSearchBarClass = computed(() => {
 
 const dropdownMenuClass = [
   'absolute z-50 left-0 mt-1 w-80 min-w-full bg-white dark:bg-gray-800',
-  'rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'
+  'rounded-lg shadow-lg border border-gray-200 dark:border-gray-700',
 ]
 
-const categoryMenuClass = computed(() => [
-  ...dropdownMenuClass
-])
+const categoryMenuClass = computed(() => [...dropdownMenuClass])
 
-const termSuggestionsClass = computed(() => [
-  ...dropdownMenuClass
-])
+const termSuggestionsClass = computed(() => [...dropdownMenuClass])
 
-const freeTextHintClass = computed(() => [
-  ...dropdownMenuClass
-])
+const freeTextHintClass = computed(() => [...dropdownMenuClass])
 
 const searchButtonClass = computed(() => {
   const baseClasses = [
@@ -104,7 +98,7 @@ const searchButtonClass = computed(() => {
     'border-l border-gray-200 dark:border-gray-700',
     'bg-gray-200 dark:bg-gray-700',
     'transition duration-200 ease-linear',
-    'focus-visible:ring-2 focus-visible:ring-primary focus:outline-none'
+    'focus-visible:ring-2 focus-visible:ring-primary focus:outline-none',
   ]
 
   if (hasValues.value) {
@@ -131,7 +125,7 @@ const inputPlaceholder = computed(() => {
     return 'Type to filter...'
   }
 
-  if (chips.value?.find(({kind}) => (kind === TEXT_QUERY_KIND))) {
+  if (chips.value?.find(({ kind }) => kind === TEXT_QUERY_KIND)) {
     return 'Type to replace search query or add a category below…'
   }
 
@@ -202,7 +196,9 @@ const categoryIcons: Record<string, Component> = {
 
 // ---- Per-item class helpers (methods, not computed, because they take loop arguments) ----
 function getCategoryItemClass(_cat: { value: string }, index: number): string[] {
-  const baseClasses = ['w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors cursor-pointer focus:outline-none']
+  const baseClasses = [
+    'w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors cursor-pointer focus:outline-none',
+  ]
   if (categoryMenuActiveIndex.value === index) {
     baseClasses.push('bg-gray-100 dark:bg-gray-700')
   } else {
@@ -212,7 +208,9 @@ function getCategoryItemClass(_cat: { value: string }, index: number): string[] 
 }
 
 function getTermItemClass(index: number): string[] {
-  const baseClasses = ['w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer focus:outline-none flex items-center gap-2']
+  const baseClasses = [
+    'w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer focus:outline-none flex items-center gap-2',
+  ]
   if (activeSuggestionIndex.value === index) {
     baseClasses.push('bg-gray-100 dark:bg-gray-700')
   } else {
@@ -319,7 +317,13 @@ function filterTermSuggestions(inputText: string) {
   const category = searchStore.categories.find((c) => c.kind === selectedCategoryKind.value)
   const terms = (category?.kindInfo?.terms || [])
     .filter(isValidTerm)
-    .filter((t) => !chips.value.some((chip) => chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === t.toLowerCase()))
+    .filter(
+      (t) =>
+        !chips.value.some(
+          (chip) =>
+            chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === t.toLowerCase(),
+        ),
+    )
 
   const query = inputText.trim().toLowerCase()
   termSuggestions.value = query ? terms.filter((t) => t.toLowerCase().includes(query)) : terms
@@ -362,7 +366,8 @@ function selectTerm(term: string) {
 
   // Prevent adding a duplicate term within the same category.
   const alreadySelected = chips.value.some(
-    (chip) => chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === term.toLowerCase(),
+    (chip) =>
+      chip.kind === selectedCategoryKind.value && chip.term.toLowerCase() === term.toLowerCase(),
   )
   if (alreadySelected) return
 
@@ -551,7 +556,8 @@ function handleKeydown(event: KeyboardEvent) {
       const items = categoryMenuItems.value
       const maxIndex = items.length - 1
       const nextIndex = categoryMenuActiveIndex.value + delta
-      categoryMenuActiveIndex.value = nextIndex < 0 ? maxIndex : nextIndex > maxIndex ? 0 : nextIndex
+      categoryMenuActiveIndex.value =
+        nextIndex < 0 ? maxIndex : nextIndex > maxIndex ? 0 : nextIndex
       return
     }
     if (showTermSuggestions.value && termSuggestions.value.length > 0) {
@@ -616,8 +622,6 @@ function handleKeydown(event: KeyboardEvent) {
     }
     return
   }
-
-
 }
 
 // The whole search bar acts as the input: pressing on empty space or a chip label must not

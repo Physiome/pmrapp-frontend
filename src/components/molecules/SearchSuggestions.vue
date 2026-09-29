@@ -42,13 +42,10 @@ const selectedFilters = ref<SearchFilter[]>(props.initialFilters ? [...props.ini
 
 const resultGroupClass = computed(() => [
   'border-b last:border-0 border-gray-200 dark:border-gray-700',
-  'transition-all group-hover/results:opacity-75 hover:!opacity-100'
+  'transition-all group-hover/results:opacity-75 hover:!opacity-100',
 ])
 
-const resultGroupHeaderClass = computed(() => [
-  'sticky-container',
-  'sticky top-0 z-1',
-])
+const resultGroupHeaderClass = computed(() => ['sticky-container', 'sticky top-0 z-1'])
 
 const resultGroupHeaderInnerClass = computed(() => [
   'sticky-container-inner',
