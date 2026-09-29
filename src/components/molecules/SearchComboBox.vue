@@ -237,6 +237,15 @@ function focusInput() {
   })
 }
 
+// Invariant: an empty, focused input with no active category always shows the category menu.
+// Set explicitly rather than relying on the focus event, which doesn't fire if the input is
+// already focused (e.g. when clicking the clear button doesn't move focus).
+function showCategoryMenuIfEmpty() {
+  if (selectedCategoryKind.value || currentInput.value.trim()) return
+  showCategoryMenu.value = true
+  categoryMenuActiveIndex.value = -1
+}
+
 // ---- Initialisation ----
 function initialiseFromProps() {
   if (props.initialFilters.length > 0) {
@@ -335,6 +344,7 @@ function cancelCategorySelection() {
   showTermSuggestions.value = false
   termSuggestions.value = []
   activeSuggestionIndex.value = -1
+  showCategoryMenuIfEmpty()
   focusInput()
 }
 
@@ -377,9 +387,9 @@ function clearAll() {
   chips.value = []
   currentInput.value = ''
   selectedCategoryKind.value = null
-  showCategoryMenu.value = false
   showTermSuggestions.value = false
   termSuggestions.value = []
+  showCategoryMenuIfEmpty()
   focusInput()
 }
 
@@ -395,6 +405,7 @@ function executeSearch() {
     .map((c) => ({ kind: c.kind, term: c.term }))
 
   if (!queryText && filters.length === 0) {
+    showCategoryMenuIfEmpty()
     focusInput()
     return
   }
@@ -425,10 +436,7 @@ function handleFocus() {
 
   // No category selected — only show the category menu when the input is empty.
   // If the user has already typed text, let them press Enter to search freely.
-  if (!currentInput.value.trim()) {
-    showCategoryMenu.value = true
-    categoryMenuActiveIndex.value = -1
-  }
+  showCategoryMenuIfEmpty()
 }
 
 function handleBlur(event: FocusEvent) {
@@ -457,8 +465,7 @@ function handleInput(_event: Event) {
       showCategoryMenu.value = false
     } else {
       // Input cleared — show the category menu again.
-      showCategoryMenu.value = true
-      categoryMenuActiveIndex.value = -1
+      showCategoryMenuIfEmpty()
     }
   }
 }
@@ -592,6 +599,17 @@ function handleKeydown(event: KeyboardEvent) {
 
 }
 
+// The whole search bar acts as the input: pressing on empty space or a chip label must not
+// blur the input (which would hide the dropdown until mouseup refocuses it). Interactive
+// children (chip remove, clear, search buttons) keep their default behaviour.
+function handleSearchBarMouseDown(event: MouseEvent) {
+  const target = event.target as HTMLElement | null
+  if (!target || target === inputRef.value) return
+  if (target.closest('button, a, input, [role="button"]')) return
+  event.preventDefault()
+  focusInput()
+}
+
 function handleCategoryMouseEnter(index: number) {
   categoryMenuActiveIndex.value = index
 }
@@ -613,6 +631,7 @@ defineExpose({
     -->
     <div
       :class="mainSearchBarClass"
+      @mousedown="handleSearchBarMouseDown"
       @click="focusInput"
     >
       <!-- Chips + input area -->
