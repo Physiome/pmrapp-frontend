@@ -810,17 +810,6 @@ defineExpose({
       :class="categoryMenuClass"
       @mousedown.prevent="focusInput"
     >
-      <!-- <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          Filter by category
-        </div>
-        <div
-          v-if="helpText"
-          class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic"
-        >
-          {{ helpText }}
-        </div>
-      </div> -->
       <div
         v-if="!hasCategoryMatches"
         class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
@@ -859,14 +848,6 @@ defineExpose({
       :class="termSuggestionsClass"
       @mousedown.prevent="focusInput"
     >
-      <!-- <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          {{ categoryPrefix }} suggestions
-        </div>
-        <div v-if="termSuggestions.length > 0" class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic">
-          Select one from the list
-        </div>
-      </div> -->
       <div
         v-if="termSuggestions.length === 0"
         class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
