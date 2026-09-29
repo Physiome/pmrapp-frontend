@@ -163,9 +163,30 @@ const hasCategoryMatches = computed(() => categoryMenuItems.value.length > 0)
 
 const showDropdown = computed(() => showCategoryMenu.value || showTermSuggestions.value)
 
+const selectedCategoryData = computed(() =>
+  searchStore.categories.find((c) => c.kind === selectedCategoryKind.value),
+)
+
+// Categories are fetched on mount, so a category can be selected before its terms have loaded.
+const isSelectedCategoryLoading = computed(() => {
+  if (!selectedCategoryKind.value || selectedCategoryKind.value === TEXT_QUERY_KIND) return false
+  return searchStore.isLoading || !!selectedCategoryData.value?.loading
+})
+
+// Refresh the open suggestions once the selected category's terms arrive.
+watch(
+  () => selectedCategoryData.value?.kindInfo,
+  () => {
+    if (!showTermSuggestions.value) return
+    filterTermSuggestions(currentInput.value)
+    emitDropdownHeight()
+  },
+)
+
 const noTermMatchesMessage = computed(() => {
   const input = currentInput.value.trim()
   const label = categoryPrefix.value || 'this category'
+  if (isSelectedCategoryLoading.value) return `Loading ${label} suggestions...`
   if (!input) return `No ${label} suggestions available`
   return `No ${label} available for "${input}". Try a different term or press Escape to pick another category.`
 })
