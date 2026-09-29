@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch, type Component } from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watch, type Component } from 'vue'
 import Chip from '@/components/atoms/Chip.vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 import SearchIcon from '@/components/icons/SearchIcon.vue'
@@ -57,6 +57,21 @@ const termSuggestions = ref<string[]>([])
 const activeSuggestionIndex = ref(-1)
 const categoryMenuActiveIndex = ref(-1)
 const isFocused = ref(false)
+
+// ---- Accessibility IDs ----
+const baseId = useId()
+const categoryListboxId = `${baseId}-categories`
+const termListboxId = `${baseId}-terms`
+const freeTextHintId = `${baseId}-hint`
+const statusId = `${baseId}-status`
+
+function getCategoryOptionId(index: number): string {
+  return `${categoryListboxId}-${index}`
+}
+
+function getTermOptionId(index: number): string {
+  return `${termListboxId}-${index}`
+}
 
 // Emits the current dropdown height whenever it changes (used by SearchOverlay to grow the dialog).
 function emitDropdownHeight() {
@@ -202,6 +217,51 @@ const showFreeTextHint = computed(() => {
     currentInput.value.trim().length > 0 &&
     !showDropdown.value
   )
+})
+
+// ---- Combobox ARIA state ----
+const isCategoryListboxVisible = computed(
+  () => showCategoryMenu.value && categoryMenuItems.value.length > 0,
+)
+
+const comboboxExpanded = computed(() => isCategoryListboxVisible.value || showTermSuggestions.value)
+
+const comboboxControls = computed(() => {
+  if (isCategoryListboxVisible.value) return categoryListboxId
+  if (showTermSuggestions.value) return termListboxId
+  return undefined
+})
+
+const comboboxActiveDescendant = computed(() => {
+  if (isCategoryListboxVisible.value && categoryMenuActiveIndex.value >= 0) {
+    return getCategoryOptionId(categoryMenuActiveIndex.value)
+  }
+  if (showTermSuggestions.value && activeSuggestionIndex.value >= 0) {
+    return getTermOptionId(activeSuggestionIndex.value)
+  }
+  return undefined
+})
+
+// Announced politely so screen-reader users know when suggestions appear or change.
+const statusMessage = computed(() => {
+  if (isCategoryListboxVisible.value) {
+    const count = categoryMenuItems.value.length
+    return `${count} ${count === 1 ? 'category' : 'categories'} available. Use up and down arrows to navigate.`
+  }
+  if (showTermSuggestions.value) {
+    const count = termSuggestions.value.length
+    if (count === 0) return noTermMatchesMessage.value
+    return `${count} ${categoryPrefix.value} ${count === 1 ? 'suggestion' : 'suggestions'} available. Use up and down arrows to navigate.`
+  }
+  return ''
+})
+
+// Keep the active option visible when arrow-navigating a scrollable list.
+watch(comboboxActiveDescendant, (id) => {
+  if (!id) return
+  nextTick(() => {
+    document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
+  })
 })
 
 // Watch all dropdown visibility states; emit the active dropdown's height so
@@ -704,7 +764,14 @@ defineExpose({
           ref="inputRef"
           :value="currentInput"
           type="text"
+          role="combobox"
           aria-label="Search term"
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
+          :aria-expanded="comboboxExpanded"
+          :aria-controls="comboboxControls"
+          :aria-activedescendant="comboboxActiveDescendant"
+          :aria-describedby="showFreeTextHint ? freeTextHintId : undefined"
           class="flex-1 min-w-[120px] outline-none border-none bg-transparent px-1 py-1 text-sm"
           :class="{ 'pl-0': selectedCategoryKind !== null || chips.length > 0 }"
           :placeholder="inputPlaceholder"
@@ -738,7 +805,7 @@ defineExpose({
 
     <!-- Category menu dropdown (shown when input is empty on focus, or after Tab) -->
     <div
-      v-if="showCategoryMenu && categoryMenuItems.length > 0"
+      v-if="isCategoryListboxVisible"
       ref="categoryMenuRef"
       :class="categoryMenuClass"
       @mousedown.prevent="focusInput"
@@ -754,24 +821,33 @@ defineExpose({
           {{ helpText }}
         </div>
       </div> -->
-      <div class="max-h-80 overflow-y-auto">
-        <div
-          v-if="!hasCategoryMatches"
-          class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
-        >
-          No matching category found. Press <strong>Enter</strong> to search as free text.
-        </div>
+      <div
+        v-if="!hasCategoryMatches"
+        class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
+      >
+        No matching category found. Press <strong>Enter</strong> to search as free text.
+      </div>
+      <div
+        :id="categoryListboxId"
+        role="listbox"
+        aria-label="Search categories"
+        class="max-h-80 overflow-y-auto"
+      >
         <button
           v-for="(cat, index) in categoryMenuItems"
+          :id="getCategoryOptionId(index)"
           :key="cat.value"
           type="button"
+          role="option"
+          tabindex="-1"
+          :aria-selected="categoryMenuActiveIndex === index"
           :class="getCategoryItemClass(cat, index)"
           @click="handleCategoryClick(cat)"
           @mouseenter="handleCategoryMouseEnter(index)"
         >
-          <component :is="categoryIcons[cat.value]" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
+          <component :is="categoryIcons[cat.value]" aria-hidden="true" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
           <span class="font-medium text-gray-800 dark:text-gray-200 flex-1">{{ cat.label }}</span>
-          <Keycap v-if="categoryMenuActiveIndex === index" size="small">&crarr;</Keycap>
+          <Keycap v-if="categoryMenuActiveIndex === index" aria-hidden="true" size="small">&crarr;</Keycap>
         </button>
       </div>
     </div>
@@ -783,31 +859,40 @@ defineExpose({
       :class="termSuggestionsClass"
       @mousedown.prevent="focusInput"
     >
-      <div class="max-h-80 overflow-y-auto">
-        <!-- <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-          <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            {{ categoryPrefix }} suggestions
-          </div>
-          <div v-if="termSuggestions.length > 0" class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic">
-            Select one from the list
-          </div>
-        </div> -->
-        <div
-          v-if="termSuggestions.length === 0"
-          class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
-        >
-          {{ noTermMatchesMessage }}
+      <!-- <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          {{ categoryPrefix }} suggestions
         </div>
+        <div v-if="termSuggestions.length > 0" class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic">
+          Select one from the list
+        </div>
+      </div> -->
+      <div
+        v-if="termSuggestions.length === 0"
+        class="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
+      >
+        {{ noTermMatchesMessage }}
+      </div>
+      <div
+        :id="termListboxId"
+        role="listbox"
+        :aria-label="`${categoryPrefix} suggestions`"
+        class="max-h-80 overflow-y-auto"
+      >
         <button
           v-for="(term, index) in termSuggestions"
+          :id="getTermOptionId(index)"
           :key="term"
           type="button"
+          role="option"
+          tabindex="-1"
+          :aria-selected="activeSuggestionIndex === index"
           :class="getTermItemClass(index)"
           @click="selectTerm(term)"
           @mouseenter="handleTermMouseEnter(index)"
         >
           <span class="truncate flex-1">{{ term }}</span>
-          <Keycap v-if="activeSuggestionIndex === index" size="small">&crarr;</Keycap>
+          <Keycap v-if="activeSuggestionIndex === index" aria-hidden="true" size="small">&crarr;</Keycap>
         </button>
       </div>
     </div>
@@ -815,6 +900,7 @@ defineExpose({
     <!-- Free-text hint (shown when user has typed text and no category/dropdown is active) -->
     <div
       v-if="showFreeTextHint"
+      :id="freeTextHintId"
       ref="freeTextHintRef"
       :class="freeTextHintClass"
       @mousedown.prevent="focusInput"
@@ -830,6 +916,11 @@ defineExpose({
         <Keycap size="small">Tab</Keycap>
         <span>to add category filters</span>
       </div>
+    </div>
+
+    <!-- Screen-reader announcements for suggestion availability -->
+    <div :id="statusId" role="status" aria-live="polite" class="sr-only">
+      {{ statusMessage }}
     </div>
   </div>
 </template>
