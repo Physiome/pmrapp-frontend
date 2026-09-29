@@ -248,16 +248,14 @@ function showCategoryMenuIfEmpty() {
 
 // ---- Initialisation ----
 function initialiseFromProps() {
-  if (props.initialFilters.length > 0) {
-    chips.value = props.initialFilters
-      .filter((f) => f.kind && f.term)
-      .map((f) => ({
-        id: generateChipId(),
-        kind: f.kind,
-        term: f.term,
-        displayLabel: getDisplayLabel(f.kind, f.term),
-      }))
-  }
+  chips.value = props.initialFilters
+    .filter((f) => f.kind && f.term)
+    .map((f) => ({
+      id: generateChipId(),
+      kind: f.kind,
+      term: f.term,
+      displayLabel: getDisplayLabel(f.kind, f.term),
+    }))
   if (props.initialQuery) {
     chips.value.push({
       id: generateChipId(),
@@ -267,6 +265,25 @@ function initialiseFromProps() {
     })
   }
 }
+
+// Rebuild chips when the parent's search params actually change
+// (e.g. after a search or back/forward navigation).
+// Compared by value so unrelated route changes (e.g. sort)
+// that produce new-but-equal props don't wipe the user's in-progress edits.
+const initialSearchKey = computed(() =>
+  JSON.stringify({
+    query: props.initialQuery,
+    filters: props.initialFilters.map((f) => [f.kind, f.term]),
+  }),
+)
+
+watch(initialSearchKey, () => {
+  initialiseFromProps()
+  currentInput.value = ''
+  selectedCategoryKind.value = null
+  showTermSuggestions.value = false
+  termSuggestions.value = []
+})
 
 onMounted(async () => {
   initialiseFromProps()
@@ -408,6 +425,19 @@ function executeSearch() {
     showCategoryMenuIfEmpty()
     focusInput()
     return
+  }
+
+  // Commit typed text as the free-text chip so the bar reflects the submitted search,
+  // even when the URL doesn't change (e.g. re-submitting the same query).
+  if (inputText) {
+    chips.value = chips.value.filter((c) => c.kind !== TEXT_QUERY_KIND)
+    chips.value.push({
+      id: generateChipId(),
+      kind: TEXT_QUERY_KIND,
+      term: inputText,
+      displayLabel: getDisplayLabel(TEXT_QUERY_KIND, inputText),
+    })
+    currentInput.value = ''
   }
 
   inputRef.value?.blur()
