@@ -238,8 +238,8 @@ function focusInput() {
 }
 
 // Invariant: an empty, focused input with no active category always shows the category menu.
-// Set explicitly rather than relying on the focus event, which doesn't fire if the input is
-// already focused (e.g. when clicking the clear button doesn't move focus).
+// Set explicitly rather than relying on the focus event, which doesn't fire
+// if the input is already focused (e.g. when clicking the clear button doesn't move focus).
 function showCategoryMenuIfEmpty() {
   if (selectedCategoryKind.value || currentInput.value.trim()) return
   showCategoryMenu.value = true
