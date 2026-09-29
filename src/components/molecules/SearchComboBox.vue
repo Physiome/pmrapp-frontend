@@ -174,8 +174,6 @@ const categoryMenuItems = computed(() => {
   return filtered
 })
 
-const hasCategoryMatches = computed(() => categoryMenuItems.value.length > 0)
-
 const showDropdown = computed(() => showCategoryMenu.value || showTermSuggestions.value)
 
 const selectedCategoryData = computed(() =>
@@ -811,12 +809,6 @@ defineExpose({
       @mousedown.prevent="focusInput"
     >
       <div
-        v-if="!hasCategoryMatches"
-        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
-      >
-        No matching category found. Press <strong>Enter</strong> to search as free text.
-      </div>
-      <div
         :id="categoryListboxId"
         role="listbox"
         aria-label="Search categories"
@@ -850,9 +842,23 @@ defineExpose({
     >
       <div
         v-if="termSuggestions.length === 0"
-        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1"
       >
-        {{ noTermMatchesMessage }}
+        <template v-if="isSelectedCategoryLoading">
+          <span>Loading {{ categoryPrefix || 'this category' }} suggestions...</span>
+        </template>
+        <template v-else-if="!currentInput.trim()">
+          <span>No {{ categoryPrefix || 'this category' }} suggestions available</span>
+        </template>
+        <template v-else>
+          <span>
+            No {{ categoryPrefix || 'this category' }} available for
+            <strong class="text-gray-700 dark:text-gray-200">{{ currentInput.trim() }}</strong>.
+            Try a different term or press
+          </span>
+          <Keycap size="small">Esc</Keycap>
+          <span>to pick another category</span>
+        </template>
       </div>
       <div
         :id="termListboxId"
