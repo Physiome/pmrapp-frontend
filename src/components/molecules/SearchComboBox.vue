@@ -16,7 +16,6 @@ interface FilterChip {
   id: string
   kind: string
   term: string
-  displayLabel: string
 }
 
 const props = withDefaults(
@@ -299,10 +298,9 @@ function getTermItemClass(index: number): string[] {
 }
 
 // ---- Helpers ----
-function getDisplayLabel(kind: string, term: string): string {
-  if (kind === TEXT_QUERY_KIND) return term
-  const singularLabel = SEARCH_KIND_LABEL_SINGULAR_MAP[kind] || kind
-  return `${singularLabel}: ${term}`
+function getCategoryLabel(kind: string): string | undefined {
+  if (kind === TEXT_QUERY_KIND) return undefined
+  return SEARCH_KIND_LABEL_SINGULAR_MAP[kind] || kind
 }
 
 function generateChipId(): string {
@@ -332,14 +330,12 @@ function initialiseFromProps() {
       id: generateChipId(),
       kind: f.kind,
       term: f.term,
-      displayLabel: getDisplayLabel(f.kind, f.term),
     }))
   if (props.initialQuery) {
     chips.value.push({
       id: generateChipId(),
       kind: TEXT_QUERY_KIND,
       term: props.initialQuery,
-      displayLabel: getDisplayLabel(TEXT_QUERY_KIND, props.initialQuery),
     })
   }
 }
@@ -454,7 +450,6 @@ function selectTerm(term: string) {
     id: generateChipId(),
     kind: selectedCategoryKind.value,
     term,
-    displayLabel: getDisplayLabel(selectedCategoryKind.value, term),
   })
 
   selectedCategoryKind.value = null
@@ -510,7 +505,6 @@ function executeSearch() {
       id: generateChipId(),
       kind: TEXT_QUERY_KIND,
       term: inputText,
-      displayLabel: getDisplayLabel(TEXT_QUERY_KIND, inputText),
     })
     currentInput.value = ''
   }
@@ -606,7 +600,6 @@ function handleKeydown(event: KeyboardEvent) {
       id: generateChipId(),
       kind: TEXT_QUERY_KIND,
       term,
-      displayLabel: getDisplayLabel(TEXT_QUERY_KIND, term),
     })
     currentInput.value = ''
     showCategoryMenu.value = true
@@ -743,7 +736,8 @@ defineExpose({
         <Chip
           v-for="chip in chips"
           :key="chip.id"
-          :label="chip.displayLabel"
+          :category="getCategoryLabel(chip.kind)"
+          :label="chip.term"
           :removable="true"
           :on-remove="() => removeChip(chip.id)"
         />

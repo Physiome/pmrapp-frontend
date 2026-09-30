@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 
 interface Props {
   label: string
+  category?: string
   removable?: boolean
   onRemove?: () => void
   onClick?: () => void
@@ -11,6 +13,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   removable: false,
 })
+
+const fullLabel = computed(() => (props.category ? `${props.category}: ${props.label}` : props.label))
 
 const transitionClasses = 'transition duration-200 ease-linear'
 
@@ -54,13 +58,14 @@ const handleClickChip = () => {
     @click="handleClickChip"
   >
   <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
-    {{ label }}
+    <span v-if="category" class="mr-1 text-gray-500 dark:text-gray-400">{{ category }}:</span>
+    <span :class="{ 'font-medium': category }">{{ label }}</span>
   </span>
   <span v-if="removable" @click.stop>
     <CloseButton
       :class="closeButtonClasses"
       @click="handleRemoveChip"
-      :aria-label="`Remove ${label}`"
+      :aria-label="`Remove ${fullLabel}`"
     />
   </span>
   </div>
