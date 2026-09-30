@@ -14,7 +14,9 @@ const props = withDefaults(defineProps<Props>(), {
   removable: false,
 })
 
-const fullLabel = computed(() => (props.category ? `${props.category}: ${props.label}` : props.label))
+const fullLabel = computed(() =>
+  props.category ? `${props.category}: ${props.label}` : props.label,
+)
 
 const transitionClasses = 'transition duration-200 ease-linear'
 
