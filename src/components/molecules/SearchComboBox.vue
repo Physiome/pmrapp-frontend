@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useId, watch, type Component } from 'vue'
+import { type Component, computed, nextTick, onMounted, ref, useId, watch } from 'vue'
 import Chip from '@/components/atoms/Chip.vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
-import SearchIcon from '@/components/icons/SearchIcon.vue'
-import UserIcon from '@/components/icons/UserIcon.vue'
+import Keycap from '@/components/atoms/Keycap.vue'
 import CodeIcon from '@/components/icons/CodeIcon.vue'
 import FileIcon from '@/components/icons/FileIcon.vue'
+import SearchIcon from '@/components/icons/SearchIcon.vue'
+import UserIcon from '@/components/icons/UserIcon.vue'
 import { SEARCH_CATEGORIES, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
 import type { SearchFilter, SearchQueryRequest } from '@/types/search'
 import { isValidTerm } from '@/utils/search'
-import Keycap from '@/components/atoms/Keycap.vue'
 
 interface FilterChip {
   id: string
