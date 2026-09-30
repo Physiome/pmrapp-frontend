@@ -7,7 +7,12 @@ import CodeIcon from '@/components/icons/CodeIcon.vue'
 import FileIcon from '@/components/icons/FileIcon.vue'
 import SearchIcon from '@/components/icons/SearchIcon.vue'
 import UserIcon from '@/components/icons/UserIcon.vue'
-import { SEARCH_CATEGORIES, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
+import {
+  SEARCH_CATEGORIES,
+  SEARCH_KIND_LABEL_SINGULAR_MAP,
+  TEXT_QUERY_KIND,
+  TEXT_QUERY_LABEL,
+} from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
 import type { SearchFilter, SearchQueryRequest } from '@/types/search'
 import { isValidTerm } from '@/utils/search'
@@ -37,9 +42,6 @@ const emit = defineEmits<{
 }>()
 
 const searchStore = useSearchStore()
-
-const TEXT_QUERY_KIND = '_text_query'
-const TEXT_QUERY_LABEL = 'Free text'
 
 // ---- Refs ----
 const inputRef = ref<HTMLInputElement | null>(null)
