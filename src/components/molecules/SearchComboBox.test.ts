@@ -121,7 +121,9 @@ describe('SearchComboBox', () => {
         w.get('[aria-label="Search categories"]').attributes('id'),
       )
       expect(input.attributes('placeholder')).toBe('Type to search or add a category below...')
-      expect(statusText(w)).toBe('4 categories available. Use up and down arrows to navigate.')
+      expect(statusText(w)).toBe(
+        '4 categories available. Use up and down arrows or Tab to navigate.',
+      )
     })
 
     it('hides the menu and shows the free-text hint while typing', async () => {
@@ -157,6 +159,48 @@ describe('SearchComboBox', () => {
       expect(options[0]?.attributes('aria-selected')).toBe('true')
       expect(options[3]?.attributes('aria-selected')).toBe('false')
       expect(input.attributes('aria-activedescendant')).toBe(options[0]?.attributes('id'))
+    })
+
+    it('cycles through categories with Tab, looping back to the input', async () => {
+      const w = await mountComboBox()
+      const input = getInput(w)
+      const activeIndex = () =>
+        categoryOptions(w).findIndex((o) => o.attributes('aria-selected') === 'true')
+
+      for (const expected of [0, 1, 2, 3]) {
+        await press(w, 'Tab')
+        expect(activeIndex()).toBe(expected)
+        expect(input.attributes('aria-activedescendant')).toBe(
+          categoryOptions(w)[expected]?.attributes('id'),
+        )
+      }
+
+      await press(w, 'Tab')
+      expect(activeIndex()).toBe(-1)
+      expect(input.attributes('aria-activedescendant')).toBeUndefined()
+      expect(categoryOptions(w)).toHaveLength(4)
+    })
+
+    it('cycles backwards with Shift+Tab', async () => {
+      const w = await mountComboBox()
+      const activeIndex = () =>
+        categoryOptions(w).findIndex((o) => o.attributes('aria-selected') === 'true')
+
+      await getInput(w).trigger('keydown', { key: 'Tab', shiftKey: true })
+      expect(activeIndex()).toBe(3)
+
+      await press(w, 'Tab')
+      expect(activeIndex()).toBe(-1)
+    })
+
+    it('does not trap Tab once the category menu is closed with Escape', async () => {
+      const w = await mountComboBox()
+
+      await press(w, 'Escape')
+      const event = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true })
+      getInput(w).element.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(false)
     })
 
     it('selects the highlighted category on Enter', async () => {
@@ -204,7 +248,7 @@ describe('SearchComboBox', () => {
 
       expect(termOptions(w).map((o) => o.text())).toEqual(['Noble', 'Penny Noble'])
       expect(statusText(w)).toBe(
-        '2 Model author suggestions available. Use up and down arrows to navigate.',
+        '2 Model author suggestions available. Use up and down arrows or Tab to navigate.',
       )
     })
 
@@ -219,6 +263,22 @@ describe('SearchComboBox', () => {
       expect(w.find('span.select-none').exists()).toBe(false)
       expect(termOptions(w)).toHaveLength(0)
       expect(categoryOptions(w)).toHaveLength(4)
+    })
+
+    it('cycles through terms with Tab, keeping the selected category', async () => {
+      const w = await mountComboBox()
+      const activeIndex = () =>
+        termOptions(w).findIndex((o) => o.attributes('aria-selected') === 'true')
+
+      await selectCategory(w, 'Publication authors')
+      for (const expected of [0, 1, 2, -1]) {
+        await press(w, 'Tab')
+        expect(activeIndex()).toBe(expected)
+      }
+
+      await getInput(w).trigger('keydown', { key: 'Tab', shiftKey: true })
+      expect(activeIndex()).toBe(2)
+      expect(w.text()).toContain('Publication author:')
     })
 
     it('selects the highlighted term on Enter', async () => {

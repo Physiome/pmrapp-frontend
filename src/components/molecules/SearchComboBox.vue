@@ -243,12 +243,12 @@ const comboboxActiveDescendant = computed(() => {
 const statusMessage = computed(() => {
   if (isCategoryListboxVisible.value) {
     const count = categoryMenuItems.value.length
-    return `${count} ${count === 1 ? 'category' : 'categories'} available. Use up and down arrows to navigate.`
+    return `${count} ${count === 1 ? 'category' : 'categories'} available. Use up and down arrows or Tab to navigate.`
   }
   if (showTermSuggestions.value) {
     const count = termSuggestions.value.length
     if (count === 0) return noTermMatchesMessage.value
-    return `${count} ${categoryPrefix.value} ${count === 1 ? 'suggestion' : 'suggestions'} available. Use up and down arrows to navigate.`
+    return `${count} ${categoryPrefix.value} ${count === 1 ? 'suggestion' : 'suggestions'} available. Use up and down arrows or Tab to navigate.`
   }
   return ''
 })
@@ -607,6 +607,28 @@ function handleKeydown(event: KeyboardEvent) {
     event.preventDefault()
     focusInput()
     return
+  }
+
+  // Tab / Shift+Tab cycle through the open list like the arrow keys, but include the
+  // input itself (index -1) in the loop. Escape closes the list so Tab can leave the bar.
+  if (event.key === 'Tab') {
+    const delta = event.shiftKey ? -1 : 1
+    const cycle = (index: number, count: number) =>
+      ((index + 1 + delta + count + 1) % (count + 1)) - 1
+
+    if (isCategoryListboxVisible.value) {
+      event.preventDefault()
+      categoryMenuActiveIndex.value = cycle(
+        categoryMenuActiveIndex.value,
+        categoryMenuItems.value.length,
+      )
+      return
+    }
+    if (showTermSuggestions.value && termSuggestions.value.length > 0) {
+      event.preventDefault()
+      activeSuggestionIndex.value = cycle(activeSuggestionIndex.value, termSuggestions.value.length)
+      return
+    }
   }
 
   // Close dropdowns on Tab (without consuming the event, so focus moves naturally).
