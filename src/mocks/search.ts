@@ -1,3 +1,4 @@
+import type { CategoryData } from '@/stores/search'
 import type { Exposure } from '@/types/exposure'
 import type { Workspace } from '@/types/workspace'
 
@@ -81,5 +82,44 @@ export const exposures: Exposure[] = [
       default_file_id: null,
       files: null,
     },
+  },
+]
+
+export const searchCategories: CategoryData[] = [
+  {
+    kind: 'citation_author_family_name',
+    kindInfo: {
+      kind: { id: 1, description: 'citation_author_family_name' },
+      terms: ['Hodgkin', 'Huxley', 'Noble', 'unknown', 'Unknown, Unknown', ' '],
+    },
+    loading: false,
+    error: null,
+  },
+  {
+    kind: 'model_author',
+    kindInfo: {
+      kind: { id: 2, description: 'model_author' },
+      terms: ['Catherine Lloyd', 'Noble', 'Penny Noble'],
+    },
+    loading: false,
+    error: null,
+  },
+  {
+    kind: 'cellml_keyword',
+    kindInfo: {
+      kind: { id: 3, description: 'cellml_keyword' },
+      terms: ['calcium', 'cardiac', 'electrophysiology'],
+    },
+    loading: false,
+    error: null,
+  },
+  {
+    kind: 'citation_id',
+    kindInfo: {
+      kind: { id: 4, description: 'citation_id' },
+      terms: ['pubmed:1185607', 'pubmed:'],
+    },
+    loading: false,
+    error: null,
   },
 ]
