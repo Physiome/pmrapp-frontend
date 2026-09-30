@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
 import RefreshIcon from '@/components/icons/RefreshIcon.vue'
-import SearchInput from '@/components/molecules/SearchInput.vue'
 import SearchResults from '@/components/molecules/SearchResults.vue'
 import SortDropdown from '@/components/molecules/SortDropdown.vue'
 import { SEARCH_KIND_NAMES } from '@/constants/search'
@@ -127,13 +126,6 @@ const loadResults = async (forceRefresh = false) => {
   }
 }
 
-const handleSearch = (searchKind: string, searchTerm: string) => {
-  router.push({
-    path: '/search',
-    query: buildQuerySearchQuery('', [{ kind: searchKind, term: searchTerm }], route.query),
-  })
-}
-
 const handleQuerySearch = (request: {
   query?: string
   filters?: Array<{ kind: string; term: string }>
@@ -155,16 +147,6 @@ const handleRefresh = async () => {
 
 <template>
   <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-    <!-- TODO: search-combobox testing -->
-    <!-- <SearchInput
-      class="w-full lg:flex-1 lg:w-auto"
-      ref="searchInputRef"
-      :initial-kind="''"
-      :initial-term="searchQueryParam"
-      :initial-filters="queryFilters"
-      @search="handleSearch"
-      @querySearch="handleQuerySearch"
-    /> -->
     <SearchComboBox
       ref="searchComboBoxRef"
       class="flex-1 w-full md:w-auto"

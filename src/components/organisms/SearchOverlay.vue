@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Keycap from '@/components/atoms/Keycap.vue'
 import Dialog from '@/components/molecules/Dialog.vue'
 import { SEARCH_KIND_NAMES } from '@/constants/search'
 import { buildQuerySearchQuery, buildSearchQuery, parseQueryFiltersFromQuery } from '@/utils/search'
@@ -40,11 +39,6 @@ watch(
   },
 )
 
-const handleSearch = (searchKind: string, searchTerm: string) => {
-  router.push({ path: '/search', query: buildSearchQuery(searchKind, searchTerm, route.query) })
-  emit('close')
-}
-
 const handleQuerySearch = (request: {
   query?: string
   filters?: Array<{ kind: string; term: string }>
@@ -75,20 +69,6 @@ const getInitialTerm = (): string => {
     :overflow-content="false"
     @close="emit('close')"
   >
-    <!-- <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-      Type a term and press <Keycap>Enter</Keycap> to search the repository,
-      or use the more options to filter by category (author, keyword, publication references), or combine both.
-    </div> -->
-    <!-- <SearchInput
-      ref="searchInputRef"
-      :inOverlay="true"
-      :initial-kind="''"
-      :initial-term="getInitialTerm()"
-      :initial-filters="parseQueryFiltersFromQuery(route.query, SEARCH_KIND_NAMES)"
-      @search="handleSearch"
-      @querySearch="handleQuerySearch"
-      @close="emit('close')"
-    /> -->
     <SearchComboBox
       ref="searchComboBoxRef"
       class="flex-1 w-full md:w-auto"
