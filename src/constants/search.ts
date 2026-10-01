@@ -18,3 +18,6 @@ export const SEARCH_KIND_LABEL_SINGULAR_MAP: Record<string, string> = Object.fro
 )
 
 export const SEARCH_KIND_NAMES = SEARCH_CATEGORIES.map((c) => c.value) as readonly string[]
+
+export const TEXT_QUERY_KIND = '_text_query'
+export const TEXT_QUERY_LABEL = 'Free text'
