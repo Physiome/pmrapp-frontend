@@ -1,47 +1,69 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { addImageDimensions } from './html'
+import { markHtmlImagesLoaded, prepareHtmlImages } from './html'
 
-describe('addImageDimensions', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
+describe('prepareHtmlImages', () => {
+  it('returns the HTML unchanged when there are no images', () => {
+    const html = '<p>Hello</p>'
+    expect(prepareHtmlImages(html)).toBe(html)
   })
 
-  const stubImage = (width: number, height: number, fail = false) => {
-    class MockImage {
-      naturalWidth = width
-      naturalHeight = height
-      onload: (() => void) | null = null
-      onerror: (() => void) | null = null
-      set src(_value: string) {
-        queueMicrotask(() => (fail ? this.onerror?.() : this.onload?.()))
-      }
-    }
-    vi.stubGlobal('Image', MockImage)
+  it('adds lazy loading and async decoding to images', () => {
+    const result = prepareHtmlImages('<img src="a.png">')
+    expect(result).toContain('loading="lazy"')
+    expect(result).toContain('decoding="async"')
+  })
+
+  it('marks images without dimensions as loading', () => {
+    const result = prepareHtmlImages('<img src="a.png">')
+    expect(result).toContain('data-img-loading')
+  })
+
+  it('does not mark images that already have dimensions', () => {
+    const result = prepareHtmlImages('<img src="a.png" width="10">')
+    expect(result).toContain('width="10"')
+    expect(result).not.toContain('data-img-loading')
+  })
+
+  it('keeps existing loading and decoding attributes', () => {
+    const result = prepareHtmlImages('<img src="a.png" loading="eager" decoding="sync">')
+    expect(result).toContain('loading="eager"')
+    expect(result).toContain('decoding="sync"')
+  })
+})
+
+describe('markHtmlImagesLoaded', () => {
+  const createContainer = () => {
+    const container = document.createElement('div')
+    container.innerHTML = prepareHtmlImages('<p>Text</p><img src="a.png">')
+    return container
   }
 
-  it('returns the HTML unchanged when there are no images', async () => {
-    const html = '<p>Hello</p>'
-    expect(await addImageDimensions(html)).toBe(html)
+  const getImage = (container: HTMLElement) => {
+    const img = container.querySelector('img')
+    if (!img) throw new Error('Image not found')
+    return img
+  }
+
+  it('removes the loading marker when the image loads', () => {
+    const container = createContainer()
+    markHtmlImagesLoaded(container)
+
+    const img = getImage(container)
+    expect(img.hasAttribute('data-img-loading')).toBe(true)
+
+    img.dispatchEvent(new Event('load'))
+    expect(img.hasAttribute('data-img-loading')).toBe(false)
+    expect(img.hasAttribute('data-img-error')).toBe(false)
   })
 
-  it('adds width and height to images without dimensions', async () => {
-    stubImage(300, 200)
-    const result = await addImageDimensions('<img src="a.png">')
-    expect(result).toContain('width="300"')
-    expect(result).toContain('height="200"')
-  })
+  it('flags the image when it fails to load', () => {
+    const container = createContainer()
+    markHtmlImagesLoaded(container)
 
-  it('keeps images that already have dimensions', async () => {
-    stubImage(300, 200)
-    const result = await addImageDimensions('<img src="a.png" width="10">')
-    expect(result).toContain('width="10"')
-    expect(result).not.toContain('height=')
-  })
-
-  it('leaves images untouched when they fail to load', async () => {
-    stubImage(0, 0, true)
-    const result = await addImageDimensions('<img src="a.png">')
-    expect(result).not.toContain('width=')
+    const img = getImage(container)
+    img.dispatchEvent(new Event('error'))
+    expect(img.hasAttribute('data-img-loading')).toBe(false)
+    expect(img.hasAttribute('data-img-error')).toBe(true)
   })
 })

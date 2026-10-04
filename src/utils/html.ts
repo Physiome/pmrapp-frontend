@@ -1,48 +1,51 @@
-const IMAGE_PRELOAD_TIMEOUT_MS = 5000
-
-const preloadImageSize = (src: string): Promise<{ width: number; height: number } | null> =>
-  new Promise((resolve) => {
-    const image = new Image()
-    const timer = setTimeout(() => resolve(null), IMAGE_PRELOAD_TIMEOUT_MS)
-
-    image.onload = () => {
-      clearTimeout(timer)
-      resolve(
-        image.naturalWidth && image.naturalHeight
-          ? { width: image.naturalWidth, height: image.naturalHeight }
-          : null,
-      )
-    }
-    image.onerror = () => {
-      clearTimeout(timer)
-      resolve(null)
-    }
-    image.src = src
-  })
+const IMAGE_LOADING_ATTR = 'data-img-loading'
+const IMAGE_ERROR_ATTR = 'data-img-error'
 
 /**
- * Adds the intrinsic width and height to `<img>` elements that do not specify them,
- * so that the browser can reserve the correct space before the images are rendered.
+ * Prepares `<img>` elements for progressive loading.
+ * All images are lazy-loaded and decoded asynchronously,
+ * and images without width and height are marked
+ * so that a placeholder can be shown until they load.
  */
-export async function addImageDimensions(html: string): Promise<string> {
+export function prepareHtmlImages(html: string): string {
   if (!html.includes('<img')) return html
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  const images = Array.from(doc.querySelectorAll('img[src]')).filter(
-    (img) => !img.hasAttribute('width') && !img.hasAttribute('height'),
-  )
+  const images = Array.from(doc.querySelectorAll('img[src]'))
 
   if (images.length === 0) return html
 
-  const sizes = await Promise.all(images.map((img) => preloadImageSize(img.getAttribute('src')!)))
-
-  images.forEach((img, index) => {
-    const size = sizes[index]
-    if (size) {
-      img.setAttribute('width', String(size.width))
-      img.setAttribute('height', String(size.height))
+  images.forEach((img) => {
+    if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy')
+    if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async')
+    if (!img.hasAttribute('width') && !img.hasAttribute('height')) {
+      img.setAttribute(IMAGE_LOADING_ATTR, '')
     }
   })
 
   return doc.body.innerHTML
+}
+
+/**
+ * Removes the placeholder marker from images prepared by `prepareHtmlImages`
+ * once they have loaded, or flags them when they fail to load.
+ */
+export function markHtmlImagesLoaded(container: HTMLElement): void {
+  const images = container.querySelectorAll<HTMLImageElement>(`img[${IMAGE_LOADING_ATTR}]`)
+
+  images.forEach((img) => {
+    const handleLoad = () => img.removeAttribute(IMAGE_LOADING_ATTR)
+    const handleError = () => {
+      img.removeAttribute(IMAGE_LOADING_ATTR)
+      img.setAttribute(IMAGE_ERROR_ATTR, '')
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      handleLoad()
+      return
+    }
+
+    img.addEventListener('load', handleLoad, { once: true })
+    img.addEventListener('error', handleError, { once: true })
+  })
 }

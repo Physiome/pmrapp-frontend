@@ -61,6 +61,8 @@ describe('ExposureDetail', () => {
     generatedCode = '',
     mathsJSON = '[]',
     exposureInfo = mockExposureInfo,
+    loadHTML = async () => '<h4>Model Status</h4>',
+    loadMetadata = async () => JSON.stringify(mockMetadata),
   }: {
     props?: Partial<{
       alias: string
@@ -72,18 +74,20 @@ describe('ExposureDetail', () => {
     generatedCode?: string
     mathsJSON?: string
     exposureInfo?: typeof mockExposureInfo
+    loadHTML?: () => Promise<string>
+    loadMetadata?: () => Promise<string>
   } = {}) => {
     vi.spyOn(exposureStore, 'getExposureInfo').mockResolvedValue(exposureInfo)
     vi.spyOn(exposureStore, 'getExposureSafeHTML').mockImplementation(
       async (_id, _fileId, _view, filename) => {
-        if (filename === 'index.html') return '<h4>Model Status</h4>'
+        if (filename === 'index.html') return loadHTML()
         if (filename === 'license.txt') return 'https://creativecommons.org/licenses/by/3.0/'
         return ''
       },
     )
     vi.spyOn(exposureStore, 'getExposureRawContent').mockImplementation(
       async (_id, _fileId, _view, filename) => {
-        if (filename === 'cmeta.json') return JSON.stringify(mockMetadata)
+        if (filename === 'cmeta.json') return loadMetadata()
         if (filename === 'math.json') return mathsJSON
         if (filename.startsWith('code.')) return generatedCode
         return ''
@@ -965,6 +969,86 @@ describe('ExposureDetail', () => {
         .findAll('h4')
         .find((heading) => heading.text().trim() === 'Citation')
       expect(citationHeading?.exists()).toBe(true)
+    })
+  })
+
+  describe('independent area loading', () => {
+    const findSectionHeading = (
+      wrapper: Awaited<ReturnType<typeof mountComponent>>,
+      text: string,
+    ) => wrapper.findAll('h4').find((heading) => heading.text().trim() === text)
+
+    it('renders the sidebar while the HTML view is still loading', async () => {
+      const wrapper = await mountComponent({ loadHTML: () => new Promise<string>(() => {}) })
+
+      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true)
+      expect(findSectionHeading(wrapper, 'Keywords')?.exists()).toBe(true)
+      expect(wrapper.find('.html-view').exists()).toBe(false)
+      expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
+    })
+
+    it('shows a skeleton for the metadata sections while metadata is loading', async () => {
+      const wrapper = await mountComponent({ loadMetadata: () => new Promise<string>(() => {}) })
+
+      expect(wrapper.find('.html-view').exists()).toBe(true)
+      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true)
+      expect(findSectionHeading(wrapper, 'About')).toBeUndefined()
+      expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
+    })
+
+    it('fetches the HTML view only once for the default view', async () => {
+      await mountComponent()
+
+      const htmlCalls = vi
+        .mocked(exposureStore.getExposureSafeHTML)
+        .mock.calls.filter((call) => call[3] === 'index.html')
+      expect(htmlCalls).toHaveLength(1)
+    })
+
+    it('does not fetch the HTML view when the file has no view entry', async () => {
+      const exposureInfo = structuredClone(mockExposureInfo)
+      for (const file of exposureInfo.exposure.files ?? []) {
+        file.views = file.views.filter((v) => v.view_key !== 'view')
+      }
+
+      const wrapper = await mountComponent({ exposureInfo })
+
+      const htmlCalls = vi
+        .mocked(exposureStore.getExposureSafeHTML)
+        .mock.calls.filter((call) => call[3] === 'index.html')
+      expect(htmlCalls).toHaveLength(0)
+      expect(wrapper.find('.html-view').exists()).toBe(false)
+      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
+    })
+
+    it('shows an error in the content area only when the HTML view fails to load', async () => {
+      const wrapper = await mountComponent({
+        loadHTML: () => Promise.reject(new Error('HTML failed')),
+      })
+
+      const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' })
+      expect(errorBlock.exists()).toBe(true)
+      expect(errorBlock.attributes('title')).toBe('Error loading view')
+      expect(errorBlock.attributes('error')).toBe('HTML failed')
+      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true)
+    })
+
+    it('keeps the page visible when the metadata fails to load', async () => {
+      const wrapper = await mountComponent({ loadMetadata: async () => 'not json' })
+
+      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
+      expect(wrapper.find('.html-view').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Model metadata could not be loaded.')
+    })
+
+    it('prepares images in the HTML view for progressive loading', async () => {
+      const wrapper = await mountComponent({
+        loadHTML: async () => '<p>Text</p><img src="figure.png">',
+      })
+
+      const img = wrapper.find('.html-view img')
+      expect(img.attributes('loading')).toBe('lazy')
+      expect(img.attributes('data-img-loading')).toBeDefined()
     })
   })
 })
