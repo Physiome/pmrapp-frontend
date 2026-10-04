@@ -38,6 +38,7 @@ import {
 } from '@/utils/exposure'
 import { getFileExtension, isOpenCORFile } from '@/utils/file'
 import { formatYear } from '@/utils/format'
+import { addImageDimensions } from '@/utils/html'
 import { formatLicenseUrl } from '@/utils/license'
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer'
 import { buildSearchQuery, isValidTerm } from '@/utils/search'
@@ -441,12 +442,14 @@ const generateMetadata = async () => {
 const loadDefaultView = async () => {
   // Only load the HTML view if we have the necessary exposure ID and file ID.
   if (exposureId.value && exposureFileId.value) {
-    detailHTML.value = await exposureStore.getExposureSafeHTML(
-      exposureId.value,
-      exposureFileId.value,
-      'view',
-      'index.html',
-      routePath,
+    detailHTML.value = await addImageDimensions(
+      await exposureStore.getExposureSafeHTML(
+        exposureId.value,
+        exposureFileId.value,
+        'view',
+        'index.html',
+        routePath,
+      ),
     )
   }
 }
@@ -727,12 +730,14 @@ const loadInitialView = async () => {
   await checkOtherRelatedModels()
 
   if (viewEntry) {
-    detailHTML.value = await exposureStore.getExposureSafeHTML(
-      exposureId.value,
-      viewEntry.exposure_file_id,
-      'view',
-      'index.html',
-      routePath,
+    detailHTML.value = await addImageDimensions(
+      await exposureStore.getExposureSafeHTML(
+        exposureId.value,
+        viewEntry.exposure_file_id,
+        'view',
+        'index.html',
+        routePath,
+      ),
     )
   }
 
