@@ -1283,6 +1283,10 @@ onMounted(async () => {
     @apply text-link dark:underline dark:decoration-dotted hover:text-link-hover transition;
   }
 
+  & :deep(img) {
+    @apply bg-white p-2;
+  }
+
   & :deep(h1) {
     @apply text-3xl font-bold mt-8 mb-8;
   }
