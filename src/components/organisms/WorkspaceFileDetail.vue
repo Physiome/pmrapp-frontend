@@ -339,7 +339,9 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
       </div>
 
       <!-- SVG Rendered View -->
-      <div :id="previewPanelId" role="tabpanel" v-if="isSvg && shouldShowPreview" class="flex justify-center p-4 bg-gray-50 dark:bg-gray-900 rounded">
+      <div :id="previewPanelId" role="tabpanel" v-if="isSvg && shouldShowPreview"
+        class="flex justify-center p-4 bg-gray-50 dark:bg-white rounded-bottom"
+      >
         <img :src="fileBlobUrl" :alt="path" class="max-w-full h-auto" />
       </div>
 
@@ -349,7 +351,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
       </div>
 
       <!-- Image View -->
-      <div v-else-if="isImage && imageDataUrl" class="flex justify-center p-4 bg-gray-50 dark:bg-gray-900 rounded">
+      <div v-else-if="isImage && imageDataUrl" class="flex justify-center p-4 bg-gray-50 dark:bg-white rounded-bottom">
         <img :src="imageDataUrl" :alt="path" class="max-w-full h-auto" />
       </div>
 
