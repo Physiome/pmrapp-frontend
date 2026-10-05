@@ -54,16 +54,45 @@ describe('markHtmlImagesLoaded', () => {
 
     img.dispatchEvent(new Event('load'))
     expect(img.hasAttribute('data-img-loading')).toBe(false)
-    expect(img.hasAttribute('data-img-error')).toBe(false)
+    expect(container.querySelector('.img-fallback')).toBeNull()
   })
 
-  it('flags the image when it fails to load', () => {
+  it('replaces the image with a placeholder when it fails to load', () => {
     const container = createContainer()
     markHtmlImagesLoaded(container)
 
-    const img = getImage(container)
+    getImage(container).dispatchEvent(new Event('error'))
+
+    const fallback = container.querySelector('.img-fallback')
+    expect(container.querySelector('img')).toBeNull()
+    expect(fallback?.getAttribute('role')).toBe('img')
+    expect(fallback?.getAttribute('aria-label')).toBe('Image not available')
+    expect(fallback?.querySelector('.img-fallback-name')?.textContent).toBe('a.png')
+  })
+
+  it('includes the alt text in the placeholder when present', () => {
+    const container = document.createElement('div')
+    container.innerHTML = '<img src="b.png" alt="Model diagram" width="10" height="10">'
+    markHtmlImagesLoaded(container)
+
+    getImage(container).dispatchEvent(new Event('error'))
+
+    const fallback = container.querySelector('.img-fallback')
+    expect(fallback?.getAttribute('aria-label')).toBe('Image not available: Model diagram')
+    expect(fallback?.textContent).toContain('Image not available: Model diagram')
+  })
+
+  it('does not render user data as HTML in the placeholder', () => {
+    const container = document.createElement('div')
+    const img = document.createElement('img')
+    img.src = 'c.png'
+    img.alt = '<b>bold</b>'
+    container.appendChild(img)
+    markHtmlImagesLoaded(container)
+
     img.dispatchEvent(new Event('error'))
-    expect(img.hasAttribute('data-img-loading')).toBe(false)
-    expect(img.hasAttribute('data-img-error')).toBe(true)
+
+    expect(container.querySelector('b')).toBeNull()
+    expect(container.textContent).toContain('<b>bold</b>')
   })
 })

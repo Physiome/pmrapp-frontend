@@ -1422,8 +1422,16 @@ onMounted(async () => {
     aspect-ratio: 4 / 3;
   }
 
-  & :deep(img[data-img-error]) {
-    @apply hidden;
+  & :deep(.img-fallback) {
+    @apply flex flex-col items-center justify-center gap-2 mx-auto my-2 w-full max-w-md min-h-32 p-4 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-sm text-center text-gray-500 dark:text-gray-400;
+  }
+
+  & :deep(.img-fallback-icon) {
+    @apply w-8 h-8;
+  }
+
+  & :deep(.img-fallback-name) {
+    @apply max-w-full truncate text-xs text-gray-400 dark:text-gray-500;
   }
 
   & :deep(table) {
