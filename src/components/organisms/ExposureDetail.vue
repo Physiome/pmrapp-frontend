@@ -9,11 +9,13 @@ import CopyButton from '@/components/atoms/CopyButton.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue'
 import TermButton from '@/components/atoms/TermButton.vue'
+import Tooltip from '@/components/atoms/Tooltip.vue'
 import WrapButton from '@/components/atoms/WrapButton.vue'
 import BugIcon from '@/components/icons/BugIcon.vue'
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
+import InfoIcon from '@/components/icons/InfoIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
@@ -21,7 +23,7 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import WarningBlock from '@/components/molecules/WarningBlock.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
-import { AVAILABLE_VIEWS, CODEGEN_LANGUAGES, DEFAULT_LICENSE } from '@/constants/exposure'
+import { AVAILABLE_VIEWS, CODEGEN_LANGUAGES, DEFAULT_LICENSE, LICENSE_FALLBACK_MESSAGE } from '@/constants/exposure'
 import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
@@ -103,6 +105,10 @@ const isViewLoading = ref(false)
 const viewError = ref<ErrorInfo | null>(null)
 const isMetadataLoading = ref(false)
 const metadataError = ref<ErrorInfo | null>(null)
+const isLicenseLoading = ref(false)
+const licenseError = ref(false)
+const isLicenseTooltipVisible = ref(false)
+const licenseInfoIconRef = ref<HTMLElement | null>(null)
 // Incremented whenever a new file or view load starts, so that stale responses can be ignored.
 let fileLoadToken = 0
 let viewLoadToken = 0
@@ -665,6 +671,8 @@ const resetState = () => {
   isViewNotFound.value = false
   isLangNotFound.value = false
   licenseInfo.value = DEFAULT_LICENSE
+  isLicenseLoading.value = false
+  licenseError.value = false
   metadataError.value = null
   metadataJSON.value = {}
   rawMathsData.value = []
@@ -750,6 +758,12 @@ const loadMetadata = async (token: number) => {
 }
 
 const loadLicense = async (exposureFileIdForLicense: number, token: number) => {
+  // The file declares its own licence, so don't show the default while it loads.
+  // If loading fails, fall back to the default and flag it so the UI can explain why.
+  licenseInfo.value = ''
+  licenseError.value = false
+  isLicenseLoading.value = true
+
   try {
     const license = await exposureStore.getExposureSafeHTML(
       exposureId.value,
@@ -759,9 +773,16 @@ const loadLicense = async (exposureFileIdForLicense: number, token: number) => {
       routePath,
     )
     if (!isCurrentFileLoad(token)) return
-    licenseInfo.value = license
+    licenseInfo.value = license.trim() || DEFAULT_LICENSE
   } catch (err) {
+    if (!isCurrentFileLoad(token)) return
+    licenseInfo.value = DEFAULT_LICENSE
+    licenseError.value = true
     console.error('Error loading exposure licence:', err)
+  } finally {
+    if (isCurrentFileLoad(token)) {
+      isLicenseLoading.value = false
+    }
   }
 }
 
@@ -1345,14 +1366,31 @@ onMounted(async () => {
           </dl>
         </div>
       </section>
-      <section v-if="licenseInfo" class="pt-6 border-t border-gray-200 dark:border-gray-700">
+      <section class="pt-6 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-lg font-semibold mb-3">Licence</h4>
-        <nav>
+        <SkeletonBlock v-if="isLicenseLoading" :lines="1" />
+        <nav v-else-if="licenseInfo">
           <ul class="space-y-2">
-            <li class="text-sm">
+            <li class="text-sm flex items-center gap-1.5">
               <a :href="licenseInfo" class="text-link" target="_blank" rel="noopener noreferrer">
                 {{ formatLicenseUrl(licenseInfo) }}
               </a>
+              <button
+                v-if="licenseError"
+                ref="licenseInfoIconRef"
+                type="button"
+                class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                :aria-label="LICENSE_FALLBACK_MESSAGE"
+                @mouseenter="isLicenseTooltipVisible = true"
+                @mouseleave="isLicenseTooltipVisible = false"
+                @focus="isLicenseTooltipVisible = true"
+                @blur="isLicenseTooltipVisible = false"
+              >
+                <InfoIcon class="w-4 h-4" />
+                <Tooltip :visible="isLicenseTooltipVisible" :anchor-el="licenseInfoIconRef">
+                  {{ LICENSE_FALLBACK_MESSAGE }}
+                </Tooltip>
+              </button>
             </li>
           </ul>
         </nav>

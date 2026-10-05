@@ -6,6 +6,7 @@
  * License URL used as a fallback when an exposure does not provide one.
  */
 export const DEFAULT_LICENSE = 'https://creativecommons.org/licenses/by/3.0/'
+export const LICENSE_FALLBACK_MESSAGE = 'Licence information could not be loaded, showing default licence.'
 
 /**
  * Views offered alongside the default exposure preview.
