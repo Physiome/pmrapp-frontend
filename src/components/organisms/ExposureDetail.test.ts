@@ -63,6 +63,7 @@ describe('ExposureDetail', () => {
     exposureInfo = mockExposureInfo,
     loadHTML = async () => '<h4>Model Status</h4>',
     loadMetadata = async () => JSON.stringify(mockMetadata),
+    loadLicense = async () => 'https://creativecommons.org/licenses/by/3.0/',
   }: {
     props?: Partial<{
       alias: string
@@ -76,12 +77,13 @@ describe('ExposureDetail', () => {
     exposureInfo?: typeof mockExposureInfo
     loadHTML?: () => Promise<string>
     loadMetadata?: () => Promise<string>
+    loadLicense?: () => Promise<string>
   } = {}) => {
     vi.spyOn(exposureStore, 'getExposureInfo').mockResolvedValue(exposureInfo)
     vi.spyOn(exposureStore, 'getExposureSafeHTML').mockImplementation(
       async (_id, _fileId, _view, filename) => {
         if (filename === 'index.html') return loadHTML()
-        if (filename === 'license.txt') return 'https://creativecommons.org/licenses/by/3.0/'
+        if (filename === 'license.txt') return loadLicense()
         return ''
       },
     )
@@ -779,6 +781,105 @@ describe('ExposureDetail', () => {
 
     const sectionContent = sectionHeading?.element.nextElementSibling?.textContent
     expect(sectionContent).toContain('CC BY 3.0')
+  })
+
+  describe('licence loading', () => {
+    const LICENSE_FALLBACK_MESSAGE =
+      'Licence information could not be loaded, showing default licence.'
+
+    const findLicenceSection = (wrapper: Awaited<ReturnType<typeof mountComponent>>) =>
+      wrapper
+        .findAll('section')
+        .find((section) => section.find('h4').exists() && section.find('h4').text() === 'Licence')
+
+    const licenceCalls = () =>
+      vi
+        .mocked(exposureStore.getExposureSafeHTML)
+        .mock.calls.filter((call) => call[3] === 'license.txt')
+
+    it('shows the licence declared by the exposure', async () => {
+      const wrapper = await mountComponent({
+        loadLicense: async () => 'https://creativecommons.org/licenses/by/4.0/',
+      })
+
+      const section = findLicenceSection(wrapper)
+      expect(section?.find('a').attributes('href')).toBe(
+        'https://creativecommons.org/licenses/by/4.0/',
+      )
+      expect(section?.text()).toContain('CC BY 4.0')
+      expect(section?.text()).not.toContain('CC BY 3.0')
+      expect(section?.find('button').exists()).toBe(false)
+    })
+
+    it('shows a skeleton instead of the default licence while the licence is loading', async () => {
+      const wrapper = await mountComponent({ loadLicense: () => new Promise<string>(() => {}) })
+
+      const section = findLicenceSection(wrapper)
+      expect(section?.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
+      expect(section?.find('a').exists()).toBe(false)
+      expect(section?.text()).not.toContain('CC BY 3.0')
+    })
+
+    it('falls back to the default licence when the declared licence is empty', async () => {
+      const wrapper = await mountComponent({
+        loadLicense: async () => '  \n',
+      })
+
+      const section = findLicenceSection(wrapper)
+      expect(section?.text()).toContain('CC BY 3.0')
+      expect(section?.find('button').exists()).toBe(false)
+    })
+
+    it('shows the default licence without fetching when the file declares no licence', async () => {
+      const exposureInfo = structuredClone(mockExposureInfo)
+      for (const file of exposureInfo.exposure.files ?? []) {
+        file.views = file.views.filter((v) => v.view_key !== 'license_citation')
+      }
+
+      const wrapper = await mountComponent({ exposureInfo })
+
+      expect(licenceCalls()).toHaveLength(0)
+      const section = findLicenceSection(wrapper)
+      expect(section?.text()).toContain('CC BY 3.0')
+      expect(section?.find('button').exists()).toBe(false)
+    })
+
+    it('shows the default licence with an info tooltip when the licence fails to load', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const wrapper = await mountComponent({
+        loadLicense: () => Promise.reject(new Error('Licence failed')),
+      })
+
+      const section = findLicenceSection(wrapper)
+      expect(section?.find('a').attributes('href')).toBe(
+        'https://creativecommons.org/licenses/by/3.0/',
+      )
+      expect(section?.text()).toContain('CC BY 3.0')
+
+      const infoButton = section?.find('button')
+      expect(infoButton?.exists()).toBe(true)
+      expect(infoButton?.attributes('aria-label')).toBe(LICENSE_FALLBACK_MESSAGE)
+
+      const tooltip = wrapper.findComponent({ name: 'Tooltip' })
+      expect(tooltip.props('visible')).toBe(false)
+
+      await infoButton?.trigger('mouseenter')
+      expect(tooltip.props('visible')).toBe(true)
+      // The tooltip is teleported to the document body.
+      expect(document.body.textContent).toContain(LICENSE_FALLBACK_MESSAGE)
+
+      await infoButton?.trigger('mouseleave')
+      expect(tooltip.props('visible')).toBe(false)
+
+      await infoButton?.trigger('focus')
+      expect(tooltip.props('visible')).toBe(true)
+
+      // The rest of the page is unaffected by the licence failure.
+      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
+      expect(wrapper.find('.html-view').exists()).toBe(true)
+      wrapper.unmount()
+      consoleErrorSpy.mockRestore()
+    })
   })
 
   describe('cellml_math view', () => {
