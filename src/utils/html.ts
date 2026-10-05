@@ -5,12 +5,13 @@ const SVG_NS = 'http://www.w3.org/2000/svg'
 
 /**
  * Prepares `<img>` elements for progressive loading.
+ * (Tag names are case-insensitive, so `<IMG>` must also be matched.)
  * All images are lazy-loaded and decoded asynchronously,
  * and images without width and height are marked
  * so that a placeholder can be shown until they load.
  */
 export function prepareHtmlImages(html: string): string {
-  if (!html.includes('<img')) return html
+  if (!/<img\b/i.test(html)) return html
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
   const images = Array.from(doc.querySelectorAll('img[src]'))

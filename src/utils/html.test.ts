@@ -14,6 +14,12 @@ describe('prepareHtmlImages', () => {
     expect(result).toContain('decoding="async"')
   })
 
+  it('matches image tags case-insensitively', () => {
+    const result = prepareHtmlImages('<IMG src="a.png">')
+    expect(result).toContain('loading="lazy"')
+    expect(result).toContain('data-img-loading')
+  })
+
   it('marks images without dimensions as loading', () => {
     const result = prepareHtmlImages('<img src="a.png">')
     expect(result).toContain('data-img-loading')
