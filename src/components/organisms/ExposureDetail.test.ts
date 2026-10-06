@@ -63,7 +63,7 @@ describe('ExposureDetail', () => {
     exposureInfo = mockExposureInfo,
     loadHTML = async () => '<h4>Model Status</h4>',
     loadMetadata = async () => JSON.stringify(mockMetadata),
-    loadLicense = async () => 'https://creativecommons.org/licenses/by/3.0/',
+    loadLicence = async () => 'https://creativecommons.org/licenses/by/3.0/',
   }: {
     props?: Partial<{
       alias: string
@@ -77,13 +77,13 @@ describe('ExposureDetail', () => {
     exposureInfo?: typeof mockExposureInfo
     loadHTML?: () => Promise<string>
     loadMetadata?: () => Promise<string>
-    loadLicense?: () => Promise<string>
+    loadLicence?: () => Promise<string>
   } = {}) => {
     vi.spyOn(exposureStore, 'getExposureInfo').mockResolvedValue(exposureInfo)
     vi.spyOn(exposureStore, 'getExposureSafeHTML').mockImplementation(
       async (_id, _fileId, _view, filename) => {
         if (filename === 'index.html') return loadHTML()
-        if (filename === 'license.txt') return loadLicense()
+        if (filename === 'license.txt') return loadLicence()
         return ''
       },
     )
@@ -784,7 +784,7 @@ describe('ExposureDetail', () => {
   })
 
   describe('licence loading', () => {
-    const LICENSE_FALLBACK_MESSAGE =
+    const LICENCE_FALLBACK_MESSAGE =
       'Licence information could not be loaded, showing default licence.'
 
     const findLicenceSection = (wrapper: Awaited<ReturnType<typeof mountComponent>>) =>
@@ -799,7 +799,7 @@ describe('ExposureDetail', () => {
 
     it('shows the licence declared by the exposure', async () => {
       const wrapper = await mountComponent({
-        loadLicense: async () => 'https://creativecommons.org/licenses/by/4.0/',
+        loadLicence: async () => 'https://creativecommons.org/licenses/by/4.0/',
       })
 
       const section = findLicenceSection(wrapper)
@@ -812,7 +812,7 @@ describe('ExposureDetail', () => {
     })
 
     it('shows a skeleton instead of the default licence while the licence is loading', async () => {
-      const wrapper = await mountComponent({ loadLicense: () => new Promise<string>(() => {}) })
+      const wrapper = await mountComponent({ loadLicence: () => new Promise<string>(() => {}) })
 
       const section = findLicenceSection(wrapper)
       expect(section?.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
@@ -822,7 +822,7 @@ describe('ExposureDetail', () => {
 
     it('falls back to the default licence when the declared licence is empty', async () => {
       const wrapper = await mountComponent({
-        loadLicense: async () => '  \n',
+        loadLicence: async () => '  \n',
       })
 
       const section = findLicenceSection(wrapper)
@@ -847,7 +847,7 @@ describe('ExposureDetail', () => {
     it('shows the default licence with an info tooltip when the licence fails to load', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const wrapper = await mountComponent({
-        loadLicense: () => Promise.reject(new Error('Licence failed')),
+        loadLicence: () => Promise.reject(new Error('Licence failed')),
       })
 
       const section = findLicenceSection(wrapper)
@@ -858,7 +858,7 @@ describe('ExposureDetail', () => {
 
       const infoButton = section?.find('button')
       expect(infoButton?.exists()).toBe(true)
-      expect(infoButton?.attributes('aria-label')).toBe(LICENSE_FALLBACK_MESSAGE)
+      expect(infoButton?.attributes('aria-label')).toBe(LICENCE_FALLBACK_MESSAGE)
 
       const tooltip = wrapper.findComponent({ name: 'Tooltip' })
       expect(tooltip.props('visible')).toBe(false)
@@ -866,7 +866,7 @@ describe('ExposureDetail', () => {
       await infoButton?.trigger('mouseenter')
       expect(tooltip.props('visible')).toBe(true)
       // The tooltip is teleported to the document body.
-      expect(document.body.textContent).toContain(LICENSE_FALLBACK_MESSAGE)
+      expect(document.body.textContent).toContain(LICENCE_FALLBACK_MESSAGE)
 
       await infoButton?.trigger('mouseleave')
       expect(tooltip.props('visible')).toBe(false)

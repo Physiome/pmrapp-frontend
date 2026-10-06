@@ -26,8 +26,8 @@ import { useBackNavigation } from '@/composables/useBackNavigation'
 import {
   AVAILABLE_VIEWS,
   CODEGEN_LANGUAGES,
-  DEFAULT_LICENSE,
-  LICENSE_FALLBACK_MESSAGE,
+  DEFAULT_LICENCE,
+  LICENCE_FALLBACK_MESSAGE,
 } from '@/constants/exposure'
 import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
@@ -47,7 +47,7 @@ import {
 import { getFileExtension, isOpenCORFile } from '@/utils/file'
 import { formatYear } from '@/utils/format'
 import { markHtmlImagesLoaded, prepareHtmlImages } from '@/utils/html'
-import { formatLicenseUrl } from '@/utils/license'
+import { formatLicenceUrl } from '@/utils/licence'
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer'
 import { buildSearchQuery, isValidTerm } from '@/utils/search'
 
@@ -98,7 +98,7 @@ const mathsJSON = computed<[string, string[]][]>(() => {
 })
 const metadataJSON = ref<Metadata>({})
 const htmlViewRef = ref<HTMLElement | null>(null)
-const licenseInfo = ref<string>(DEFAULT_LICENSE)
+const licenceInfo = ref<string>(DEFAULT_LICENCE)
 const availableViews = ref<ViewEntry[]>([])
 const isCitationDetailsOpen = ref(false)
 const hasOtherRelatedModels = ref(false)
@@ -110,10 +110,10 @@ const isViewLoading = ref(false)
 const viewError = ref<ErrorInfo | null>(null)
 const isMetadataLoading = ref(false)
 const metadataError = ref<ErrorInfo | null>(null)
-const isLicenseLoading = ref(false)
-const licenseError = ref(false)
-const isLicenseTooltipVisible = ref(false)
-const licenseInfoIconRef = ref<HTMLElement | null>(null)
+const isLicenceLoading = ref(false)
+const licenceError = ref(false)
+const isLicenceTooltipVisible = ref(false)
+const licenceInfoIconRef = ref<HTMLElement | null>(null)
 // Incremented whenever a new file or view load starts, so that stale responses can be ignored.
 let fileLoadToken = 0
 let viewLoadToken = 0
@@ -675,9 +675,9 @@ const resetState = () => {
   isFileNotFound.value = false
   isViewNotFound.value = false
   isLangNotFound.value = false
-  licenseInfo.value = DEFAULT_LICENSE
-  isLicenseLoading.value = false
-  licenseError.value = false
+  licenceInfo.value = DEFAULT_LICENCE
+  isLicenceLoading.value = false
+  licenceError.value = false
   metadataError.value = null
   metadataJSON.value = {}
   rawMathsData.value = []
@@ -762,31 +762,31 @@ const loadMetadata = async (token: number) => {
   }
 }
 
-const loadLicense = async (exposureFileIdForLicense: number, token: number) => {
+const loadLicence = async (exposureFileIdForLicence: number, token: number) => {
   // The file declares its own licence, so don't show the default while it loads.
   // If loading fails, fall back to the default and flag it so the UI can explain why.
-  licenseInfo.value = ''
-  licenseError.value = false
-  isLicenseLoading.value = true
+  licenceInfo.value = ''
+  licenceError.value = false
+  isLicenceLoading.value = true
 
   try {
-    const license = await exposureStore.getExposureSafeHTML(
+    const licence = await exposureStore.getExposureSafeHTML(
       exposureId.value,
-      exposureFileIdForLicense,
+      exposureFileIdForLicence,
       'license_citation',
       'license.txt',
       routePath,
     )
     if (!isCurrentFileLoad(token)) return
-    licenseInfo.value = license.trim() || DEFAULT_LICENSE
+    licenceInfo.value = licence.trim() || DEFAULT_LICENCE
   } catch (err) {
     if (!isCurrentFileLoad(token)) return
-    licenseInfo.value = DEFAULT_LICENSE
-    licenseError.value = true
+    licenceInfo.value = DEFAULT_LICENCE
+    licenceError.value = true
     console.error('Error loading exposure licence:', err)
   } finally {
     if (isCurrentFileLoad(token)) {
-      isLicenseLoading.value = false
+      isLicenceLoading.value = false
     }
   }
 }
@@ -833,7 +833,7 @@ const loadInitialView = async () => {
   exposureId.value = fileWithViews.exposure_id
 
   const viewEntry = fileWithViews.views.find((v) => v.view_key === 'view')
-  const licenseEntry = fileWithViews.views.find((v) => v.view_key === 'license_citation')
+  const licenceEntry = fileWithViews.views.find((v) => v.view_key === 'license_citation')
   const metaEntry = fileWithViews.views.find((v) => v.view_key === 'cellml_metadata')
 
   if (viewEntry) {
@@ -843,7 +843,7 @@ const loadInitialView = async () => {
   // Load each area independently so that one slow request does not block the others.
   await Promise.allSettled([
     metaEntry ? loadMetadata(token) : checkOtherRelatedModels(token),
-    licenseEntry ? loadLicense(licenseEntry.exposure_file_id, token) : Promise.resolve(),
+    licenceEntry ? loadLicence(licenceEntry.exposure_file_id, token) : Promise.resolve(),
     loadCurrentView(),
   ])
 }
@@ -1373,27 +1373,27 @@ onMounted(async () => {
       </section>
       <section class="pt-6 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-lg font-semibold mb-3">Licence</h4>
-        <SkeletonBlock v-if="isLicenseLoading" :lines="1" />
-        <nav v-else-if="licenseInfo">
+        <SkeletonBlock v-if="isLicenceLoading" :lines="1" />
+        <nav v-else-if="licenceInfo">
           <ul class="space-y-2">
             <li class="text-sm flex items-center gap-1.5">
-              <a :href="licenseInfo" class="text-link" target="_blank" rel="noopener noreferrer">
-                {{ formatLicenseUrl(licenseInfo) }}
+              <a :href="licenceInfo" class="text-link" target="_blank" rel="noopener noreferrer">
+                {{ formatLicenceUrl(licenceInfo) }}
               </a>
               <button
-                v-if="licenseError"
-                ref="licenseInfoIconRef"
+                v-if="licenceError"
+                ref="licenceInfoIconRef"
                 type="button"
                 class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                :aria-label="LICENSE_FALLBACK_MESSAGE"
-                @mouseenter="isLicenseTooltipVisible = true"
-                @mouseleave="isLicenseTooltipVisible = false"
-                @focus="isLicenseTooltipVisible = true"
-                @blur="isLicenseTooltipVisible = false"
+                :aria-label="LICENCE_FALLBACK_MESSAGE"
+                @mouseenter="isLicenceTooltipVisible = true"
+                @mouseleave="isLicenceTooltipVisible = false"
+                @focus="isLicenceTooltipVisible = true"
+                @blur="isLicenceTooltipVisible = false"
               >
                 <InfoIcon class="w-4 h-4" />
-                <Tooltip :visible="isLicenseTooltipVisible" :anchor-el="licenseInfoIconRef">
-                  {{ LICENSE_FALLBACK_MESSAGE }}
+                <Tooltip :visible="isLicenceTooltipVisible" :anchor-el="licenceInfoIconRef">
+                  {{ LICENCE_FALLBACK_MESSAGE }}
                 </Tooltip>
               </button>
             </li>
