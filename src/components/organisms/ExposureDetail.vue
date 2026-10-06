@@ -23,7 +23,12 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import WarningBlock from '@/components/molecules/WarningBlock.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
-import { AVAILABLE_VIEWS, CODEGEN_LANGUAGES, DEFAULT_LICENSE, LICENSE_FALLBACK_MESSAGE } from '@/constants/exposure'
+import {
+  AVAILABLE_VIEWS,
+  CODEGEN_LANGUAGES,
+  DEFAULT_LICENSE,
+  LICENSE_FALLBACK_MESSAGE,
+} from '@/constants/exposure'
 import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
