@@ -19,15 +19,15 @@ const LICENCE_NAMES: LicenceMap = {
   'creativecommons.org/licenses/by-nc-sa/4.0': 'CC BY-NC-SA 4.0',
   'creativecommons.org/licenses/by-nc-nd/3.0': 'CC BY-NC-ND 3.0',
   'creativecommons.org/licenses/by-nc-nd/4.0': 'CC BY-NC-ND 4.0',
-  'opensource.org/licenses/MIT': 'MIT Licence',
-  'opensource.org/licenses/Apache-2.0': 'Apache Licence 2.0',
+  'opensource.org/licenses/MIT': 'MIT License',
+  'opensource.org/licenses/Apache-2.0': 'Apache License 2.0',
   'gnu.org/licenses/gpl-3.0': 'GPL 3.0',
   'gnu.org/licenses/gpl-2.0': 'GPL 2.0',
   'gnu.org/licenses/lgpl-3.0': 'LGPL 3.0',
   'gnu.org/licenses/lgpl-2.0': 'LGPL 2.0',
   'gnu.org/licenses/agpl-3.0': 'AGPL 3.0',
-  'opensource.org/licenses/BSD-2-Clause': 'BSD 2-Clause Licence',
-  'opensource.org/licenses/BSD-3-Clause': 'BSD 3-Clause Licence',
+  'opensource.org/licenses/BSD-2-Clause': 'BSD 2-Clause License',
+  'opensource.org/licenses/BSD-3-Clause': 'BSD 3-Clause License',
 }
 
 /**
