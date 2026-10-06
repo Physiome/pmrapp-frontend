@@ -1,5 +1,5 @@
-import { defineConfig } from 'cypress'
 import fs from 'node:fs'
+import { defineConfig } from 'cypress'
 import { loadEnv } from 'vite'
 
 const basePath = loadEnv('', process.cwd(), 'VITE_').VITE_BASE_PATH || '/'
