@@ -9,14 +9,13 @@ import CopyButton from '@/components/atoms/CopyButton.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue'
 import TermButton from '@/components/atoms/TermButton.vue'
-import Tooltip from '@/components/atoms/Tooltip.vue'
 import WrapButton from '@/components/atoms/WrapButton.vue'
 import BugIcon from '@/components/icons/BugIcon.vue'
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
-import InfoIcon from '@/components/icons/InfoIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
+import WarningIcon from '@/components/icons/WarningIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
@@ -27,7 +26,7 @@ import {
   AVAILABLE_VIEWS,
   CODEGEN_LANGUAGES,
   DEFAULT_LICENCE,
-  LICENCE_FALLBACK_MESSAGE,
+  LICENCE_ERROR_MESSAGE,
 } from '@/constants/exposure'
 import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
@@ -112,8 +111,6 @@ const isMetadataLoading = ref(false)
 const metadataError = ref<ErrorInfo | null>(null)
 const isLicenceLoading = ref(false)
 const licenceError = ref(false)
-const isLicenceTooltipVisible = ref(false)
-const licenceInfoIconRef = ref<HTMLElement | null>(null)
 // Incremented whenever a new file or view load starts, so that stale responses can be ignored.
 let fileLoadToken = 0
 let viewLoadToken = 0
@@ -764,7 +761,7 @@ const loadMetadata = async (token: number) => {
 
 const loadLicence = async (exposureFileIdForLicence: number, token: number) => {
   // The file declares its own licence, so don't show the default while it loads.
-  // If loading fails, fall back to the default and flag it so the UI can explain why.
+  // If loading fails, show an error message instead of the default.
   licenceInfo.value = ''
   licenceError.value = false
   isLicenceLoading.value = true
@@ -781,7 +778,6 @@ const loadLicence = async (exposureFileIdForLicence: number, token: number) => {
     licenceInfo.value = licence.trim() || DEFAULT_LICENCE
   } catch (err) {
     if (!isCurrentFileLoad(token)) return
-    licenceInfo.value = DEFAULT_LICENCE
     licenceError.value = true
     console.error('Error loading exposure licence:', err)
   } finally {
@@ -1374,28 +1370,19 @@ onMounted(async () => {
       <section class="pt-6 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-lg font-semibold mb-3">Licence</h4>
         <SkeletonBlock v-if="isLicenceLoading" :lines="1" />
+        <p
+          v-else-if="licenceError"
+          class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5"
+        >
+          <WarningIcon class="w-4 h-4 shrink-0" aria-hidden="true" />
+          {{ LICENCE_ERROR_MESSAGE }}
+        </p>
         <nav v-else-if="licenceInfo">
           <ul class="space-y-2">
-            <li class="text-sm flex items-center gap-1.5">
+            <li class="text-sm">
               <a :href="licenceInfo" class="text-link" target="_blank" rel="noopener noreferrer">
                 {{ formatLicenceUrl(licenceInfo) }}
               </a>
-              <button
-                v-if="licenceError"
-                ref="licenceInfoIconRef"
-                type="button"
-                class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                :aria-label="LICENCE_FALLBACK_MESSAGE"
-                @mouseenter="isLicenceTooltipVisible = true"
-                @mouseleave="isLicenceTooltipVisible = false"
-                @focus="isLicenceTooltipVisible = true"
-                @blur="isLicenceTooltipVisible = false"
-              >
-                <InfoIcon class="w-4 h-4" />
-                <Tooltip :visible="isLicenceTooltipVisible" :anchor-el="licenceInfoIconRef">
-                  {{ LICENCE_FALLBACK_MESSAGE }}
-                </Tooltip>
-              </button>
             </li>
           </ul>
         </nav>

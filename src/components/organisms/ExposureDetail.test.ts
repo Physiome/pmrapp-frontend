@@ -784,8 +784,7 @@ describe('ExposureDetail', () => {
   })
 
   describe('licence loading', () => {
-    const LICENCE_FALLBACK_MESSAGE =
-      'Licence information could not be loaded, showing default licence.'
+    const LICENCE_ERROR_MESSAGE = 'Licence information could not be loaded.'
 
     const findLicenceSection = (wrapper: Awaited<ReturnType<typeof mountComponent>>) =>
       wrapper
@@ -844,35 +843,16 @@ describe('ExposureDetail', () => {
       expect(section?.find('button').exists()).toBe(false)
     })
 
-    it('shows the default licence with an info tooltip when the licence fails to load', async () => {
+    it('shows an error message instead of the default licence when the licence fails to load', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const wrapper = await mountComponent({
         loadLicence: () => Promise.reject(new Error('Licence failed')),
       })
 
       const section = findLicenceSection(wrapper)
-      expect(section?.find('a').attributes('href')).toBe(
-        'https://creativecommons.org/licenses/by/3.0/',
-      )
-      expect(section?.text()).toContain('CC BY 3.0')
-
-      const infoButton = section?.find('button')
-      expect(infoButton?.exists()).toBe(true)
-      expect(infoButton?.attributes('aria-label')).toBe(LICENCE_FALLBACK_MESSAGE)
-
-      const tooltip = wrapper.findComponent({ name: 'Tooltip' })
-      expect(tooltip.props('visible')).toBe(false)
-
-      await infoButton?.trigger('mouseenter')
-      expect(tooltip.props('visible')).toBe(true)
-      // The tooltip is teleported to the document body.
-      expect(document.body.textContent).toContain(LICENCE_FALLBACK_MESSAGE)
-
-      await infoButton?.trigger('mouseleave')
-      expect(tooltip.props('visible')).toBe(false)
-
-      await infoButton?.trigger('focus')
-      expect(tooltip.props('visible')).toBe(true)
+      expect(section?.text()).toContain(LICENCE_ERROR_MESSAGE)
+      expect(section?.find('a').exists()).toBe(false)
+      expect(section?.text()).not.toContain('CC BY 3.0')
 
       // The rest of the page is unaffected by the licence failure.
       expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
