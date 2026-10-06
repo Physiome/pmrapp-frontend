@@ -1129,7 +1129,7 @@ describe('ExposureDetail', () => {
 
       const img = wrapper.find('.html-view img')
       expect(img.attributes('loading')).toBe('lazy')
-      expect(img.attributes('data-img-loading')).toBeDefined()
+      expect(wrapper.find('.html-view .img-frame').attributes('data-img-loading')).toBeDefined()
     })
   })
 })

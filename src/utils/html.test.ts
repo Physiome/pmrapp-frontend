@@ -20,15 +20,19 @@ describe('prepareHtmlImages', () => {
     expect(result).toContain('data-img-loading')
   })
 
-  it('marks images without dimensions as loading', () => {
+  it('wraps images in a loading frame', () => {
     const result = prepareHtmlImages('<img src="a.png">')
-    expect(result).toContain('data-img-loading')
+    expect(result).toBe(
+      '<span class="img-frame" data-img-loading="" data-img-unsized="">' +
+        '<img src="a.png" loading="lazy" decoding="async"></span>',
+    )
   })
 
-  it('does not mark images that already have dimensions', () => {
+  it('does not mark frames of images that already have dimensions as unsized', () => {
     const result = prepareHtmlImages('<img src="a.png" width="10">')
     expect(result).toContain('width="10"')
-    expect(result).not.toContain('data-img-loading')
+    expect(result).toContain('data-img-loading')
+    expect(result).not.toContain('data-img-unsized')
   })
 
   it('keeps existing loading and decoding attributes', () => {
@@ -51,19 +55,20 @@ describe('markHtmlImagesLoaded', () => {
     return img
   }
 
-  it('removes the loading marker when the image loads', () => {
+  it('removes the loading marker from the frame when the image loads', () => {
     const container = createContainer()
     markHtmlImagesLoaded(container)
 
     const img = getImage(container)
-    expect(img.hasAttribute('data-img-loading')).toBe(true)
+    const frame = container.querySelector('.img-frame')
+    expect(frame?.hasAttribute('data-img-loading')).toBe(true)
 
     img.dispatchEvent(new Event('load'))
-    expect(img.hasAttribute('data-img-loading')).toBe(false)
+    expect(frame?.hasAttribute('data-img-loading')).toBe(false)
     expect(container.querySelector('.img-fallback')).toBeNull()
   })
 
-  it('replaces the image with a placeholder when it fails to load', () => {
+  it('replaces the image frame with a placeholder when it fails to load', () => {
     const container = createContainer()
     markHtmlImagesLoaded(container)
 
@@ -71,6 +76,7 @@ describe('markHtmlImagesLoaded', () => {
 
     const fallback = container.querySelector('.img-fallback')
     expect(container.querySelector('img')).toBeNull()
+    expect(container.querySelector('.img-frame')).toBeNull()
     expect(fallback?.getAttribute('role')).toBe('img')
     expect(fallback?.getAttribute('aria-label')).toBe('Image not available')
     expect(fallback?.querySelector('.img-fallback-name')?.textContent).toBe('a.png')

@@ -1446,10 +1446,30 @@ onMounted(async () => {
     @apply max-w-full h-auto mx-auto bg-white p-2 transition-opacity duration-300;
   }
 
-  /* Placeholder for images without dimensions until they load. */
-  & :deep(img[data-img-loading]) {
-    @apply block w-full max-w-md min-h-48 opacity-60 rounded bg-gray-200 dark:bg-gray-700 animate-pulse;
+  /*
+   * Images are wrapped in a frame that shows a placeholder and hides the image
+   * until it has fully loaded, then fades the image in over the placeholder.
+   */
+  & :deep(.img-frame) {
+    @apply block w-fit max-w-full mx-auto rounded transition-colors duration-300;
+  }
+
+  & :deep(.img-frame[data-img-loading]) {
+    @apply bg-gray-200 dark:bg-gray-700 animate-pulse;
+  }
+
+  & :deep(.img-frame[data-img-loading] img) {
+    @apply opacity-0;
+  }
+
+  /* Default placeholder size for images without dimensions. */
+  & :deep(.img-frame[data-img-loading][data-img-unsized]) {
+    @apply relative w-full max-w-md min-h-48;
     aspect-ratio: 4 / 3;
+  }
+
+  & :deep(.img-frame[data-img-loading][data-img-unsized] img) {
+    @apply absolute inset-0 w-full h-full;
   }
 
   & :deep(.img-fallback) {

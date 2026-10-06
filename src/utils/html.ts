@@ -1,4 +1,6 @@
 const IMAGE_LOADING_ATTR = 'data-img-loading'
+const IMAGE_UNSIZED_ATTR = 'data-img-unsized'
+const IMAGE_FRAME_CLASS = 'img-frame'
 const IMAGE_FALLBACK_CLASS = 'img-fallback'
 const IMAGE_FALLBACK_TEXT = 'Image not available'
 const SVG_NS = 'http://www.w3.org/2000/svg'
@@ -6,9 +8,11 @@ const SVG_NS = 'http://www.w3.org/2000/svg'
 /**
  * Prepares `<img>` elements for progressive loading.
  * (Tag names are case-insensitive, so `<IMG>` must also be matched.)
- * All images are lazy-loaded and decoded asynchronously,
- * and images without width and height are marked
- * so that a placeholder can be shown until they load.
+ * All images are lazy-loaded and decoded asynchronously, and wrapped in a frame
+ * that shows a placeholder and hides the image until it has fully loaded,
+ * so partially downloaded (e.g. progressive) images are never shown.
+ * Frames of images without width and height are marked
+ * so that the placeholder can be given a default size.
  */
 export function prepareHtmlImages(html: string): string {
   if (!/<img\b/i.test(html)) return html
@@ -21,9 +25,15 @@ export function prepareHtmlImages(html: string): string {
   images.forEach((img) => {
     if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy')
     if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async')
+
+    const frame = doc.createElement('span')
+    frame.className = IMAGE_FRAME_CLASS
+    frame.setAttribute(IMAGE_LOADING_ATTR, '')
     if (!img.hasAttribute('width') && !img.hasAttribute('height')) {
-      img.setAttribute(IMAGE_LOADING_ATTR, '')
+      frame.setAttribute(IMAGE_UNSIZED_ATTR, '')
     }
+    img.replaceWith(frame)
+    frame.appendChild(img)
   })
 
   return doc.body.innerHTML
@@ -90,16 +100,17 @@ function createImageFallback(img: HTMLImageElement): HTMLElement {
 }
 
 /**
- * Removes the placeholder marker from images prepared by `prepareHtmlImages`
- * once they have loaded, and replaces images that fail to load
- * with an accessible "Image not available" placeholder.
+ * Removes the loading marker from the frames of images prepared by `prepareHtmlImages`
+ * once they have fully loaded, which fades the image in over the placeholder,
+ * and replaces images that fail to load with an accessible "Image not available" placeholder.
  */
 export function markHtmlImagesLoaded(container: HTMLElement): void {
   const images = container.querySelectorAll<HTMLImageElement>('img[src]')
 
   images.forEach((img) => {
-    const handleLoad = () => img.removeAttribute(IMAGE_LOADING_ATTR)
-    const handleError = () => img.replaceWith(createImageFallback(img))
+    const frame = img.parentElement?.classList.contains(IMAGE_FRAME_CLASS) ? img.parentElement : img
+    const handleLoad = () => frame.removeAttribute(IMAGE_LOADING_ATTR)
+    const handleError = () => frame.replaceWith(createImageFallback(img))
 
     if (img.complete) {
       // The load or error event has already fired, so check the result directly.
