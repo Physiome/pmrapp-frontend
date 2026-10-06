@@ -34,7 +34,7 @@ export function prepareHtmlImages(html: string): string {
  * and sources without a usable path.
  */
 function getImageFileName(src: string): string {
-  if (!src || src.startsWith('data:')) return ''
+  if (!src || /^\s*data:/i.test(src)) return ''
 
   try {
     const { pathname } = new URL(src, window.location.href)

@@ -88,6 +88,23 @@ describe('markHtmlImagesLoaded', () => {
     expect(fallback?.textContent).toContain('Image not available: Model diagram')
   })
 
+  it.each(['data:image/png;base64,AAAA', 'DATA:image/png;base64,AAAA', ' Data:image/png;base64,AAAA'])(
+    'omits the file name for data URI %s',
+    (src) => {
+      const container = document.createElement('div')
+      const img = document.createElement('img')
+      img.setAttribute('src', src)
+      container.appendChild(img)
+      markHtmlImagesLoaded(container)
+
+      img.dispatchEvent(new Event('error'))
+
+      expect(container.querySelector('.img-fallback')).not.toBeNull()
+      expect(container.querySelector('.img-fallback-name')).toBeNull()
+      expect(container.textContent).not.toContain('AAAA')
+    },
+  )
+
   it('does not render user data as HTML in the placeholder', () => {
     const container = document.createElement('div')
     const img = document.createElement('img')
