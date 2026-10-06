@@ -1091,7 +1091,7 @@ onMounted(async () => {
       </div>
 
       <div v-else-if="detailHTML" class="box">
-        <div ref="htmlViewRef" v-html="detailHTML" class="html-view"></div>
+        <div ref="htmlViewRef" v-html="detailHTML" class="html-view html-images"></div>
       </div>
 
       <WorkspaceFileBrowser
@@ -1391,6 +1391,10 @@ onMounted(async () => {
   </div>
 </template>
 
+<style>
+@import '@/assets/html-images.css';
+</style>
+
 <style scoped>
 @import '@/assets/text-link.css';
 @import '@/assets/box.css';
@@ -1440,48 +1444,6 @@ onMounted(async () => {
 
   & :deep(dt) {
     @apply font-semibold;
-  }
-
-  & :deep(img) {
-    @apply max-w-full h-auto mx-auto bg-white p-2 transition-opacity duration-300;
-  }
-
-  /*
-   * Images are wrapped in a frame that shows a placeholder and hides the image
-   * until it has fully loaded, then fades the image in over the placeholder.
-   */
-  & :deep(.img-frame) {
-    @apply block w-fit max-w-full mx-auto rounded transition-colors duration-300;
-  }
-
-  & :deep(.img-frame[data-img-loading]) {
-    @apply bg-gray-200 dark:bg-gray-700 animate-pulse;
-  }
-
-  & :deep(.img-frame[data-img-loading] img) {
-    @apply opacity-0;
-  }
-
-  /* Default placeholder size for images without dimensions. */
-  & :deep(.img-frame[data-img-loading][data-img-unsized]) {
-    @apply relative w-full max-w-md min-h-48;
-    aspect-ratio: 4 / 3;
-  }
-
-  & :deep(.img-frame[data-img-loading][data-img-unsized] img) {
-    @apply absolute inset-0 w-full h-full;
-  }
-
-  & :deep(.img-fallback) {
-    @apply flex flex-col items-center justify-center gap-2 mx-auto my-2 w-full max-w-md min-h-32 p-4 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-sm text-center text-gray-500 dark:text-gray-400;
-  }
-
-  & :deep(.img-fallback-icon) {
-    @apply w-8 h-8;
-  }
-
-  & :deep(.img-fallback-name) {
-    @apply max-w-full truncate text-xs text-gray-400 dark:text-gray-500;
   }
 
   & :deep(table) {

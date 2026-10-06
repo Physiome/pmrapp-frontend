@@ -13,6 +13,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg'
  * so partially downloaded (e.g. progressive) images are never shown.
  * Frames of images without width and height are marked
  * so that the placeholder can be given a default size.
+ * Styles: `src/assets/html-images.css` (apply the `html-images` class to the container).
  */
 export function prepareHtmlImages(html: string): string {
   if (!/<img\b/i.test(html)) return html

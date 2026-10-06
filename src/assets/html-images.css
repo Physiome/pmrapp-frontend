@@ -1,0 +1,52 @@
+@reference "tailwindcss";
+@reference "./main.css";
+
+/*
+ * Styles for images in HTML prepared by `prepareHtmlImages` and `markHtmlImagesLoaded`
+ * in `src/utils/html.ts`; keep the class and attribute names in sync with it.
+ * Apply the `html-images` class to the container the HTML is rendered into.
+ */
+.html-images {
+  & img {
+    @apply max-w-full h-auto mx-auto bg-white p-2 transition-opacity duration-300;
+  }
+
+  /*
+   * Images are wrapped in a frame that shows a placeholder and hides the image
+   * until it has fully loaded, then fades the image in over the placeholder.
+   */
+  & .img-frame {
+    @apply block w-fit max-w-full mx-auto rounded transition-colors duration-300;
+  }
+
+  & .img-frame[data-img-loading] {
+    @apply bg-gray-200 dark:bg-gray-700 animate-pulse;
+  }
+
+  & .img-frame[data-img-loading] img {
+    @apply opacity-0;
+  }
+
+  /* Default placeholder size for images without dimensions. */
+  & .img-frame[data-img-loading][data-img-unsized] {
+    @apply relative w-full max-w-md min-h-48;
+    aspect-ratio: 4 / 3;
+  }
+
+  & .img-frame[data-img-loading][data-img-unsized] img {
+    @apply absolute inset-0 w-full h-full;
+  }
+
+  /* Accessible placeholder for images that failed to load. */
+  & .img-fallback {
+    @apply flex flex-col items-center justify-center gap-2 mx-auto my-2 w-full max-w-md min-h-32 p-4 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-sm text-center text-gray-500 dark:text-gray-400;
+  }
+
+  & .img-fallback-icon {
+    @apply w-8 h-8;
+  }
+
+  & .img-fallback-name {
+    @apply max-w-full truncate text-xs text-gray-400 dark:text-gray-500;
+  }
+}
