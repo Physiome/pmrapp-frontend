@@ -8,7 +8,7 @@
  */
 .html-images {
   & img {
-    @apply max-w-full h-auto mx-auto bg-white p-2 transition-opacity duration-300;
+    @apply max-w-full h-auto mx-auto transition-opacity duration-300;
   }
 
   /*
@@ -16,7 +16,7 @@
    * until it has fully loaded, then fades the image in over the placeholder.
    */
   & .img-frame {
-    @apply block w-fit max-w-full mx-auto rounded transition-colors duration-300;
+    @apply block w-fit max-w-full mx-auto p-2 bg-white transition-colors duration-300;
   }
 
   & .img-frame[data-img-loading] {
