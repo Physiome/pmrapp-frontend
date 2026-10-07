@@ -77,15 +77,15 @@ Build output is generated in `dist/`.
 
 The app is a single-page application: the build output (`dist/`) only contains `index.html`, the compiled assets, and the files copied from `public/`. There are **no** physical files or folders on the server for application routes such as:
 
-- `/exposures` — the exposures listing page
-- `/exposures/4e4` — a specific exposure's detail page
-- `/workspaces/baylor_hollingworth_chandler_2002` — a specific workspace's detail page
+- `/exposure` — the exposures listing page
+- `/exposure/4e4` — a specific exposure's detail page
+- `/workspace/baylor_hollingworth_chandler_2002` — a specific workspace's detail page
 
 Once the browser has loaded `index.html`, the Vue Router (see [src/router/index.ts](src/router/index.ts)) decides which page to render. But if a user opens one of these URLs directly or refreshes the page, the server receives a request for a path that doesn't exist on disk and would normally respond with 404.
 
 **Therefore the hosting platform must return `index.html` for any request that doesn't match a real file** — commonly known as an "SPA fallback" (or "history-mode rewrite"). Worked examples for Nginx, CloudFront, and other hosts are given in the [Deployment Patterns](#deployment-patterns) section.
 
-Without this fallback, refreshing a deep link such as `/exposures/4e4` returns 404.
+Without this fallback, refreshing a deep link such as `/exposure/4e4` returns 404.
 
 ## Deployment Patterns
 
@@ -184,7 +184,7 @@ Before using it for live deployment, replace the placeholder step with your prov
 - Build succeeds with Bun.
 - `bun run build` fails with a clear message when a required variable is missing or invalid (verify by unsetting one and rebuilding).
 - `/` loads correctly on the production domain.
-- Deep-link refresh works (e.g., `/workspaces/...` doesn't return 404).
+- Deep-link refresh works (e.g., `/workspace/...` doesn't return 404).
 - API requests resolve to production backend URLs.
 - OAuth callback and login flow work.
 - Optional analytics loads, when configured.
