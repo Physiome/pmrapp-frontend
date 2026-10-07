@@ -17,7 +17,7 @@ import WorkspaceView from '@/views/WorkspaceView.vue'
 
 import {
   createAliases,
-  createPluralRouteAliases,
+  createRouteAliases,
   workspaceAliasBases,
   workspaceDetailRouteSuffixes,
   workspaceFileRouteSuffixes,
@@ -50,93 +50,78 @@ const router = createRouter({
       meta: { title: TITLE },
     },
     {
-      path: '/workspaces',
+      path: '/workspace',
       name: 'workspaces',
       component: WorkspaceView,
+      alias: createAliases(workspaceAliasBases, ''),
       meta: { title: `Workspaces – ${TITLE}` },
     },
     {
-      path: '/workspaces/:alias',
+      path: '/workspace/:alias',
       name: 'workspace-detail',
       component: WorkspaceDetailView,
-      alias: createPluralRouteAliases(
-        '/workspaces',
-        workspaceAliasBases,
-        workspaceDetailRouteSuffixes,
-      ),
+      alias: createRouteAliases('/workspace', workspaceAliasBases, workspaceDetailRouteSuffixes),
       meta: { title: `Workspace Detail – ${TITLE}` },
     },
     {
-      path: '/workspaces/:alias/file/:commitId',
+      path: '/workspace/:alias/file/:commitId',
       name: 'workspace-detail-alias-commit',
       component: WorkspaceDetailView,
-      alias: createPluralRouteAliases(
-        '/workspaces',
-        workspaceAliasBases,
-        workspaceDetailCommitSuffixes,
-      ),
+      alias: createRouteAliases('/workspace', workspaceAliasBases, workspaceDetailCommitSuffixes),
       meta: { title: `Workspace Detail – ${TITLE}` },
     },
     {
-      path: '/workspaces/:alias/file/:commitId/:path(.+)',
+      path: '/workspace/:alias/file/:commitId/:path(.+)',
       name: 'workspace-file-detail',
       component: WorkspaceDetailView,
-      alias: createPluralRouteAliases(
-        '/workspaces',
-        workspaceAliasBases,
-        workspaceFileRouteSuffixes,
-      ),
+      alias: createRouteAliases('/workspace', workspaceAliasBases, workspaceFileRouteSuffixes),
       meta: { title: `Workspace File – ${TITLE}` },
     },
     {
-      path: '/exposures',
+      path: '/exposure',
       name: 'exposures',
       component: ExposureView,
       alias: createAliases(exposureAliasBases, ''),
       meta: { title: `Exposures – ${TITLE}` },
     },
     {
-      path: '/exposures/:alias',
+      path: '/exposure/:alias',
       name: 'exposure-detail',
       component: ExposureDetailView,
-      alias: createPluralRouteAliases(
-        '/exposures',
-        exposureAliasBases,
-        exposureDetailRouteSuffixes,
-      ),
+      alias: createRouteAliases('/exposure', exposureAliasBases, exposureDetailRouteSuffixes),
       meta: { title: `Exposure Detail – ${TITLE}` },
     },
     {
-      path: '/exposures/:alias/:file(.+)/:view([^./]+)/:lang([^./]+)',
+      path: '/exposure/:alias/:file(.+)/:view([^./]+)/:lang([^./]+)',
       name: 'exposure-file-detail-view-lang',
       component: ExposureDetailView,
       // biome-ignore format: keep the formatting for readability
-      alias: createPluralRouteAliases(
-        '/exposures',
+      alias: createRouteAliases(
+        '/exposure',
         exposureAliasBases,
         exposureFileViewLangRouteSuffixes
       ),
       meta: { title: `Exposure File – ${TITLE}` },
     },
     {
-      path: '/exposures/:alias/:file(.+)/:view([^./]+)',
+      path: '/exposure/:alias/:file(.+)/:view([^./]+)',
       name: 'exposure-file-detail-view',
       component: ExposureDetailView,
       // biome-ignore format: keep the formatting for readability
-      alias: createPluralRouteAliases(
-        '/exposures',
+      alias: createRouteAliases(
+        '/exposure',
         exposureAliasBases,
         exposureFileViewRouteSuffixes
       ),
       meta: { title: `Exposure File – ${TITLE}` },
     },
     {
-      path: '/exposures/:alias/:file(.+)',
+      path: '/exposure/:alias/:file(.+)',
       name: 'exposure-file-detail',
       component: ExposureDetailView,
       // biome-ignore format: keep the formatting for readability
-      alias: createPluralRouteAliases(
-        '/exposures',
+      alias: createRouteAliases(
+        '/exposure',
         exposureAliasBases,
         exposureFileRouteSuffixes
       ),
