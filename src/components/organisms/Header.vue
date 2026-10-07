@@ -57,8 +57,8 @@ const closeMobileMenu = () => {
 }
 
 const navLinks = [
-  { path: '/exposures', label: 'Exposures' },
-  { path: '/workspaces', label: 'Workspaces' },
+  { path: '/exposure', label: 'Exposures' },
+  { path: '/workspace', label: 'Workspaces' },
 ]
 
 const isActive = (path: string) => computed(() => route.path.startsWith(path))
