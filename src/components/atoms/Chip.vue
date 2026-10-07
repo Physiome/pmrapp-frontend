@@ -1,15 +1,22 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import CloseButton from '@/components/atoms/CloseButton.vue'
 
 interface Props {
   label: string
+  category?: string
   removable?: boolean
   onRemove?: () => void
+  onClick?: () => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   removable: false,
 })
+
+const fullLabel = computed(() =>
+  props.category ? `${props.category}: ${props.label}` : props.label,
+)
 
 const transitionClasses = 'transition duration-200 ease-linear'
 
@@ -39,20 +46,29 @@ const handleRemoveChip = () => {
     props.onRemove()
   }
 }
+
+const handleClickChip = () => {
+  if (props.onClick) {
+    props.onClick()
+  }
+}
 </script>
 
 <template>
   <div
     :class="[chipClasses, removable ? 'pl-2.5 pr-1' : 'px-2.5']"
+    @click="handleClickChip"
   >
-  <span class="truncate max-w-48 group-hover/chip:opacity-75" :class="[transitionClasses]">
-    {{ label }}
+  <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
+    <span v-if="category" class="mr-1 text-gray-500 dark:text-gray-400">{{ category }}:</span>
+    <span :class="{ 'font-medium': category }">{{ label }}</span>
   </span>
-  <CloseButton
-    v-if="removable"
-    :class="closeButtonClasses"
-    @click="handleRemoveChip"
-    :aria-label="`Remove ${label}`"
-  />
+  <span v-if="removable" @click.stop>
+    <CloseButton
+      :class="closeButtonClasses"
+      @click="handleRemoveChip"
+      :aria-label="`Remove ${fullLabel}`"
+    />
+  </span>
   </div>
 </template>

@@ -1,6 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { LOGIN_DISABLED } from '@/constants/auth'
 import { TITLE } from '@/constants/global'
+import {
+  createAliases,
+  createPluralRouteAliases,
+  exposureAliasBases,
+  exposureDetailRouteSuffixes,
+  exposureFileRouteSuffixes,
+  exposureFileViewLangRouteSuffixes,
+  exposureFileViewRouteSuffixes,
+  workspaceAliasBases,
+  workspaceDetailCommitSuffixes,
+  workspaceDetailRouteSuffixes,
+  workspaceFileRouteSuffixes,
+} from '@/router/routeAliases'
+import { resolveRouteTitle } from '@/router/routeResolvers'
 import { useAuthStore } from '@/stores/auth'
 import { isJwtExpired } from '@/utils/auth'
 import { getQueryTextFromRouteQuery } from '@/utils/search'
@@ -14,21 +28,6 @@ import ProfileView from '@/views/ProfileView.vue'
 import SearchView from '@/views/SearchView.vue'
 import WorkspaceDetailView from '@/views/WorkspaceDetailView.vue'
 import WorkspaceView from '@/views/WorkspaceView.vue'
-
-import {
-  createAliases,
-  createPluralRouteAliases,
-  workspaceAliasBases,
-  workspaceDetailRouteSuffixes,
-  workspaceFileRouteSuffixes,
-  exposureAliasBases,
-  exposureDetailRouteSuffixes,
-  exposureFileRouteSuffixes,
-  exposureFileViewRouteSuffixes,
-  exposureFileViewLangRouteSuffixes,
-  workspaceDetailCommitSuffixes,
-} from '@/router/routeAliases'
-import { resolveRouteTitle } from '@/router/routeResolvers'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
