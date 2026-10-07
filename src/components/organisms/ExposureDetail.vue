@@ -7,6 +7,7 @@ import Citation from '@/components/atoms/Citation.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
+import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue'
 import TermButton from '@/components/atoms/TermButton.vue'
 import WrapButton from '@/components/atoms/WrapButton.vue'
 import BugIcon from '@/components/icons/BugIcon.vue'
@@ -14,13 +15,19 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
+import WarningIcon from '@/components/icons/WarningIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WarningBlock from '@/components/molecules/WarningBlock.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { useBackNavigation } from '@/composables/useBackNavigation'
-import { AVAILABLE_VIEWS, CODEGEN_LANGUAGES, DEFAULT_LICENSE } from '@/constants/exposure'
+import {
+  AVAILABLE_VIEWS,
+  CODEGEN_LANGUAGES,
+  DEFAULT_LICENCE,
+  LICENCE_ERROR_MESSAGE,
+} from '@/constants/exposure'
 import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
@@ -38,7 +45,8 @@ import {
 } from '@/utils/exposure'
 import { getFileExtension, isOpenCORFile } from '@/utils/file'
 import { formatYear } from '@/utils/format'
-import { formatLicenseUrl } from '@/utils/license'
+import { markHtmlImagesLoaded, prepareHtmlImages } from '@/utils/html'
+import { formatLicenceUrl } from '@/utils/licence'
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer'
 import { buildSearchQuery, isValidTerm } from '@/utils/search'
 
@@ -63,6 +71,8 @@ const isLoading = ref(true)
 const exposureId = ref<number>(NaN)
 const exposureFilePath = ref<string>(props.file)
 const exposureFileId = ref<number>(NaN)
+// The HTML view is only available when the file has a 'view' entry.
+const htmlViewFileId = ref<number>(NaN)
 const detailHTML = ref<string>('')
 const generatedCode = ref<string>('')
 const generatedCodeFilename = ref<string>('')
@@ -87,7 +97,7 @@ const mathsJSON = computed<[string, string[]][]>(() => {
 })
 const metadataJSON = ref<Metadata>({})
 const htmlViewRef = ref<HTMLElement | null>(null)
-const licenseInfo = ref<string>(DEFAULT_LICENSE)
+const licenceInfo = ref<string>(DEFAULT_LICENCE)
 const availableViews = ref<ViewEntry[]>([])
 const isCitationDetailsOpen = ref(false)
 const hasOtherRelatedModels = ref(false)
@@ -95,6 +105,15 @@ const isDownloadingCOMBINE = ref(false)
 const isFileNotFound = ref(false)
 const isViewNotFound = ref(false)
 const isLangNotFound = ref(false)
+const isViewLoading = ref(false)
+const viewError = ref<ErrorInfo | null>(null)
+const isMetadataLoading = ref(false)
+const metadataError = ref<ErrorInfo | null>(null)
+const isLicenceLoading = ref(false)
+const licenceError = ref(false)
+// Incremented whenever a new file or view load starts, so that stale responses can be ignored.
+let fileLoadToken = 0
+let viewLoadToken = 0
 
 const hasPathError = computed(
   () => isFileNotFound.value || isViewNotFound.value || isLangNotFound.value,
@@ -366,13 +385,17 @@ const convertFirstTextNodeToTitle = () => {
   }
 }
 
-const generateCode = async (langPath: string, fileName: string) => {
+const isCurrentViewLoad = (token: number) => token === viewLoadToken
+const isCurrentFileLoad = (token: number) => token === fileLoadToken
+
+const generateCode = async (langPath: string, fileName: string, token: number) => {
   const code = await exposureStore.getExposureRawContent(
     exposureId.value,
     exposureFileId.value,
     'cellml_codegen',
     langPath,
   )
+  if (!isCurrentViewLoad(token)) return
   generatedCode.value = code
   generatedCodeFilename.value = fileName
 }
@@ -385,9 +408,7 @@ const toggleCodeWrap = () => {
   codeWrapActive.value = !codeWrapActive.value
 }
 
-const generateMath = async () => {
-  error.value = null
-
+const generateMath = async (token: number) => {
   await initMathPolyfills()
 
   try {
@@ -397,6 +418,7 @@ const generateMath = async () => {
       'cellml_math',
       'math.json',
     )
+    if (!isCurrentViewLoad(token)) return
     const mathResponseJSON = JSON.parse(response)
     const filteredMathsJSON = Array.isArray(mathResponseJSON)
       ? mathResponseJSON.filter(
@@ -408,8 +430,9 @@ const generateMath = async () => {
       return [entry[0], mathMLArray]
     })
   } catch (err) {
+    if (!isCurrentViewLoad(token)) return
     const errorMessage = err instanceof Error ? err.message : 'Failed to parse mathematics data.'
-    error.value = {
+    viewError.value = {
       title: 'Error parsing mathematics',
       message: errorMessage,
     }
@@ -417,8 +440,8 @@ const generateMath = async () => {
   }
 }
 
-const generateMetadata = async () => {
-  error.value = null
+const generateMetadata = async (token: number) => {
+  metadataError.value = null
 
   try {
     const metadata = await exposureStore.getExposureRawContent(
@@ -427,10 +450,12 @@ const generateMetadata = async () => {
       'cellml_metadata',
       'cmeta.json',
     )
+    if (!isCurrentFileLoad(token)) return
     metadataJSON.value = JSON.parse(metadata)
   } catch (err) {
+    if (!isCurrentFileLoad(token)) return
     const errorMessage = err instanceof Error ? err.message : 'Failed to parse metadata JSON.'
-    error.value = {
+    metadataError.value = {
       title: 'Error parsing metadata',
       message: errorMessage,
     }
@@ -438,20 +463,22 @@ const generateMetadata = async () => {
   }
 }
 
-const loadDefaultView = async () => {
-  // Only load the HTML view if we have the necessary exposure ID and file ID.
-  if (exposureId.value && exposureFileId.value) {
-    detailHTML.value = await exposureStore.getExposureSafeHTML(
+const loadDefaultView = async (token: number) => {
+  // Only load the HTML view if the file has a 'view' entry.
+  if (exposureId.value && htmlViewFileId.value) {
+    const html = await exposureStore.getExposureSafeHTML(
       exposureId.value,
-      exposureFileId.value,
+      htmlViewFileId.value,
       'view',
       'index.html',
       routePath,
     )
+    if (!isCurrentViewLoad(token)) return
+    detailHTML.value = prepareHtmlImages(html)
   }
 }
 
-const loadCodegenView = async () => {
+const loadCodegenView = async (token: number) => {
   if (!exposureInfo.value) return
 
   // When no language is specified in the URL, redirect to the default language (C).
@@ -460,7 +487,8 @@ const loadCodegenView = async () => {
     if (!defaultLang) return
 
     isLangNotFound.value = false
-    await generateCode(defaultLang.path, defaultLang.fileName)
+    await generateCode(defaultLang.path, defaultLang.fileName, token)
+    if (!isCurrentViewLoad(token)) return
 
     // Reflect the default language in the URL (replace so it does not pollute browser history).
     if (props.view === 'cellml_codegen') {
@@ -486,7 +514,8 @@ const loadCodegenView = async () => {
   }
 
   isLangNotFound.value = false
-  await generateCode(activeLang.path, activeLang.fileName)
+  await generateCode(activeLang.path, activeLang.fileName, token)
+  if (!isCurrentViewLoad(token)) return
 
   // Reflect the active language in the URL (replace so it does not pollute browser history).
   if (props.view === 'cellml_codegen') {
@@ -535,6 +564,14 @@ const viewButtonTarget = (viewKey: string) => {
   }
   return `/exposures/${props.alias}/${exposureFilePath.value}/${viewKey}`
 }
+
+// Keep the current content visible while switching between codegen languages,
+// and only show the skeleton when there is nothing to show yet.
+const hasViewContent = computed(() => {
+  if (props.view === 'cellml_codegen') return Boolean(generatedCode.value)
+  if (props.view === 'cellml_math') return rawMathsData.value.length > 0
+  return Boolean(detailHTML.value)
+})
 
 const isAboutSectionAvailable = computed(() => {
   return (
@@ -591,7 +628,7 @@ const filteredKeywords = computed(() => {
     .map((keywordTuple) => keywordTuple[1] || '')
 })
 
-const checkOtherRelatedModels = async () => {
+const checkOtherRelatedModels = async (token: number) => {
   const term = metadataJSON.value.citation_id
   const kind = 'citation_id'
 
@@ -602,6 +639,7 @@ const checkOtherRelatedModels = async () => {
 
   try {
     const searchResults = await searchStore.searchIndexTerm(kind, term)
+    if (!isCurrentFileLoad(token)) return
 
     if (!Array.isArray(searchResults)) {
       hasOtherRelatedModels.value = false
@@ -616,6 +654,7 @@ const checkOtherRelatedModels = async () => {
     hasOtherRelatedModels.value = otherRelatedModels.length > 0
   } catch (err) {
     console.error('Error checking related models:', err)
+    if (!isCurrentFileLoad(token)) return
     hasOtherRelatedModels.value = false
   }
 }
@@ -625,6 +664,7 @@ const resetState = () => {
   availableViews.value = []
   detailHTML.value = ''
   exposureFileId.value = Number.NaN
+  htmlViewFileId.value = Number.NaN
   exposureFilePath.value = ''
   generatedCode.value = ''
   generatedCodeFilename.value = ''
@@ -632,15 +672,20 @@ const resetState = () => {
   isFileNotFound.value = false
   isViewNotFound.value = false
   isLangNotFound.value = false
-  licenseInfo.value = DEFAULT_LICENSE
+  licenceInfo.value = DEFAULT_LICENCE
+  isLicenceLoading.value = false
+  licenceError.value = false
+  metadataError.value = null
   metadataJSON.value = {}
   rawMathsData.value = []
+  viewError.value = null
+  isMetadataLoading.value = false
+  isViewLoading.value = false
+  // Invalidate any in-flight view load for the previous file.
+  viewLoadToken++
 }
 
-const loadCurrentView = async () => {
-  isViewNotFound.value = false
-  isLangNotFound.value = false
-
+const loadViewContent = async (token: number) => {
   if (isFileNotFound.value) {
     return
   }
@@ -651,7 +696,7 @@ const loadCurrentView = async () => {
       isViewNotFound.value = true
       return
     }
-    await loadDefaultView()
+    await loadDefaultView(token)
     return
   }
 
@@ -663,7 +708,7 @@ const loadCurrentView = async () => {
   }
 
   if (props.view === 'cellml_codegen') {
-    await loadCodegenView()
+    await loadCodegenView(token)
     return
   }
 
@@ -672,13 +717,80 @@ const loadCurrentView = async () => {
       isViewNotFound.value = true
       return
     }
-    await generateMath()
+    await generateMath(token)
     return
+  }
+}
+
+const loadCurrentView = async () => {
+  const token = ++viewLoadToken
+  isViewNotFound.value = false
+  isLangNotFound.value = false
+  viewError.value = null
+  isViewLoading.value = true
+
+  try {
+    await loadViewContent(token)
+  } catch (err) {
+    if (!isCurrentViewLoad(token)) return
+    const errorMessage = err instanceof Error ? err.message : 'Failed to load view.'
+    viewError.value = {
+      title: 'Error loading view',
+      message: errorMessage,
+    }
+    console.error('Error loading exposure view:', err)
+  } finally {
+    if (isCurrentViewLoad(token)) {
+      isViewLoading.value = false
+    }
+  }
+}
+
+const loadMetadata = async (token: number) => {
+  isMetadataLoading.value = true
+
+  try {
+    await generateMetadata(token)
+    await checkOtherRelatedModels(token)
+  } finally {
+    if (isCurrentFileLoad(token)) {
+      isMetadataLoading.value = false
+    }
+  }
+}
+
+const loadLicence = async (exposureFileIdForLicence: number, token: number) => {
+  // The file declares its own licence, so don't show the default while it loads.
+  // If loading fails, show an error message instead of the default.
+  licenceInfo.value = ''
+  licenceError.value = false
+  isLicenceLoading.value = true
+
+  try {
+    const licence = await exposureStore.getExposureSafeHTML(
+      exposureId.value,
+      exposureFileIdForLicence,
+      'license_citation',
+      'license.txt',
+      routePath,
+    )
+    if (!isCurrentFileLoad(token)) return
+    licenceInfo.value = licence.trim() || DEFAULT_LICENCE
+  } catch (err) {
+    if (!isCurrentFileLoad(token)) return
+    licenceError.value = true
+    console.error('Error loading exposure licence:', err)
+  } finally {
+    if (isCurrentFileLoad(token)) {
+      isLicenceLoading.value = false
+    }
   }
 }
 
 const loadInitialView = async () => {
   if (!exposureInfo.value) return
+
+  const token = ++fileLoadToken
 
   // Reset per-file state before selecting a new file to avoid stale view content.
   resetState()
@@ -717,42 +829,28 @@ const loadInitialView = async () => {
   exposureId.value = fileWithViews.exposure_id
 
   const viewEntry = fileWithViews.views.find((v) => v.view_key === 'view')
-  const licenseEntry = fileWithViews.views.find((v) => v.view_key === 'license_citation')
+  const licenceEntry = fileWithViews.views.find((v) => v.view_key === 'license_citation')
   const metaEntry = fileWithViews.views.find((v) => v.view_key === 'cellml_metadata')
 
-  // Show metadata onload.
-  if (metaEntry) {
-    await generateMetadata()
-  }
-  await checkOtherRelatedModels()
-
   if (viewEntry) {
-    detailHTML.value = await exposureStore.getExposureSafeHTML(
-      exposureId.value,
-      viewEntry.exposure_file_id,
-      'view',
-      'index.html',
-      routePath,
-    )
+    htmlViewFileId.value = viewEntry.exposure_file_id
   }
 
-  if (licenseEntry) {
-    licenseInfo.value = await exposureStore.getExposureSafeHTML(
-      exposureId.value,
-      licenseEntry.exposure_file_id,
-      'license_citation',
-      'license.txt',
-      routePath,
-    )
-  }
-
-  await loadCurrentView()
+  // Load each area independently so that one slow request does not block the others.
+  await Promise.allSettled([
+    metaEntry ? loadMetadata(token) : checkOtherRelatedModels(token),
+    licenceEntry ? loadLicence(licenceEntry.exposure_file_id, token) : Promise.resolve(),
+    loadCurrentView(),
+  ])
 }
 
 watch(detailHTML, async () => {
   if (detailHTML.value) {
     await nextTick()
     convertFirstTextNodeToTitle()
+    if (htmlViewRef.value) {
+      markHtmlImagesLoaded(htmlViewRef.value)
+    }
   }
 })
 
@@ -786,11 +884,7 @@ watch(
   async (newLang, oldLang) => {
     // Only react when the lang segment actually changed.
     if (newLang === oldLang) return
-    if (props.view === 'cellml_codegen') {
-      await loadCodegenView()
-    } else {
-      await loadCurrentView()
-    }
+    await loadCurrentView()
   },
 )
 
@@ -800,7 +894,6 @@ onMounted(async () => {
   try {
     void refreshLoadedFileTitle()
     exposureInfo.value = await exposureStore.getExposureInfo(props.alias)
-    await loadInitialView()
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Failed to load exposure.'
     if (errorMessage.toLowerCase().includes('not found')) {
@@ -818,6 +911,9 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
+
+  // Render the page shell first, then load each area independently.
+  void loadInitialView()
 })
 </script>
 
@@ -919,6 +1015,16 @@ onMounted(async () => {
         </template>
       </WarningBlock>
 
+      <ErrorBlock
+        v-else-if="viewError"
+        :title="viewError.title"
+        :error="viewError.message"
+      />
+
+      <div v-else-if="isViewLoading && !hasViewContent" class="box">
+        <SkeletonBlock :lines="6" />
+      </div>
+
       <div v-else-if="props.view === 'cellml_codegen'" class="relative">
         <nav>
           <ul class="space-x-2 mb-4 inline-flex">
@@ -985,7 +1091,7 @@ onMounted(async () => {
       </div>
 
       <div v-else-if="detailHTML" class="box">
-        <div ref="htmlViewRef" v-html="detailHTML" class="html-view"></div>
+        <div ref="htmlViewRef" v-html="detailHTML" class="html-view html-images"></div>
       </div>
 
       <WorkspaceFileBrowser
@@ -1017,7 +1123,19 @@ onMounted(async () => {
         </div>
       </section>
       <section
-        v-if="isAboutSectionAvailable"
+        v-if="isMetadataLoading"
+        class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
+      >
+        <SkeletonBlock :lines="4" />
+      </section>
+      <section
+        v-else-if="metadataError"
+        class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
+      >
+        <p class="text-sm text-gray-500 dark:text-gray-400">Model metadata could not be loaded.</p>
+      </section>
+      <section
+        v-else-if="isAboutSectionAvailable"
         class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
       >
         <h4 class="text-lg font-semibold mb-3">About</h4>
@@ -1249,13 +1367,21 @@ onMounted(async () => {
           </dl>
         </div>
       </section>
-      <section v-if="licenseInfo" class="pt-6 border-t border-gray-200 dark:border-gray-700">
+      <section class="pt-6 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-lg font-semibold mb-3">Licence</h4>
-        <nav>
+        <SkeletonBlock v-if="isLicenceLoading" :lines="1" />
+        <p
+          v-else-if="licenceError"
+          class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5"
+        >
+          <WarningIcon class="w-4 h-4 shrink-0" aria-hidden="true" />
+          {{ LICENCE_ERROR_MESSAGE }}
+        </p>
+        <nav v-else-if="licenceInfo">
           <ul class="space-y-2">
             <li class="text-sm">
-              <a :href="licenseInfo" class="text-link" target="_blank" rel="noopener noreferrer">
-                {{ formatLicenseUrl(licenseInfo) }}
+              <a :href="licenceInfo" class="text-link" target="_blank" rel="noopener noreferrer">
+                {{ formatLicenceUrl(licenceInfo) }}
               </a>
             </li>
           </ul>
@@ -1264,6 +1390,10 @@ onMounted(async () => {
     </aside>
   </div>
 </template>
+
+<style>
+@import '@/assets/html-images.css';
+</style>
 
 <style scoped>
 @import '@/assets/text-link.css';
@@ -1314,10 +1444,6 @@ onMounted(async () => {
 
   & :deep(dt) {
     @apply font-semibold;
-  }
-
-  & :deep(img) {
-    @apply max-w-full h-auto mx-auto;
   }
 
   & :deep(table) {
