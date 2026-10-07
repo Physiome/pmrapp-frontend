@@ -16,13 +16,13 @@ import NavigationCard from '@/components/molecules/NavigationCard.vue'
 
   <section class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
     <NavigationCard
-      to="/exposures"
+      to="/exposure"
       title="Exposures"
       description="Explore published models and simulation results for citation and public use."
     />
 
     <NavigationCard
-      to="/workspaces"
+      to="/workspace"
       title="Workspaces"
       description="Access project files and Git-based version history for all models."
     />

@@ -100,7 +100,7 @@ const hasPathError = computed(
   () => isFileNotFound.value || isViewNotFound.value || isLangNotFound.value,
 )
 const loadedFileTitle = ref('')
-const { goBack } = useBackNavigation('/exposures')
+const { goBack } = useBackNavigation('/exposure')
 
 const router = useRouter()
 const route = useRoute()
@@ -112,7 +112,7 @@ const backButtonLabel = computed(() => {
   const backPath = router.options.history.state.back
   const backPathname = typeof backPath === 'string' ? backPath.split(/[?#]/)[0] : ''
 
-  if (backPathname === '/exposures') {
+  if (backPathname === '/exposure' || backPathname === '/exposures') {
     return 'Back to exposures'
   }
 
@@ -157,7 +157,7 @@ const handleFileBrowserPathChange = (newPath: string | undefined) => {
 
 // This route path is used to fix relative paths in the HTML content.
 // It is not a part of the API request parameters.
-// Note: Keep as "exposure" (singular) to match server file paths, not the router path.
+// Note: Keep as "exposure" (singular) to match server file paths, even if the route was matched via an alias.
 const routePath = `/exposure/${props.alias}`
 
 const loadTitle = async (file: string) =>
@@ -281,9 +281,9 @@ const isKnownLang = (lang: string) =>
 
 const defaultFileViewTarget = computed(() => {
   if (exposureFilePath.value) {
-    return `/exposures/${props.alias}/${exposureFilePath.value}`
+    return `/exposure/${props.alias}/${exposureFilePath.value}`
   }
-  return `/exposures/${props.alias}`
+  return `/exposure/${props.alias}`
 })
 
 const handleDownloadCOMBINEArchive = async () => {
@@ -533,7 +533,7 @@ const viewButtonTarget = (viewKey: string) => {
       },
     }
   }
-  return `/exposures/${props.alias}/${exposureFilePath.value}/${viewKey}`
+  return `/exposure/${props.alias}/${exposureFilePath.value}/${viewKey}`
 }
 
 const isAboutSectionAvailable = computed(() => {
@@ -869,7 +869,7 @@ onMounted(async () => {
           <ActionButton
             variant="primary"
             size="sm"
-            :to="`/exposures/${props.alias}`"
+            :to="`/exposure/${props.alias}`"
             content-section="Exposure Detail"
           >
             Go to exposure
@@ -1002,14 +1002,14 @@ onMounted(async () => {
         <div class="text-sm leading-relaxed">
           Derived from workspace
           <RouterLink
-            :to="`/workspaces/${exposureInfo.workspace_alias}`"
+            :to="`/workspace/${exposureInfo.workspace_alias}`"
             class="text-link dark:underline dark:decoration-dotted"
           >
             {{ exposureInfo.exposure.description }}
           </RouterLink>
           at changeset
           <RouterLink
-            :to="`/workspaces/${exposureInfo.workspace_alias}/file/${exposureInfo.exposure.commit_id}`"
+            :to="`/workspace/${exposureInfo.workspace_alias}/file/${exposureInfo.exposure.commit_id}`"
             class="text-link font-mono dark:underline dark:decoration-dotted"
           >
             {{ exposureInfo.exposure.commit_id.substring(0, 12) }}
@@ -1109,7 +1109,7 @@ onMounted(async () => {
               class="text-sm"
             >
               <RouterLink
-                :to="`/exposures/${props.alias}/${entry[0]}/`"
+                :to="`/exposure/${props.alias}/${entry[0]}/`"
                 class="inline-flex items-center gap-2 break-all transition-colors"
                 :class="
                   props.file === entry[0]

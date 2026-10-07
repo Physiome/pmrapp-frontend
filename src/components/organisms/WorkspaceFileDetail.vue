@@ -63,11 +63,11 @@ const backPath = computed(() => {
   const lastSlash = props.path.lastIndexOf('/')
   if (lastSlash === -1) {
     // File in root - go to root workspace.
-    return `/workspaces/${props.alias}`
+    return `/workspace/${props.alias}`
   }
   // Go to parent folder.
   const parentPath = props.path.substring(0, lastSlash)
-  return `/workspaces/${props.alias}/file/${props.commitId}/${parentPath}`
+  return `/workspace/${props.alias}/file/${props.commitId}/${parentPath}`
 })
 
 const { goBack } = useBackNavigation(backPath.value)
@@ -238,7 +238,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
   trackButtonClick({
     button_name: buttonText,
     content_section: pageTitle.value,
-    link_category: `/workspaces/${props.alias}/file/${props.commitId}/${props.path}`,
+    link_category: `/workspace/${props.alias}/file/${props.commitId}/${props.path}`,
   })
 }
 </script>

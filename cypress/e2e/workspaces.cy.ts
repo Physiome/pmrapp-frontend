@@ -1,6 +1,6 @@
 describe('Workspaces page', () => {
   beforeEach(() => {
-    cy.visit('/workspaces')
+    cy.visit('/workspace')
   })
 
   it('has the correct title.', () => {

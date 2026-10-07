@@ -93,8 +93,8 @@ describe('Header', () => {
     await wrapper.find('button[aria-controls="mobile-navigation-menu"]').trigger('click')
     expect(wrapper.find('#mobile-navigation-menu').classes()).toContain('block')
 
-    route.path = '/exposures'
-    route.fullPath = '/exposures'
+    route.path = '/exposure'
+    route.fullPath = '/exposure'
     await wrapper.vm.$nextTick()
 
     expect(wrapper.find('#mobile-navigation-menu').classes()).toContain('hidden')
