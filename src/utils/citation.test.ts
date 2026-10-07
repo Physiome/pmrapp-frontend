@@ -184,10 +184,10 @@ describe('normaliseUrl', () => {
   it('preserves URL with special characters %20 for spaces', () => {
     expect(
       normaliseUrl(
-        'http://localhost:5173/pmrapp-frontend/exposures/d6a/mapclient%20workflow/Argon_Viewer-previous-docs/document_whole_body.json',
+        'http://localhost:5173/pmrapp-frontend/exposure/d6a/mapclient%20workflow/Argon_Viewer-previous-docs/document_whole_body.json',
       ),
     ).toBe(
-      'http://localhost:5173/pmrapp-frontend/exposures/d6a/mapclient%20workflow/Argon_Viewer-previous-docs/document_whole_body.json',
+      'http://localhost:5173/pmrapp-frontend/exposure/d6a/mapclient%20workflow/Argon_Viewer-previous-docs/document_whole_body.json',
     )
   })
 })
