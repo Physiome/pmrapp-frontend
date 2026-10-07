@@ -35,6 +35,23 @@ describe('prepareHtmlImages', () => {
     expect(result).not.toContain('data-img-unsized')
   })
 
+  it('wraps the picture instead of the image to keep its sources', () => {
+    const result = prepareHtmlImages(
+      '<picture><source srcset="a.webp" type="image/webp"><img src="a.png"></picture>',
+    )
+    expect(result).toBe(
+      '<span class="img-frame" data-img-loading="" data-img-unsized="">' +
+        '<picture><source srcset="a.webp" type="image/webp">' +
+        '<img src="a.png" loading="lazy" decoding="async"></picture></span>',
+    )
+  })
+
+  it('wraps images that only have srcset', () => {
+    const result = prepareHtmlImages('<img srcset="a.png 1x, a@2x.png 2x">')
+    expect(result).toContain('class="img-frame"')
+    expect(result).toContain('loading="lazy"')
+  })
+
   it('keeps existing loading and decoding attributes', () => {
     const result = prepareHtmlImages('<img src="a.png" loading="eager" decoding="sync">')
     expect(result).toContain('loading="eager"')
@@ -80,6 +97,33 @@ describe('markHtmlImagesLoaded', () => {
     expect(fallback?.getAttribute('role')).toBe('img')
     expect(fallback?.getAttribute('aria-label')).toBe('Image not available')
     expect(fallback?.querySelector('.img-fallback-name')?.textContent).toBe('a.png')
+  })
+
+  it('removes the loading marker from the frame of an image in a picture', () => {
+    const container = document.createElement('div')
+    container.innerHTML = prepareHtmlImages(
+      '<picture><source srcset="a.webp" type="image/webp"><img src="a.png"></picture>',
+    )
+    markHtmlImagesLoaded(container)
+
+    const frame = container.querySelector('.img-frame')
+    getImage(container).dispatchEvent(new Event('load'))
+    expect(frame?.hasAttribute('data-img-loading')).toBe(false)
+    expect(frame?.querySelector(':scope > picture > img')).not.toBeNull()
+  })
+
+  it('replaces the frame of a picture with a placeholder when its image fails to load', () => {
+    const container = document.createElement('div')
+    container.innerHTML = prepareHtmlImages(
+      '<picture><source srcset="a.webp" type="image/webp"><img src="a.png"></picture>',
+    )
+    markHtmlImagesLoaded(container)
+
+    getImage(container).dispatchEvent(new Event('error'))
+
+    expect(container.querySelector('picture')).toBeNull()
+    expect(container.querySelector('.img-frame')).toBeNull()
+    expect(container.querySelector('.img-fallback')).not.toBeNull()
   })
 
   it('includes the alt text in the placeholder when present', () => {

@@ -4,6 +4,19 @@ const IMAGE_FRAME_CLASS = 'img-frame'
 const IMAGE_FALLBACK_CLASS = 'img-fallback'
 const IMAGE_FALLBACK_TEXT = 'Image not available'
 const SVG_NS = 'http://www.w3.org/2000/svg'
+const IMAGE_SELECTOR = 'img[src], img[srcset]'
+
+/**
+ * Returns the element to wrap in a frame for an image:
+ * its `<picture>` when the image is a direct child of one,
+ * since `<source>` elements only apply to an `<img>`
+ * that is a direct child of the same `<picture>`;
+ * otherwise the image itself.
+ */
+function getImageFrameContent(img: Element): Element {
+  const parent = img.parentElement
+  return parent?.tagName === 'PICTURE' ? parent : img
+}
 
 /**
  * Prepares `<img>` elements for progressive loading.
@@ -11,6 +24,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg'
  * All images are lazy-loaded and decoded asynchronously, and wrapped in a frame
  * that shows a placeholder and hides the image until it has fully loaded,
  * so partially downloaded (e.g. progressive) images are never shown.
+ * Images in a `<picture>` are wrapped together with it to keep their `<source>` elements working.
  * Frames of images without width and height are marked
  * so that the placeholder can be given a default size.
  * Styles: `src/assets/html-images.css` (apply the `html-images` class to the container).
@@ -19,7 +33,7 @@ export function prepareHtmlImages(html: string): string {
   if (!/<img\b/i.test(html)) return html
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  const images = Array.from(doc.querySelectorAll('img[src]'))
+  const images = Array.from(doc.querySelectorAll(IMAGE_SELECTOR))
 
   if (images.length === 0) return html
 
@@ -33,8 +47,9 @@ export function prepareHtmlImages(html: string): string {
     if (!img.hasAttribute('width') && !img.hasAttribute('height')) {
       frame.setAttribute(IMAGE_UNSIZED_ATTR, '')
     }
-    img.replaceWith(frame)
-    frame.appendChild(img)
+    const content = getImageFrameContent(img)
+    content.replaceWith(frame)
+    frame.appendChild(content)
   })
 
   return doc.body.innerHTML
@@ -61,7 +76,7 @@ function getImageFileName(src: string): string {
  */
 function createImageFallback(img: HTMLImageElement): HTMLElement {
   const alt = img.getAttribute('alt')?.trim()
-  const fileName = getImageFileName(img.getAttribute('src') ?? '')
+  const fileName = getImageFileName(img.currentSrc || img.getAttribute('src') || '')
 
   const fallback = document.createElement('span')
   fallback.className = IMAGE_FALLBACK_CLASS
@@ -106,10 +121,13 @@ function createImageFallback(img: HTMLImageElement): HTMLElement {
  * and replaces images that fail to load with an accessible "Image not available" placeholder.
  */
 export function markHtmlImagesLoaded(container: HTMLElement): void {
-  const images = container.querySelectorAll<HTMLImageElement>('img[src]')
+  const images = container.querySelectorAll<HTMLImageElement>(IMAGE_SELECTOR)
 
   images.forEach((img) => {
-    const frame = img.parentElement?.classList.contains(IMAGE_FRAME_CLASS) ? img.parentElement : img
+    const content = getImageFrameContent(img)
+    const frame = content.parentElement?.classList.contains(IMAGE_FRAME_CLASS)
+      ? content.parentElement
+      : content
     const handleLoad = () => frame.removeAttribute(IMAGE_LOADING_ATTR)
     const handleError = () => frame.replaceWith(createImageFallback(img))
 
