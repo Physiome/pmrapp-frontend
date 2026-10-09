@@ -74,7 +74,7 @@ const { goBack } = useBackNavigation(backPath.value)
 const workspaceStore = useWorkspaceStore()
 
 const tabButtonClasses = {
-  base: 'flex items-center gap-1.5 px-3 py-1.5 transition-colors',
+  base: 'flex items-center gap-1.5 px-3 h-full transition-colors',
   active: 'text-gray-900 dark:text-gray-100 bg-gray-200 dark:bg-gray-700 z-0',
   inactive: 'text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 cursor-pointer z-1',
   hover: 'hover:text-gray-700 dark:hover:text-gray-200',
@@ -269,7 +269,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
         <div class="flex items-center gap-2">
           <div
             v-if="isSvg || isMarkdown"
-            class="flex items-center border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden text-sm"
+            class="flex items-center h-8 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden text-sm"
             role="tablist"
             aria-label="File view tabs"
           >
