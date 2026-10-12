@@ -4,6 +4,7 @@ import ActionButton from '@/components/atoms/ActionButton.vue'
 import BackButton from '@/components/atoms/BackButton.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
+import FilePanel from '@/components/atoms/FilePanel.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import WrapButton from '@/components/atoms/WrapButton.vue'
 import CodeIcon from '@/components/icons/CodeIcon.vue'
@@ -261,82 +262,77 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
   <LoadingBox v-else-if="isLoading" message="Loading file..." />
 
   <div v-else>
-    <div class="box p-0! overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <div>
-          {{ filename }}
+    <FilePanel :title="filename">
+      <template #actions>
+        <div
+          v-if="isSvg || isMarkdown"
+          class="flex items-center h-8 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden text-sm"
+          role="tablist"
+          aria-label="File view tabs"
+        >
+          <button
+            type="button"
+            role="tab"
+            @click="switchCodeView($event, false)"
+            :aria-selected="!isCodeViewVisible"
+            :aria-controls="previewPanelId"
+            :class="previewButtonClass"
+          >
+            <PreviewIcon class="w-4 h-4" />
+            Preview
+          </button>
+          <button
+            type="button"
+            role="tab"
+            @click="switchCodeView($event, true)"
+            :aria-selected="isCodeViewVisible"
+            :aria-controls="codePanelId"
+            :class="codeButtonClass"
+          >
+            <CodeIcon class="w-4 h-4" />
+            Code
+          </button>
         </div>
-        <div class="flex items-center gap-2">
-          <div
-            v-if="isSvg || isMarkdown"
-            class="flex items-center h-8 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden text-sm"
-            role="tablist"
-            aria-label="File view tabs"
-          >
-            <button
-              type="button"
-              role="tab"
-              @click="switchCodeView($event, false)"
-              :aria-selected="!isCodeViewVisible"
-              :aria-controls="previewPanelId"
-              :class="previewButtonClass"
-            >
-              <PreviewIcon class="w-4 h-4" />
-              Preview
-            </button>
-            <button
-              type="button"
-              role="tab"
-              @click="switchCodeView($event, true)"
-              :aria-selected="isCodeViewVisible"
-              :aria-controls="codePanelId"
-              :class="codeButtonClass"
-            >
-              <CodeIcon class="w-4 h-4" />
-              Code
-            </button>
-          </div>
-          <WrapButton
-            v-if="shouldShowAsText && !isTooLargeForPreview"
-            :disabled="!shouldShowAsText || isTooLargeForPreview || ((isSvg || isMarkdown) ? !isCodeViewVisible : false)"
-            :active="codeWrapActive"
-            @click="toggleCodeWrap"
-          />
-          <CopyButton
-            v-if="shouldShowAsText && !isTooLargeForPreview"
-            :disabled="!shouldShowAsText || isTooLargeForPreview || (isSvg ? !isCodeViewVisible : false)"
-            :text="fileContent"
-            title="Copy code"
-          />
-          <ActionButton
-            v-if="canShowOpenCORButton"
-            variant="icon"
-            size="sm"
-            :contentSection="pageTitle"
-            :href="openCORFileURL"
-            target="_blank"
-            rel="noopener noreferrer"
-            tooltip="Open with OpenCOR's Web app"
-            aria-label="Open with OpenCOR's Web app"
-          >
-            <ExternalLinkIcon class="w-4 h-4" />
-            <span class="sr-only">Open with OpenCOR's Web app</span>
-          </ActionButton>
-          <ActionButton
-            variant="icon"
-            size="sm"
-            :contentSection="pageTitle"
-            :href="downloadUrl"
-            :download="filename"
-            @click.prevent="downloadWorkspaceFileDetail"
-            tooltip="Download"
-            aria-label="Download"
-          >
-            <DownloadIcon class="w-4 h-4" />
-            <span class="sr-only">Download</span>
-          </ActionButton>
-        </div>
-      </div>
+        <WrapButton
+          v-if="shouldShowAsText && !isTooLargeForPreview"
+          :disabled="!shouldShowAsText || isTooLargeForPreview || ((isSvg || isMarkdown) ? !isCodeViewVisible : false)"
+          :active="codeWrapActive"
+          @click="toggleCodeWrap"
+        />
+        <CopyButton
+          v-if="shouldShowAsText && !isTooLargeForPreview"
+          :disabled="!shouldShowAsText || isTooLargeForPreview || (isSvg ? !isCodeViewVisible : false)"
+          :text="fileContent"
+          title="Copy code"
+        />
+        <ActionButton
+          v-if="canShowOpenCORButton"
+          variant="icon"
+          size="sm"
+          :contentSection="pageTitle"
+          :href="openCORFileURL"
+          target="_blank"
+          rel="noopener noreferrer"
+          tooltip="Open with OpenCOR's Web app"
+          aria-label="Open with OpenCOR's Web app"
+        >
+          <ExternalLinkIcon class="w-4 h-4" />
+          <span class="sr-only">Open with OpenCOR's Web app</span>
+        </ActionButton>
+        <ActionButton
+          variant="icon"
+          size="sm"
+          :contentSection="pageTitle"
+          :href="downloadUrl"
+          :download="filename"
+          @click.prevent="downloadWorkspaceFileDetail"
+          tooltip="Download"
+          aria-label="Download"
+        >
+          <DownloadIcon class="w-4 h-4" />
+          <span class="sr-only">Download</span>
+        </ActionButton>
+      </template>
 
       <!-- SVG Rendered View -->
       <div :id="previewPanelId" role="tabpanel" v-if="isSvg && shouldShowPreview" class="flex justify-center p-4 bg-gray-50 dark:bg-gray-900 rounded">
@@ -396,10 +392,6 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
           Download
         </ActionButton>
       </div>
-    </div>
+    </FilePanel>
   </div>
 </template>
-
-<style scoped>
-@import '@/assets/box.css';
-</style>
