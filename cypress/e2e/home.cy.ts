@@ -30,11 +30,11 @@ describe('Home page', () => {
 
   it('navigates to the Workspaces page from the home page.', () => {
     cy.contains('a', 'Workspaces').first().click()
-    cy.url().should('include', '/workspaces')
+    cy.url().should('include', '/workspace')
   })
 
   it('navigates to the Exposures page from the home page.', () => {
     cy.contains('a', 'Exposures').first().click()
-    cy.url().should('include', '/exposures')
+    cy.url().should('include', '/exposure')
   })
 })

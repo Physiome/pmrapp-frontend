@@ -1,13 +1,13 @@
 describe('Workspace detail page', () => {
   it('renders the workspace detail page with correct title', () => {
-    cy.visit('/workspaces/6b0')
+    cy.visit('/workspace/6b0')
 
     cy.get('h1').should('exist')
     cy.get('h1').should('contain.text', '12 L Platform 1 model codes')
   })
 
   it('renders the README.md link and navigates to the file view page', () => {
-    cy.visit('/workspaces/6b0')
+    cy.visit('/workspace/6b0')
 
     cy.get('a.text-link').contains('README.md').should('exist')
     // The link is sometimes covered by the cookie banner.
@@ -15,12 +15,12 @@ describe('Workspace detail page', () => {
 
     cy.url().should(
       'include',
-      '/workspaces/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md',
+      '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md',
     )
   })
 
   it('renders the file view page with action buttons', () => {
-    cy.visit('/workspaces/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md')
+    cy.visit('/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md')
 
     cy.get('button').contains('Preview').should('exist')
     cy.get('button').contains('Code').should('exist')

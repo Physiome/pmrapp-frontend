@@ -23,7 +23,7 @@ const pathSegments = computed(() => props.path.split('/').filter(Boolean))
     </button>
     <RouterLink
       v-else
-      :to="`/workspaces/${props.alias}/file/${props.commitId}`"
+      :to="`/workspace/${props.alias}/file/${props.commitId}`"
       class="text-link shrink-0 truncate text-left cursor-pointer"
     >
       Files
@@ -41,7 +41,7 @@ const pathSegments = computed(() => props.path.split('/').filter(Boolean))
       </button>
       <RouterLink
         v-else-if="index < pathSegments.length - 1"
-        :to="`/workspaces/${props.alias}/file/${props.commitId}/${pathSegments.slice(0, index + 1).join('/')}`"
+        :to="`/workspace/${props.alias}/file/${props.commitId}/${pathSegments.slice(0, index + 1).join('/')}`"
         class="text-link truncate text-left cursor-pointer"
       >
         {{ segment }}

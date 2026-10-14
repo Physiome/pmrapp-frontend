@@ -31,7 +31,7 @@ onMounted(async () => {
     content-section="Workspace Listing"
     error-title="Error loading workspaces"
     empty-message="No workspaces found."
-    route-base="/workspaces"
+    route-base="/workspace"
     :get-title="getTitle"
     @refresh="handleRefresh"
     @update-filtered-count="(...args) => emit('updateFilteredCount', ...args)"
