@@ -113,7 +113,7 @@ const backButtonLabel = computed(() => {
   const backPath = router.options.history.state.back
   const backPathname = typeof backPath === 'string' ? backPath.split(/[?#]/)[0] : ''
 
-  if (backPathname === '/exposure' || backPathname === '/exposures') {
+  if (backPathname === '/exposure') {
     return 'Back to exposures'
   }
 

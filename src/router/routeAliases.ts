@@ -10,7 +10,6 @@ export const createRouteAliases = (
   ...createAliases(aliasBases, ...suffixes),
 ]
 
-export const workspaceAliasBases = ['/workspaces']
 export const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias/@@file']
 export const workspaceDetailCommitSuffixes = ['/:alias/file/:commitId', '/:alias/@@file/:commitId']
 export const workspaceFileRouteSuffixes = [
@@ -18,7 +17,7 @@ export const workspaceFileRouteSuffixes = [
   '/:alias/@@file/:commitId/:path(.+)',
 ]
 
-export const exposureAliasBases = ['/exposures', '/e']
+export const exposureAliasBases = ['/e']
 export const exposureDetailRouteSuffixes = ['/:alias', '/:alias/view']
 export const exposureFileRouteSuffixes = [
   '/:alias/:file',
