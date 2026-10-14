@@ -11,11 +11,11 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({
     push: vi.fn(),
     back: vi.fn(),
-    resolve: vi.fn(() => ({ href: '/workspaces/test-alias' })),
+    resolve: vi.fn(() => ({ href: '/workspace/test-alias' })),
     options: {
       history: {
         state: {
-          back: '/workspaces',
+          back: '/workspace',
         },
       },
     },
@@ -69,7 +69,7 @@ describe('WorkspaceDetail', () => {
     expect(issueLink.attributes('href')).toContain('labels=workspace')
     expect(issueLink.attributes('href')).toContain('title=%5BWorkspace%5D%3A+')
     expect(issueLink.attributes('href')).toContain(
-      `workspace-url=${encodeURIComponent(`${window.location.origin}/workspaces/test-alias`)}`,
+      `workspace-url=${encodeURIComponent(`${window.location.origin}/workspace/test-alias`)}`,
     )
   })
 })
