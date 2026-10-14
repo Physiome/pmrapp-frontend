@@ -1,16 +1,15 @@
 export const createAliases = (bases: string[], ...suffixes: string[]) =>
   bases.flatMap((base) => suffixes.map((suffix) => `${base}${suffix}`))
 
-export const createPluralRouteAliases = (
-  pluralBase: string,
+export const createRouteAliases = (
+  primaryBase: string,
   aliasBases: string[],
   suffixes: string[],
 ) => [
-  ...suffixes.slice(1).map((suffix) => `${pluralBase}${suffix}`),
+  ...suffixes.slice(1).map((suffix) => `${primaryBase}${suffix}`),
   ...createAliases(aliasBases, ...suffixes),
 ]
 
-export const workspaceAliasBases = ['/workspace']
 export const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias/@@file']
 export const workspaceDetailCommitSuffixes = ['/:alias/file/:commitId', '/:alias/@@file/:commitId']
 export const workspaceFileRouteSuffixes = [
@@ -18,7 +17,7 @@ export const workspaceFileRouteSuffixes = [
   '/:alias/@@file/:commitId/:path(.+)',
 ]
 
-export const exposureAliasBases = ['/exposure', '/e']
+export const exposureAliasBases = ['/e']
 export const exposureDetailRouteSuffixes = ['/:alias', '/:alias/view']
 export const exposureFileRouteSuffixes = [
   '/:alias/:file',

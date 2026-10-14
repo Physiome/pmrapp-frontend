@@ -17,17 +17,17 @@ const { mockRouterPush, mockRouterReplace } = vi.hoisted(() => ({
 vi.mock('vue-router', () => ({
   useRoute: () => ({
     query: {},
-    path: '/exposures/test-alias',
+    path: '/exposure/test-alias',
   }),
   useRouter: () => ({
     push: mockRouterPush,
     replace: mockRouterReplace,
     back: vi.fn(),
-    resolve: vi.fn(() => ({ href: '/exposures/test-alias' })),
+    resolve: vi.fn(() => ({ href: '/exposure/test-alias' })),
     options: {
       history: {
         state: {
-          back: '/exposures',
+          back: '/exposure',
         },
       },
     },
@@ -981,7 +981,7 @@ describe('ExposureDetail', () => {
       expect(actionButton.exists()).toBe(true)
       expect(actionButton.text()).toContain('Go to file')
       expect(actionButton.props('to')).toBe(
-        `/exposures/${mockExposureInfo.exposure_alias}/baylor_hollingworth_chandler_2002_a.cellml`,
+        `/exposure/${mockExposureInfo.exposure_alias}/baylor_hollingworth_chandler_2002_a.cellml`,
       )
 
       // Citation section must not be shown.

@@ -171,7 +171,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 
             <RouterLink
               v-if="entry.kind === 'commit'"
-              :to="`/workspaces/${entry.name}/file/${entry.id}`"
+              :to="`/workspace/${entry.name}/file/${entry.id}`"
               class="text-link font-medium truncate text-left cursor-pointer"
             >
               {{ entry.name }}
@@ -185,7 +185,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             </button>
             <RouterLink
               v-else
-              :to="`/workspaces/${alias}/file/${workspaceInfo?.commit.commit_id}/${(path ? path + '/' : '') + entry.name}`"
+              :to="`/workspace/${alias}/file/${workspaceInfo?.commit.commit_id}/${(path ? path + '/' : '') + entry.name}`"
               class="text-link font-medium truncate text-left cursor-pointer"
             >
               {{ entry.name }}

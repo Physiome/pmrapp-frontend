@@ -14,10 +14,10 @@ describe('It covers global layout, navigation and routing.', () => {
     it('navigates between pages using the header links.', () => {
       cy.visit('/')
       cy.get('header').contains('a', 'Workspaces').click()
-      cy.url().should('include', '/workspaces')
+      cy.url().should('include', '/workspace')
 
       cy.get('header').contains('a', 'Exposures').click()
-      cy.url().should('include', '/exposures')
+      cy.url().should('include', '/exposure')
 
       cy.get('header').contains('a', 'Log in').click()
       cy.url().should('include', '/login')
@@ -34,7 +34,7 @@ describe('It covers global layout, navigation and routing.', () => {
     })
 
     it('navigates to the home page when clicking the logo.', () => {
-      cy.visit('/workspaces')
+      cy.visit('/workspace')
       cy.get('header [aria-label="Home"]').click()
       cy.url().should('eq', Cypress.config().baseUrl)
     })

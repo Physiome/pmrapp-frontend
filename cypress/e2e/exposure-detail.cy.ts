@@ -1,6 +1,6 @@
 describe('Exposure detail page', () => {
   beforeEach(() => {
-    cy.visit('/exposures/da9')
+    cy.visit('/exposure/da9')
 
     // Clear the downloads folder before starting the test.
     // Only for the GUI runner (`cypress open`)
@@ -51,7 +51,7 @@ describe('Exposure detail page', () => {
   it('renders the citation with the correct information.', () => {
     cy.get('aside section').contains('Noble, Denyer, Brown, DiFrancesco, 1992.').should('exist')
     cy.get('aside section').contains('(2026). Physiome Model Repository.').should('exist')
-    cy.get('aside section').contains('/exposures/da9').should('exist')
+    cy.get('aside section').contains('/exposure/da9').should('exist')
   })
 
   it('renders the views available section.', () => {
