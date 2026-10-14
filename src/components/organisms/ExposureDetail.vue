@@ -1315,7 +1315,7 @@ onMounted(async () => {
   }
 
   & :deep(img) {
-    @apply max-w-full h-auto mx-auto;
+    @apply max-w-full h-auto mx-auto bg-white p-2;
   }
 
   & :deep(table) {
