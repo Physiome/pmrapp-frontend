@@ -6,6 +6,7 @@ import BackButton from '@/components/atoms/BackButton.vue'
 import Citation from '@/components/atoms/Citation.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
+import FilePanel from '@/components/atoms/FilePanel.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue'
 import TermButton from '@/components/atoms/TermButton.vue'
@@ -1042,31 +1043,28 @@ onMounted(async () => {
             </li>
           </ul>
         </nav>
-        <div class="box p-0! overflow-hidden">
-          <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <span>{{ generatedCodeFilename }}</span>
-            <div class="flex items-center gap-2">
-              <WrapButton :active="codeWrapActive" @click="toggleCodeWrap" />
-              <CopyButton :text="generatedCode" title="Copy code" />
-              <ActionButton
-                @click="downloadCode"
-                variant="icon"
-                size="sm"
-                content-section="Exposure Detail"
-                tooltip="Download"
-                :aria-label="`Download ${generatedCodeFilename}`"
-              >
-                <DownloadIcon class="w-4 h-4" />
-                <span class="sr-only">Download {{ generatedCodeFilename }}</span>
-              </ActionButton>
-            </div>
-          </div>
+        <FilePanel :title="generatedCodeFilename">
+          <template #actions>
+            <WrapButton :active="codeWrapActive" @click="toggleCodeWrap" />
+            <CopyButton :text="generatedCode" title="Copy code" />
+            <ActionButton
+              @click="downloadCode"
+              variant="icon"
+              size="sm"
+              content-section="Exposure Detail"
+              tooltip="Download"
+              :aria-label="`Download ${generatedCodeFilename}`"
+            >
+              <DownloadIcon class="w-4 h-4" />
+              <span class="sr-only">Download {{ generatedCodeFilename }}</span>
+            </ActionButton>
+          </template>
           <CodeBlock
             :code="generatedCode"
             :filename="generatedCodeFilename"
             :startWrapped="codeWrapActive"
           />
-        </div>
+        </FilePanel>
       </div>
 
       <div v-else-if="props.view === 'cellml_math'" class="box p-0!">
@@ -1444,6 +1442,10 @@ onMounted(async () => {
 
   & :deep(dt) {
     @apply font-semibold;
+  }
+
+  & :deep(img) {
+    @apply max-w-full h-auto mx-auto bg-white p-2;
   }
 
   & :deep(table) {
