@@ -943,8 +943,7 @@ defineExpose({
         </span>
         <Keycap size="small">Tab</Keycap>
         <span>
-          to add as keywords. Results must contain <strong class="text-gray-700 dark:text-gray-200">all</strong> keywords;
-          wrap in "quotes" for an exact phrase.
+          to add as keywords.
         </span>
       </div>
     </div>
