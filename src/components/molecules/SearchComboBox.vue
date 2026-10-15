@@ -202,7 +202,7 @@ const noTermMatchesMessage = computed(() => {
   const label = categoryPrefix.value || 'this category'
   if (isSelectedCategoryLoading.value) return `Loading ${label} suggestions...`
   if (!input) return `No ${label} suggestions available`
-  return `No ${label} available for "${input}". Try a different term or press Escape to pick another category.`
+  return `No ${label} available for "${input}". Press Enter to search it as free text, or Escape to pick another category.`
 })
 
 /**
@@ -245,12 +245,12 @@ const comboboxActiveDescendant = computed(() => {
 const statusMessage = computed(() => {
   if (isCategoryListboxVisible.value) {
     const count = categoryMenuItems.value.length
-    return `${count} ${count === 1 ? 'category' : 'categories'} available. Use up and down arrows or Tab to navigate.`
+    return `${count} ${count === 1 ? 'category' : 'categories'} available. Use up and down arrows or Tab to navigate, Enter to select, Escape to close.`
   }
   if (showTermSuggestions.value) {
     const count = termSuggestions.value.length
     if (count === 0) return noTermMatchesMessage.value
-    return `${count} ${categoryPrefix.value} ${count === 1 ? 'suggestion' : 'suggestions'} available. Use up and down arrows or Tab to navigate.`
+    return `${count} ${categoryPrefix.value} ${count === 1 ? 'suggestion' : 'suggestions'} available. Use up and down arrows or Tab to navigate, Enter to select, Escape to close.`
   }
   return ''
 })
@@ -407,7 +407,11 @@ function filterTermSuggestions(inputText: string) {
   const query = inputText.trim().toLowerCase()
   termSuggestions.value = query ? terms.filter((t) => t.toLowerCase().includes(query)) : terms
   showTermSuggestions.value = true
-  activeSuggestionIndex.value = -1
+  // Highlight an exact match (or else the first match) while typing so Enter/Tab picks it;
+  // nothing is pre-selected when the category is first opened.
+  const exactIndex = termSuggestions.value.findIndex((t) => t.toLowerCase() === query)
+  activeSuggestionIndex.value =
+    !query || termSuggestions.value.length === 0 ? -1 : Math.max(exactIndex, 0)
 }
 
 // ---- Category selection ----
@@ -579,6 +583,13 @@ function handleInput(_event: Event) {
   }
 }
 
+// Moves an active index through a list of `count` items, wrapping at both ends.
+// From no highlight (-1), down goes to the first item and up to the last.
+function wrapIndex(index: number, delta: number, count: number): number {
+  if (index < 0) return delta > 0 ? 0 : count - 1
+  return (index + delta + count) % count
+}
+
 function handleKeydown(event: KeyboardEvent) {
   const input = event.target as HTMLInputElement
 
@@ -601,9 +612,13 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   // ---- Tab ----
-  // If the user has typed free text (no category active), Tab commits it as keyword chips
-  // so they can continue adding keywords or category filters.
-  if (event.key === 'Tab' && !selectedCategoryKind.value && currentInput.value.trim()) {
+  // Free text typed (no category active): Tab commits it as keyword chips.
+  if (
+    event.key === 'Tab' &&
+    !event.shiftKey &&
+    !selectedCategoryKind.value &&
+    currentInput.value.trim()
+  ) {
     commitInputAsTextChips()
     showCategoryMenu.value = true
     categoryMenuActiveIndex.value = -1
@@ -612,57 +627,45 @@ function handleKeydown(event: KeyboardEvent) {
     return
   }
 
-  // Tab / Shift+Tab cycle through the open list like the arrow keys, but include the
-  // input itself (index -1) in the loop. Escape closes the list so Tab can leave the bar.
-  if (event.key === 'Tab') {
-    const delta = event.shiftKey ? -1 : 1
-    const cycle = (index: number, count: number) =>
-      ((index + 1 + delta + count + 1) % (count + 1)) - 1
-
+  // ---- Arrow / Tab navigation ----
+  // Tab / Shift+Tab move through an open list like the arrow keys
+  // (Escape closes the list so Tab can leave the bar).
+  const isTab = event.key === 'Tab'
+  if (isTab || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    const delta = event.key === 'ArrowUp' || (isTab && event.shiftKey) ? -1 : 1
     if (isCategoryListboxVisible.value) {
       event.preventDefault()
-      categoryMenuActiveIndex.value = cycle(
+      categoryMenuActiveIndex.value = wrapIndex(
         categoryMenuActiveIndex.value,
+        delta,
         categoryMenuItems.value.length,
       )
       return
     }
     if (showTermSuggestions.value && termSuggestions.value.length > 0) {
       event.preventDefault()
-      activeSuggestionIndex.value = cycle(activeSuggestionIndex.value, termSuggestions.value.length)
+      activeSuggestionIndex.value = wrapIndex(
+        activeSuggestionIndex.value,
+        delta,
+        termSuggestions.value.length,
+      )
       return
     }
-  }
-
-  // Close dropdowns on Tab (without consuming the event, so focus moves naturally).
-  if (event.key === 'Tab' && showDropdown.value) {
-    showCategoryMenu.value = false
-    showTermSuggestions.value = false
-    if (selectedCategoryKind.value) {
-      selectedCategoryKind.value = null
+    // Nothing to navigate (e.g. no matching terms): close the dropdowns and let Tab
+    // move focus naturally.
+    if (isTab) {
+      if (showDropdown.value) {
+        showCategoryMenu.value = false
+        showTermSuggestions.value = false
+        selectedCategoryKind.value = null
+      }
+      return
     }
-    return
-  }
-
-  // ---- Arrow navigation ----
-  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-    if (showCategoryMenu.value) {
+    // Menu closed (e.g. after Escape) with an empty input: ArrowDown reopens it.
+    if (event.key === 'ArrowDown' && !selectedCategoryKind.value && !currentInput.value.trim()) {
       event.preventDefault()
-      const delta = event.key === 'ArrowDown' ? 1 : -1
-      const items = categoryMenuItems.value
-      const maxIndex = items.length - 1
-      const nextIndex = categoryMenuActiveIndex.value + delta
-      categoryMenuActiveIndex.value =
-        nextIndex < 0 ? maxIndex : nextIndex > maxIndex ? 0 : nextIndex
-      return
-    }
-    if (showTermSuggestions.value && termSuggestions.value.length > 0) {
-      event.preventDefault()
-      const delta = event.key === 'ArrowDown' ? 1 : -1
-      const maxIndex = termSuggestions.value.length - 1
-      const nextIndex = activeSuggestionIndex.value + delta
-      activeSuggestionIndex.value = nextIndex < 0 ? maxIndex : nextIndex > maxIndex ? 0 : nextIndex
-      return
+      showCategoryMenuIfEmpty()
+      categoryMenuActiveIndex.value = 0
     }
     return
   }
@@ -683,18 +686,13 @@ function handleKeydown(event: KeyboardEvent) {
       return
     }
 
-    // Category selected but no item highlighted — try exact match, else fall to free-text search.
+    // Category selected but nothing highlighted (no matching terms, or empty input) —
+    // cancel the category and search the typed text as free text.
     if (showTermSuggestions.value && selectedCategoryKind.value) {
       event.preventDefault()
-      const term = currentInput.value.trim()
-      if (term && termSuggestions.value.some((t) => t.toLowerCase() === term.toLowerCase())) {
-        selectTerm(term)
-      } else {
-        // Cancel category, use input as free-text query.
-        cancelCategorySelection()
-        showCategoryMenu.value = false
-        executeSearch()
-      }
+      cancelCategorySelection()
+      showCategoryMenu.value = false
+      executeSearch()
       return
     }
 
@@ -872,8 +870,10 @@ defineExpose({
           <span>
             No {{ categoryPrefix || 'this category' }} available for
             <strong class="text-gray-700 dark:text-gray-200">{{ currentInput.trim() }}</strong>.
-            Try a different term or press
+            Press
           </span>
+          <Keycap size="small">&crarr;</Keycap>
+          <span>to search it as free text, or</span>
           <Keycap size="small">Esc</Keycap>
           <span>to pick another category</span>
         </template>

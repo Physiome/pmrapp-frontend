@@ -150,7 +150,7 @@ describe('SearchComboBox', () => {
       )
       expect(input.attributes('placeholder')).toBe('Type to search or add a category below...')
       expect(statusText(w)).toBe(
-        '4 categories available. Use up and down arrows or Tab to navigate.',
+        '4 categories available. Use up and down arrows or Tab to navigate, Enter to select, Escape to close.',
       )
     })
 
@@ -189,36 +189,41 @@ describe('SearchComboBox', () => {
       expect(input.attributes('aria-activedescendant')).toBe(options[0]?.attributes('id'))
     })
 
-    it('cycles through categories with Tab, looping back to the input', async () => {
+    it('cycles through categories with Tab, wrapping from last to first', async () => {
       const w = await mountComboBox()
       const input = getInput(w)
       const activeIndex = () =>
         categoryOptions(w).findIndex((o) => o.attributes('aria-selected') === 'true')
 
-      for (const expected of [0, 1, 2, 3]) {
+      for (const expected of [0, 1, 2, 3, 0]) {
         await press(w, 'Tab')
         expect(activeIndex()).toBe(expected)
         expect(input.attributes('aria-activedescendant')).toBe(
           categoryOptions(w)[expected]?.attributes('id'),
         )
       }
-
-      await press(w, 'Tab')
-      expect(activeIndex()).toBe(-1)
-      expect(input.attributes('aria-activedescendant')).toBeUndefined()
-      expect(categoryOptions(w)).toHaveLength(4)
     })
 
-    it('cycles backwards with Shift+Tab', async () => {
+    it('cycles backwards with Shift+Tab, starting from the last category', async () => {
       const w = await mountComboBox()
       const activeIndex = () =>
         categoryOptions(w).findIndex((o) => o.attributes('aria-selected') === 'true')
 
-      await getInput(w).trigger('keydown', { key: 'Tab', shiftKey: true })
-      expect(activeIndex()).toBe(3)
+      for (const expected of [3, 2]) {
+        await getInput(w).trigger('keydown', { key: 'Tab', shiftKey: true })
+        expect(activeIndex()).toBe(expected)
+      }
+    })
 
-      await press(w, 'Tab')
-      expect(activeIndex()).toBe(-1)
+    it('reopens the category menu with ArrowDown after Escape', async () => {
+      const w = await mountComboBox()
+
+      await press(w, 'Escape')
+      expect(categoryOptions(w)).toHaveLength(0)
+
+      await press(w, 'ArrowDown')
+      expect(categoryOptions(w)).toHaveLength(4)
+      expect(categoryOptions(w)[0]?.attributes('aria-selected')).toBe('true')
     })
 
     it('does not trap Tab once the category menu is closed with Escape', async () => {
@@ -274,9 +279,9 @@ describe('SearchComboBox', () => {
       await selectCategory(w, 'Model authors')
       await getInput(w).setValue('NOBLE')
 
-      expect(termOptions(w).map((o) => o.text())).toEqual(['Noble', 'Penny Noble'])
+      expect(termOptions(w).map((o) => o.get('span').text())).toEqual(['Noble', 'Penny Noble'])
       expect(statusText(w)).toBe(
-        '2 Model author suggestions available. Use up and down arrows or Tab to navigate.',
+        '2 Model author suggestions available. Use up and down arrows or Tab to navigate, Enter to select, Escape to close.',
       )
     })
 
@@ -299,14 +304,46 @@ describe('SearchComboBox', () => {
         termOptions(w).findIndex((o) => o.attributes('aria-selected') === 'true')
 
       await selectCategory(w, 'Publication authors')
-      for (const expected of [0, 1, 2, -1]) {
+      for (const expected of [0, 1, 2, 0]) {
         await press(w, 'Tab')
         expect(activeIndex()).toBe(expected)
       }
 
-      await getInput(w).trigger('keydown', { key: 'Tab', shiftKey: true })
-      expect(activeIndex()).toBe(2)
       expect(w.text()).toContain('Publication author:')
+      expect(chipLabels(w)).toEqual([])
+    })
+
+    it('lets Tab leave the bar when the term list has no matches', async () => {
+      const w = await mountComboBox()
+
+      await selectCategory(w, 'Model authors')
+      await getInput(w).setValue('xyz')
+      const event = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true })
+      getInput(w).element.dispatchEvent(event)
+      await nextTick()
+
+      expect(event.defaultPrevented).toBe(false)
+      expect(w.text()).not.toContain('No Model author available')
+    })
+
+    it('does not highlight a term when a category is first opened', async () => {
+      const w = await mountComboBox()
+
+      await selectCategory(w, 'Publication authors')
+
+      expect(termOptions(w).some((o) => o.attributes('aria-selected') === 'true')).toBe(false)
+    })
+
+    it('highlights the first match while typing so Enter selects it', async () => {
+      const w = await mountComboBox()
+
+      await selectCategory(w, 'Model authors')
+      await getInput(w).setValue('lloy')
+      expect(termOptions(w)[0]?.attributes('aria-selected')).toBe('true')
+
+      await press(w, 'Enter')
+      expect(chipLabels(w)).toEqual(['Model author: Catherine Lloyd'])
+      expect(w.emitted('querySearch')).toBeUndefined()
     })
 
     it('selects the highlighted term on Enter', async () => {
@@ -319,14 +356,14 @@ describe('SearchComboBox', () => {
       expect(chipLabels(w)).toEqual(['CellML keyword: calcium'])
     })
 
-    it('selects an exact typed match on Enter without highlighting', async () => {
+    it('prefers an exact typed match over the first match on Enter', async () => {
       const w = await mountComboBox()
 
       await selectCategory(w, 'Model authors')
       await getInput(w).setValue('noble')
       await press(w, 'Enter')
 
-      expect(chipLabels(w)).toEqual(['Model author: noble'])
+      expect(chipLabels(w)).toEqual(['Model author: Noble'])
       expect(w.emitted('querySearch')).toBeUndefined()
     })
 
@@ -352,7 +389,7 @@ describe('SearchComboBox', () => {
       expect(chipLabels(w)).toEqual(['xyz'])
     })
 
-    it('shows a no-match message with an Esc hint', async () => {
+    it('shows a no-match message with Enter and Esc hints', async () => {
       const w = await mountComboBox()
 
       await selectCategory(w, 'Model authors')
@@ -360,9 +397,10 @@ describe('SearchComboBox', () => {
 
       expect(termOptions(w)).toHaveLength(0)
       expect(w.text()).toContain('No Model author available for xyz')
+      expect(w.text()).toContain('to search it as free text')
       expect(w.findAll('kbd').some((k) => k.text() === 'Esc')).toBe(true)
       expect(statusText(w)).toBe(
-        'No Model author available for "xyz". Try a different term or press Escape to pick another category.',
+        'No Model author available for "xyz". Press Enter to search it as free text, or Escape to pick another category.',
       )
     })
 
