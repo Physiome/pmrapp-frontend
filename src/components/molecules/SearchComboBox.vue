@@ -136,25 +136,44 @@ const categoryPrefix = computed(() => {
   return SEARCH_KIND_LABEL_SINGULAR_MAP[selectedCategoryKind.value] || selectedCategoryKind.value
 })
 
+const PLACEHOLDER_FILTER = 'Type to filter...'
+const PLACEHOLDER_ADD_KEYWORD = 'Type to add another keyword...'
+const PLACEHOLDER_ADD_KEYWORD_OR_CATEGORY = 'Type to add another keyword or a category below...'
+const PLACEHOLDER_SEARCH = 'Type to search...'
+const PLACEHOLDER_SEARCH_OR_CATEGORY = 'Type to search or add a category below...'
+
+const isFilteringCategory = computed(
+  () => !!selectedCategoryKind.value && selectedCategoryKind.value !== TEXT_QUERY_KIND,
+)
+
+const hasTextChips = computed(() => chips.value.some(({ kind }) => kind === TEXT_QUERY_KIND))
+
 const inputPlaceholder = computed(() => {
-  if (selectedCategoryKind.value && selectedCategoryKind.value !== TEXT_QUERY_KIND) {
-    return 'Type to filter...'
+  if (isFilteringCategory.value) {
+    return PLACEHOLDER_FILTER
   }
 
-  if (chips.value?.find(({ kind }) => kind === TEXT_QUERY_KIND)) {
-    if (showCategoryMenu.value) {
-      return 'Type to add another keyword or a category below...'
-    } else {
-      return 'Type to add another keyword...'
-    }
+  if (hasTextChips.value) {
+    return showCategoryMenu.value ? PLACEHOLDER_ADD_KEYWORD_OR_CATEGORY : PLACEHOLDER_ADD_KEYWORD
   }
 
-  if (showCategoryMenu.value) {
-    return 'Type to search or add a category below...'
-  }
-
-  return 'Type to search...'
+  return showCategoryMenu.value ? PLACEHOLDER_SEARCH_OR_CATEGORY : PLACEHOLDER_SEARCH
 })
+
+// Longest placeholder for the current state (the one shown while the dropdown is open).
+// The input's min-width is based on it, so it doesn't move when the dropdown opens.
+const longestPlaceholder = computed(() => {
+  if (isFilteringCategory.value) {
+    return PLACEHOLDER_FILTER
+  }
+  return hasTextChips.value ? PLACEHOLDER_ADD_KEYWORD_OR_CATEGORY : PLACEHOLDER_SEARCH_OR_CATEGORY
+})
+
+// Keep the input wide enough for the whole placeholder;
+// flex-wrap moves it to the next line when the chips leave too little room.
+const inputMinWidth = computed(() =>
+  currentInput.value ? '120px' : `min(100%, ${longestPlaceholder.value.length + 2}ch)`,
+)
 
 const helpText = computed(() => {
   if (!isFocused.value && !props.inOverlay) return ''
@@ -790,8 +809,9 @@ defineExpose({
           :aria-controls="comboboxControls"
           :aria-activedescendant="comboboxActiveDescendant"
           :aria-describedby="showFreeTextHint ? freeTextHintId : undefined"
-          class="flex-1 min-w-[120px] outline-none border-none bg-transparent px-1 py-1 text-sm"
+          class="flex-1 outline-none border-none bg-transparent px-1 py-1 text-sm"
           :class="{ 'pl-0': selectedCategoryKind !== null || chips.length > 0 }"
+          :style="{ minWidth: inputMinWidth }"
           :placeholder="inputPlaceholder"
           @input="handleInput"
           @keydown="handleKeydown"
