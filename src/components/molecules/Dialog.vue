@@ -49,7 +49,8 @@ const handleBackdropMouseUp = (event: MouseEvent) => {
 }
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && !props.isStatic) {
+  // Skip Escape already handled by a child (e.g. a combobox stepping back a level).
+  if (event.key === 'Escape' && !event.defaultPrevented && !props.isStatic) {
     emit('close')
   }
 }
