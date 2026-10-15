@@ -10,6 +10,7 @@ import type { SearchFilter } from '@/types/search'
 const { mockSearchStore } = vi.hoisted(() => ({
   mockSearchStore: {
     categories: [] as CategoryData[],
+    lastChipOrder: [] as SearchFilter[],
     isLoading: false,
     fetchCategories: vi.fn<(kinds?: string[]) => Promise<void>>(),
   },
@@ -61,6 +62,7 @@ describe('SearchComboBox', () => {
   beforeEach(() => {
     mockSearchStore.categories = structuredClone(searchCategories)
     mockSearchStore.isLoading = false
+    mockSearchStore.lastChipOrder = []
     mockSearchStore.fetchCategories.mockReset()
     mockSearchStore.fetchCategories.mockResolvedValue(undefined)
   })
@@ -89,7 +91,33 @@ describe('SearchComboBox', () => {
         ],
       })
 
-      expect(chipLabels(w)).toEqual(['Model author: Noble', 'sodium', 'channel'])
+      expect(chipLabels(w)).toEqual(['sodium', 'channel', 'Model author: Noble'])
+    })
+
+    it('rebuilds chips in the order of the last search when they match', async () => {
+      mockSearchStore.lastChipOrder = [
+        { kind: 'model_author', term: 'Noble' },
+        { kind: '_text_query', term: 'cardiac' },
+      ]
+      const w = await mountComboBox({
+        initialQuery: 'cardiac',
+        initialFilters: [{ kind: 'model_author', term: 'Noble' }],
+      })
+
+      expect(chipLabels(w)).toEqual(['Model author: Noble', 'cardiac'])
+    })
+
+    it('falls back to text-first order when the last search has different chips', async () => {
+      mockSearchStore.lastChipOrder = [
+        { kind: 'model_author', term: 'Noble' },
+        { kind: '_text_query', term: 'other' },
+      ]
+      const w = await mountComboBox({
+        initialQuery: 'cardiac',
+        initialFilters: [{ kind: 'model_author', term: 'Noble' }],
+      })
+
+      expect(chipLabels(w)).toEqual(['cardiac', 'Model author: Noble'])
     })
 
     it('rebuilds chips when the initial search params change', async () => {
@@ -435,7 +463,7 @@ describe('SearchComboBox', () => {
       expect(w.emitted('querySearch')?.[0]).toEqual([
         { query: 'cardiac myocyte', filters: [{ kind: 'model_author', term: 'Noble' }] },
       ])
-      expect(chipLabels(w)).toEqual(['Model author: Noble', 'cardiac', 'myocyte'])
+      expect(chipLabels(w)).toEqual(['cardiac', 'Model author: Noble', 'myocyte'])
     })
 
     it('emits the existing free-text chip when nothing is typed', async () => {
@@ -510,20 +538,41 @@ describe('SearchComboBox', () => {
       expect(chipLabels(w)).toEqual(['calcium', '"cardiac myocyte"'])
     })
 
-    it('adds new keywords next to existing ones when a filter chip comes after them', async () => {
+    it('appends new chips at the end in the order they are added', async () => {
       const w = await mountComboBox()
 
       await getInput(w).setValue('cardiac')
       await press(w, 'Tab')
       await selectCategory(w, 'Model author')
+
+      const author = termOptions(w)[0]?.text() as string
       await termOptions(w)[0]?.trigger('click')
       await nextTick()
       await getInput(w).setValue('myocyte')
       await press(w, 'Tab')
 
-      const labels = chipLabels(w)
-      expect(labels.slice(0, 2)).toEqual(['cardiac', 'myocyte'])
-      expect(labels).toHaveLength(3)
+      expect(chipLabels(w)).toEqual(['cardiac', `Model author: ${author}`, 'myocyte'])
+    })
+
+    it('keeps the chip order after searching and receiving the new search params', async () => {
+      const w = await mountComboBox()
+
+      await selectCategory(w, 'Model author')
+
+      const author = termOptions(w)[0]?.text() as string
+      await termOptions(w)[0]?.trigger('click')
+      await nextTick()
+      await getInput(w).setValue('cardiac')
+      await press(w, 'Enter')
+      expect(chipLabels(w)).toEqual([`Model author: ${author}`, 'cardiac'])
+
+      // The parent passes the searched params back down (as it would after navigating).
+      await w.setProps({
+        initialQuery: 'cardiac',
+        initialFilters: [{ kind: 'model_author', term: author }],
+      })
+
+      expect(chipLabels(w)).toEqual([`Model author: ${author}`, 'cardiac'])
     })
 
     it('emits a search when the search button is clicked', async () => {

@@ -325,21 +325,23 @@ function showCategoryMenuIfEmpty() {
 }
 
 // ---- Initialisation ----
+// Order-independent key for comparing two sets of chips.
+function chipSetKey(items: SearchFilter[]): string {
+  return JSON.stringify(items.map(({ kind, term }) => `${kind}|${term}`).sort())
+}
+
 function initialiseFromProps() {
-  chips.value = props.initialFilters
-    .filter((f) => f.kind && f.term)
-    .map((f) => ({
-      id: generateChipId(),
-      kind: f.kind,
-      term: f.term,
-    }))
-  for (const term of parseQueryTokens(props.initialQuery)) {
-    chips.value.push({
-      id: generateChipId(),
-      kind: TEXT_QUERY_KIND,
-      term,
-    })
-  }
+  // Default order: free text first, then filters.
+  const items: SearchFilter[] = [
+    ...parseQueryTokens(props.initialQuery).map((term) => ({ kind: TEXT_QUERY_KIND, term })),
+    ...props.initialFilters.filter((f) => f.kind && f.term),
+  ]
+  // The URL can't hold the order the chips were added in,
+  // so reuse the order from the last search when it has the same chips
+  // (e.g. after searching or opening /search).
+  const ordered =
+    chipSetKey(items) === chipSetKey(searchStore.lastChipOrder) ? searchStore.lastChipOrder : items
+  chips.value = ordered.map(({ kind, term }) => ({ id: generateChipId(), kind, term }))
 }
 
 // Rebuild chips when the parent's search params actually change
@@ -483,22 +485,18 @@ function clearAll() {
 }
 
 // ---- Free text ----
-// Splits the typed text into keyword/phrase chips
-// and adds them after the existing free-text chips, skipping duplicates.
+// Splits the typed text into keyword/phrase chips and appends them, skipping duplicates.
 function commitInputAsTextChips() {
   const tokens = parseQueryTokens(currentInput.value)
   currentInput.value = ''
 
-  const textChips = chips.value.filter((c) => c.kind === TEXT_QUERY_KIND)
-  const existing = new Set(textChips.map((c) => c.term.toLowerCase()))
+  const existing = new Set(
+    chips.value.filter((c) => c.kind === TEXT_QUERY_KIND).map((c) => c.term.toLowerCase()),
+  )
   const newChips = tokens
     .filter((term) => !existing.has(term.toLowerCase()))
     .map((term) => ({ id: generateChipId(), kind: TEXT_QUERY_KIND, term }))
-  if (newChips.length === 0) return
-
-  const lastTextChip = textChips[textChips.length - 1]
-  const insertAt = lastTextChip ? chips.value.indexOf(lastTextChip) + 1 : chips.value.length
-  chips.value.splice(insertAt, 0, ...newChips)
+  chips.value.push(...newChips)
 }
 
 // ---- Search ----
@@ -523,6 +521,8 @@ function executeSearch() {
   showCategoryMenu.value = false
   showTermSuggestions.value = false
   selectedCategoryKind.value = null
+
+  searchStore.lastChipOrder = chips.value.map(({ kind, term }) => ({ kind, term }))
 
   const request: SearchQueryRequest = {
     query: queryText || undefined,
