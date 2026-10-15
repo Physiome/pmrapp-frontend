@@ -147,6 +147,24 @@ const isFilteringCategory = computed(
 
 const hasTextChips = computed(() => chips.value.some(({ kind }) => kind === TEXT_QUERY_KIND))
 
+const pluralise = (count: number, word: string) => `${count} ${count === 1 ? word : `${word}s`}`
+
+// Enter searches with the existing chips too, so the free-text hint mentions them.
+// Text chips are keywords in the query; the rest are sent as filters.
+const otherChipsText = computed(() => {
+  const keywordCount = chips.value.filter(({ kind }) => kind === TEXT_QUERY_KIND).length
+  const filterCount = chips.value.length - keywordCount
+  const parts = []
+  if (keywordCount > 0) parts.push(pluralise(keywordCount, 'other keyword'))
+  if (filterCount > 0) parts.push(pluralise(filterCount, 'filter'))
+  return parts.length > 0 ? ` with ${parts.join(' and ')}` : ''
+})
+
+// Tab adds one keyword chip per word or quoted phrase.
+const tabKeywordLabel = computed(() =>
+  parseQueryTokens(currentInput.value).length > 1 ? 'keywords' : 'keyword',
+)
+
 const inputPlaceholder = computed(() => {
   if (isFilteringCategory.value) {
     return PLACEHOLDER_FILTER
@@ -941,12 +959,12 @@ defineExpose({
         <Keycap size="small">&crarr;</Keycap>
         <span>
           to search for
-          <strong class="text-gray-700 dark:text-gray-200">{{ currentInput }}</strong>,
+          <strong class="text-gray-700 dark:text-gray-200">{{ currentInput }}</strong>{{ otherChipsText }},
           or press
         </span>
         <Keycap size="small">Tab</Keycap>
         <span>
-          to add as keywords.
+          to add as {{ tabKeywordLabel }}.
         </span>
       </div>
     </div>
