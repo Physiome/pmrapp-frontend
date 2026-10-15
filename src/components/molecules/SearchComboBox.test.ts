@@ -169,13 +169,14 @@ describe('SearchComboBox', () => {
       const input = getInput(w)
 
       await input.setValue('cardiac myocyte')
-      const button = w.get('button[aria-label^="Replace the typed text"]')
-      expect(button.text()).toBe('"cardiac myocyte"')
+      const button = w.get('button[type="button"][tabindex="-1"]')
+      expect(button.text()).toBe('replace with "cardiac myocyte"')
+      expect(button.attributes('title')).toBeUndefined()
 
       await button.trigger('click')
 
       expect((input.element as HTMLInputElement).value).toBe('"cardiac myocyte"')
-      expect(w.find('button[aria-label^="Replace the typed text"]').exists()).toBe(false)
+      expect(w.find('button[type="button"][tabindex="-1"]').exists()).toBe(false)
     })
 
     it('does not offer the exact phrase button for a single word', async () => {
@@ -183,7 +184,7 @@ describe('SearchComboBox', () => {
 
       await getInput(w).setValue('calcium')
 
-      expect(w.find('button[aria-label^="Replace the typed text"]').exists()).toBe(false)
+      expect(w.find('button[type="button"][tabindex="-1"]').exists()).toBe(false)
     })
 
     it('shows the menu again when the input is cleared', async () => {

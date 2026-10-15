@@ -1000,14 +1000,13 @@ defineExpose({
         <span>
           to add as {{ tabKeywordLabel }}.
           <template v-if="showExactPhraseTip">
-            Use double quotes to search for an exact phrase, e.g.
+            To search for an exact phrase instead,
             <button
               type="button"
               tabindex="-1"
-              class="font-medium text-gray-700 dark:text-gray-200 underline decoration-dotted hover:text-gray-900 dark:hover:text-white cursor-pointer"
-              :aria-label="`Replace the typed text with ${exactPhraseSuggestion}`"
+              class="font-medium text-left break-words text-gray-700 dark:text-gray-200 underline decoration-dotted hover:text-gray-900 dark:hover:text-white cursor-pointer"
               @click="applyExactPhrase"
-            >{{ exactPhraseSuggestion }}</button>.
+            >replace with {{ exactPhraseSuggestion }}</button>.
           </template>
         </span>
       </div>
