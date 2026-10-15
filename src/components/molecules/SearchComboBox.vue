@@ -172,6 +172,19 @@ const tokenSeparator = (index: number) => {
   return index === typedTokens.value.length - 1 ? ' and ' : ', '
 }
 
+// The Enter hint sentence as text and emphasised token segments, so that spacing is
+// defined here instead of relying on template whitespace.
+const freeTextHintParts = computed(() => {
+  const parts = [{ key: 'prefix', text: 'to search for ', emphasised: false }]
+  typedTokens.value.forEach((token, index) => {
+    const separator = tokenSeparator(index)
+    if (separator) parts.push({ key: `separator-${index}`, text: separator, emphasised: false })
+    parts.push({ key: `token-${index}`, text: token, emphasised: true })
+  })
+  parts.push({ key: 'suffix', text: `${otherChipsText.value}, or press`, emphasised: false })
+  return parts
+})
+
 // Typing several words without quotes searches them separately, so suggest quotes for an exact phrase.
 const showExactPhraseTip = computed(
   () => typedTokens.value.length > 1 && !typedTokens.value.some((token) => token.startsWith('"')),
@@ -970,10 +983,10 @@ defineExpose({
         <span>Press</span>
         <Keycap size="small">&crarr;</Keycap>
         <span>
-          to search for
-          <template v-for="(token, index) in typedTokens" :key="token"
-            >{{ tokenSeparator(index) }}<strong class="text-gray-700 dark:text-gray-200">{{ token }}</strong></template
-          >{{ otherChipsText }}, or press
+          <template v-for="part in freeTextHintParts" :key="part.key">
+            <strong v-if="part.emphasised" class="text-gray-700 dark:text-gray-200">{{ part.text }}</strong>
+            <template v-else>{{ part.text }}</template>
+          </template>
         </span>
         <Keycap size="small">Tab</Keycap>
         <span>
