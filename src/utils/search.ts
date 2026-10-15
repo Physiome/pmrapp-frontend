@@ -36,6 +36,7 @@ export const normaliseSearchText = (text: string): string => {
  * while double-quoted text stays a single exact-match phrase with its quotes kept.
  * An unclosed quote is treated as closed at the end of the text,
  * a quoted single word becomes a plain word,
+ * tokens made only of single quotes (e.g. '') are skipped,
  * and duplicates are removed case-insensitively.
  * e.g. `calcium "cardiac  myocyte"` → ['calcium', '"cardiac myocyte"']
  */
@@ -51,6 +52,8 @@ export const parseQueryTokens = (text: string): string[] => {
       token = phrase.includes(' ') ? `"${phrase}"` : phrase
     } else {
       token = match[2] as string
+      // Single quotes aren't phrase quotes, but a token of only quote marks (e.g. '') means nothing.
+      if (/^['‘’]+$/.test(token)) continue
     }
 
     const key = token.toLowerCase()

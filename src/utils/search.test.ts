@@ -41,6 +41,10 @@ describe('parseQueryTokens', () => {
     expect(parseQueryTokens('"" "cardiac"')).toEqual(['cardiac'])
   })
 
+  it('skips tokens made only of single quotes but keeps apostrophes in words', () => {
+    expect(parseQueryTokens("cardiac '' ‘’ heart's")).toEqual(['cardiac', "heart's"])
+  })
+
   it('collapses whitespace and removes case-insensitive duplicates', () => {
     expect(parseQueryTokens('  Cardiac   cardiac "cardiac   myocyte" "Cardiac Myocyte" ')).toEqual([
       'Cardiac',

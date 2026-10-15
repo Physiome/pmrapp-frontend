@@ -160,9 +160,21 @@ const otherChipsText = computed(() => {
   return parts.length > 0 ? ` with ${parts.join(' and ')}` : ''
 })
 
-// Tab adds one keyword chip per word or quoted phrase.
-const tabKeywordLabel = computed(() =>
-  parseQueryTokens(currentInput.value).length > 1 ? 'keywords' : 'keyword',
+// The typed text as it will be searched: one keyword per word or quoted phrase.
+const typedTokens = computed(() => parseQueryTokens(currentInput.value))
+
+// Tab adds one keyword chip per token.
+const tabKeywordLabel = computed(() => (typedTokens.value.length > 1 ? 'keywords' : 'keyword'))
+
+// Separator shown before each typed token, e.g. "a, b and c".
+const tokenSeparator = (index: number) => {
+  if (index === 0) return ''
+  return index === typedTokens.value.length - 1 ? ' and ' : ', '
+}
+
+// Typing several words without quotes searches them separately, so suggest quotes for an exact phrase.
+const showExactPhraseTip = computed(
+  () => typedTokens.value.length > 1 && !typedTokens.value.some((token) => token.startsWith('"')),
 )
 
 const inputPlaceholder = computed(() => {
@@ -959,12 +971,14 @@ defineExpose({
         <Keycap size="small">&crarr;</Keycap>
         <span>
           to search for
-          <strong class="text-gray-700 dark:text-gray-200">{{ currentInput }}</strong>{{ otherChipsText }},
-          or press
+          <template v-for="(token, index) in typedTokens" :key="token"
+            >{{ tokenSeparator(index) }}<strong class="text-gray-700 dark:text-gray-200">{{ token }}</strong></template
+          >{{ otherChipsText }}, or press
         </span>
         <Keycap size="small">Tab</Keycap>
         <span>
           to add as {{ tabKeywordLabel }}.
+          <template v-if="showExactPhraseTip">Use double quotes to search for an exact phrase.</template>
         </span>
       </div>
     </div>
