@@ -190,6 +190,14 @@ const showExactPhraseTip = computed(
   () => typedTokens.value.length > 1 && !typedTokens.value.some((token) => token.startsWith('"')),
 )
 
+// The typed words wrapped in double quotes, offered as a one-click replacement for the typed text.
+const exactPhraseSuggestion = computed(() => `"${typedTokens.value.join(' ')}"`)
+
+function applyExactPhrase() {
+  currentInput.value = exactPhraseSuggestion.value
+  focusInput()
+}
+
 const inputPlaceholder = computed(() => {
   if (isFilteringCategory.value) {
     return PLACEHOLDER_FILTER
@@ -991,7 +999,16 @@ defineExpose({
         <Keycap size="small" class="mx-1 align-middle">Tab</Keycap>
         <span>
           to add as {{ tabKeywordLabel }}.
-          <template v-if="showExactPhraseTip">Use double quotes to search for an exact phrase.</template>
+          <template v-if="showExactPhraseTip">
+            Use double quotes to search for an exact phrase, e.g.
+            <button
+              type="button"
+              tabindex="-1"
+              class="font-medium text-gray-700 dark:text-gray-200 underline decoration-dotted hover:text-gray-900 dark:hover:text-white cursor-pointer"
+              :aria-label="`Replace the typed text with ${exactPhraseSuggestion}`"
+              @click="applyExactPhrase"
+            >{{ exactPhraseSuggestion }}</button>.
+          </template>
         </span>
       </div>
     </div>

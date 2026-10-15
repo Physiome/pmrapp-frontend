@@ -164,6 +164,28 @@ describe('SearchComboBox', () => {
       expect(getInput(w).attributes('aria-describedby')).toBeDefined()
     })
 
+    it('offers the typed words as an exact phrase button that replaces the input', async () => {
+      const w = await mountComboBox()
+      const input = getInput(w)
+
+      await input.setValue('cardiac myocyte')
+      const button = w.get('button[aria-label^="Replace the typed text"]')
+      expect(button.text()).toBe('"cardiac myocyte"')
+
+      await button.trigger('click')
+
+      expect((input.element as HTMLInputElement).value).toBe('"cardiac myocyte"')
+      expect(w.find('button[aria-label^="Replace the typed text"]').exists()).toBe(false)
+    })
+
+    it('does not offer the exact phrase button for a single word', async () => {
+      const w = await mountComboBox()
+
+      await getInput(w).setValue('calcium')
+
+      expect(w.find('button[aria-label^="Replace the typed text"]').exists()).toBe(false)
+    })
+
     it('shows the menu again when the input is cleared', async () => {
       const w = await mountComboBox()
 
