@@ -530,7 +530,7 @@ describe('SearchComboBox', () => {
       expect(chipLabels(w)).toEqual(['calcium'])
       expect((getInput(w).element as HTMLInputElement).value).toBe('')
       expect(categoryOptions(w)).toHaveLength(4)
-      expect(getInput(w).attributes('placeholder')).toBe('Type to add another keyword or a category below…')
+      expect(getInput(w).attributes('placeholder')).toBe('Type to add another keyword or a category below...')
     })
 
     it('adds keywords from successive Tabs instead of replacing them', async () => {
