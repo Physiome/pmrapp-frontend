@@ -891,7 +891,10 @@ defineExpose({
         </template>
         <template v-else>
           <span>
-            No {{ categoryPrefix || 'this category' }} available for
+            No
+            <span v-if="categoryPrefix" class="font-medium text-gray-700 dark:text-gray-200">{{ categoryPrefix }}</span>
+            <template v-else>this category</template>
+            available for
             <strong class="text-gray-700 dark:text-gray-200">{{ currentInput.trim() }}</strong>.
             Press
           </span>
