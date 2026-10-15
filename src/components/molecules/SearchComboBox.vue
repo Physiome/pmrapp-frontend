@@ -142,7 +142,11 @@ const inputPlaceholder = computed(() => {
   }
 
   if (chips.value?.find(({ kind }) => kind === TEXT_QUERY_KIND)) {
-    return 'Add another keyword or a category below…'
+    if (showCategoryMenu.value) {
+      return 'Type to add another keyword or a category below…'
+    } else {
+      return 'Type to add another keyword...'
+    }
   }
 
   if (showCategoryMenu.value) {
