@@ -221,10 +221,10 @@ watch(
 
 const noTermMatchesMessage = computed(() => {
   const input = currentInput.value.trim()
-  const label = categoryPrefix.value || 'this category'
-  if (isSelectedCategoryLoading.value) return `Loading ${label} suggestions...`
-  if (!input) return `No ${label} suggestions available`
-  return `No ${label} available for "${input}". Press Enter to search it as free text, or Escape to pick another category.`
+  const label = categoryPrefix.value ? `${categoryPrefix.value} ` : ''
+  if (isSelectedCategoryLoading.value) return `Loading ${label}suggestions...`
+  if (!input) return `No ${label}suggestions available`
+  return `No ${categoryPrefix.value || 'matches'} available for "${input}". Press Enter to search it as free text, or Escape to pick another category.`
 })
 
 /**
@@ -884,16 +884,16 @@ defineExpose({
         class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1"
       >
         <template v-if="isSelectedCategoryLoading">
-          <span>Loading {{ categoryPrefix || 'this category' }} suggestions...</span>
+          <span>Loading {{ categoryPrefix ? `${categoryPrefix} ` : '' }}suggestions...</span>
         </template>
         <template v-else-if="!currentInput.trim()">
-          <span>No {{ categoryPrefix || 'this category' }} suggestions available</span>
+          <span>No {{ categoryPrefix ? `${categoryPrefix} ` : '' }}suggestions available</span>
         </template>
         <template v-else>
           <span>
             No
             <span v-if="categoryPrefix" class="font-medium text-gray-700 dark:text-gray-200">{{ categoryPrefix }}</span>
-            <template v-else>this category</template>
+            <template v-else>matches</template>
             available for
             <strong class="text-gray-700 dark:text-gray-200">{{ currentInput.trim() }}</strong>.
             Press
