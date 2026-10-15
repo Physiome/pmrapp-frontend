@@ -21,3 +21,10 @@ export const SEARCH_KIND_NAMES = SEARCH_CATEGORIES.map((c) => c.value) as readon
 
 export const TEXT_QUERY_KIND = '_text_query'
 export const TEXT_QUERY_LABEL = 'Free text'
+
+export const PLACEHOLDER_FILTER = 'Type to filter...'
+export const PLACEHOLDER_ADD_KEYWORD = 'Type to add another keyword...'
+export const PLACEHOLDER_ADD_KEYWORD_OR_CATEGORY =
+  'Type to add another keyword or a category below...'
+export const PLACEHOLDER_SEARCH = 'Type to search...'
+export const PLACEHOLDER_SEARCH_OR_CATEGORY = 'Type to search or add a category below...'

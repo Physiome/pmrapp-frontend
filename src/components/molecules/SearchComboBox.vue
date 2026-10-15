@@ -8,6 +8,11 @@ import FileIcon from '@/components/icons/FileIcon.vue'
 import SearchIcon from '@/components/icons/SearchIcon.vue'
 import UserIcon from '@/components/icons/UserIcon.vue'
 import {
+  PLACEHOLDER_ADD_KEYWORD,
+  PLACEHOLDER_ADD_KEYWORD_OR_CATEGORY,
+  PLACEHOLDER_FILTER,
+  PLACEHOLDER_SEARCH,
+  PLACEHOLDER_SEARCH_OR_CATEGORY,
   SEARCH_CATEGORIES,
   SEARCH_KIND_LABEL_SINGULAR_MAP,
   TEXT_QUERY_KIND,
@@ -135,12 +140,6 @@ const categoryPrefix = computed(() => {
   if (selectedCategoryKind.value === TEXT_QUERY_KIND) return TEXT_QUERY_LABEL
   return SEARCH_KIND_LABEL_SINGULAR_MAP[selectedCategoryKind.value] || selectedCategoryKind.value
 })
-
-const PLACEHOLDER_FILTER = 'Type to filter...'
-const PLACEHOLDER_ADD_KEYWORD = 'Type to add another keyword...'
-const PLACEHOLDER_ADD_KEYWORD_OR_CATEGORY = 'Type to add another keyword or a category below...'
-const PLACEHOLDER_SEARCH = 'Type to search...'
-const PLACEHOLDER_SEARCH_OR_CATEGORY = 'Type to search or add a category below...'
 
 const isFilteringCategory = computed(
   () => !!selectedCategoryKind.value && selectedCategoryKind.value !== TEXT_QUERY_KIND,
