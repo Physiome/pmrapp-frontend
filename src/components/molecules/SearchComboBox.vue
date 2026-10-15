@@ -172,8 +172,8 @@ const tokenSeparator = (index: number) => {
   return index === typedTokens.value.length - 1 ? ' and ' : ', '
 }
 
-// The Enter hint sentence as text and emphasised token segments, so that spacing is
-// defined here instead of relying on template whitespace.
+// The Enter hint sentence as text and emphasised token segments,
+// so that spacing is defined here instead of relying on template whitespace.
 const freeTextHintParts = computed(() => {
   const parts = [{ key: 'prefix', text: 'to search for ', emphasised: false }]
   typedTokens.value.forEach((token, index) => {
@@ -924,7 +924,7 @@ defineExpose({
     >
       <div
         v-if="termSuggestions.length === 0"
-        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1"
+        class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 leading-6"
       >
         <template v-if="isSelectedCategoryLoading">
           <span>Loading {{ categoryPrefix ? `${categoryPrefix} ` : '' }}suggestions...</span>
@@ -941,9 +941,9 @@ defineExpose({
             <strong class="text-gray-700 dark:text-gray-200">{{ currentInput.trim() }}</strong>.
             Press
           </span>
-          <Keycap size="small">&crarr;</Keycap>
+          <Keycap size="small" class="mx-1 align-middle">&crarr;</Keycap>
           <span>to search it as free text, or</span>
-          <Keycap size="small">Esc</Keycap>
+          <Keycap size="small" class="mx-1 align-middle">Esc</Keycap>
           <span>to pick another category</span>
         </template>
       </div>
@@ -979,16 +979,16 @@ defineExpose({
       :class="freeTextHintClass"
       @mousedown.prevent="focusInput"
     >
-      <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 flex items-center flex-wrap gap-x-1.5 gap-y-1">
+      <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 leading-6">
         <span>Press</span>
-        <Keycap size="small">&crarr;</Keycap>
+        <Keycap size="small" class="mx-1 align-middle">&crarr;</Keycap>
         <span>
           <template v-for="part in freeTextHintParts" :key="part.key">
             <strong v-if="part.emphasised" class="text-gray-700 dark:text-gray-200">{{ part.text }}</strong>
             <template v-else>{{ part.text }}</template>
           </template>
         </span>
-        <Keycap size="small">Tab</Keycap>
+        <Keycap size="small" class="mx-1 align-middle">Tab</Keycap>
         <span>
           to add as {{ tabKeywordLabel }}.
           <template v-if="showExactPhraseTip">Use double quotes to search for an exact phrase.</template>
