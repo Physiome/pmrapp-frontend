@@ -15,7 +15,7 @@ import {
 } from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
 import type { SearchFilter, SearchQueryRequest } from '@/types/search'
-import { isValidTerm } from '@/utils/search'
+import { buildQueryFromTokens, isValidTerm, parseQueryTokens } from '@/utils/search'
 
 interface FilterChip {
   id: string
@@ -142,7 +142,7 @@ const inputPlaceholder = computed(() => {
   }
 
   if (chips.value?.find(({ kind }) => kind === TEXT_QUERY_KIND)) {
-    return 'Type to replace search query or add a category below…'
+    return 'Add another keyword or a category below…'
   }
 
   if (showCategoryMenu.value) {
@@ -160,7 +160,7 @@ const helpText = computed(() => {
   if (chips.value.length > 0) {
     return 'Add another category filter below to narrow your search'
   }
-  return 'Select a category filter below, or just type and press Enter to search'
+  return 'Select a category filter below, or just type and press Enter to search. Wrap words in quotes for an exact phrase'
 })
 
 const categoryMenuItems = computed(() => {
@@ -333,11 +333,11 @@ function initialiseFromProps() {
       kind: f.kind,
       term: f.term,
     }))
-  if (props.initialQuery) {
+  for (const term of parseQueryTokens(props.initialQuery)) {
     chips.value.push({
       id: generateChipId(),
       kind: TEXT_QUERY_KIND,
-      term: props.initialQuery,
+      term,
     })
   }
 }
@@ -482,12 +482,32 @@ function clearAll() {
   focusInput()
 }
 
+// ---- Free text ----
+// Splits the typed text into keyword/phrase chips
+// and adds them after the existing free-text chips, skipping duplicates.
+function commitInputAsTextChips() {
+  const tokens = parseQueryTokens(currentInput.value)
+  currentInput.value = ''
+
+  const textChips = chips.value.filter((c) => c.kind === TEXT_QUERY_KIND)
+  const existing = new Set(textChips.map((c) => c.term.toLowerCase()))
+  const newChips = tokens
+    .filter((term) => !existing.has(term.toLowerCase()))
+    .map((term) => ({ id: generateChipId(), kind: TEXT_QUERY_KIND, term }))
+  if (newChips.length === 0) return
+
+  const lastTextChip = textChips[textChips.length - 1]
+  const insertAt = lastTextChip ? chips.value.indexOf(lastTextChip) + 1 : chips.value.length
+  chips.value.splice(insertAt, 0, ...newChips)
+}
+
 // ---- Search ----
 function executeSearch() {
-  // Priority: whatever the user has typed right now, then fall back to an existing free-text chip.
-  const inputText = currentInput.value.trim()
-  const existingTextChip = chips.value.find((c) => c.kind === TEXT_QUERY_KIND)
-  const queryText = inputText || existingTextChip?.term || ''
+  // Typed text is added to the existing free-text chips; all of them make up the query.
+  commitInputAsTextChips()
+  const queryText = buildQueryFromTokens(
+    chips.value.filter((c) => c.kind === TEXT_QUERY_KIND).map((c) => c.term),
+  )
 
   const filters: SearchFilter[] = chips.value
     .filter((c) => c.kind !== TEXT_QUERY_KIND)
@@ -497,18 +517,6 @@ function executeSearch() {
     showCategoryMenuIfEmpty()
     focusInput()
     return
-  }
-
-  // Commit typed text as the free-text chip so the bar reflects the submitted search,
-  // even when the URL doesn't change (e.g. re-submitting the same query).
-  if (inputText) {
-    chips.value = chips.value.filter((c) => c.kind !== TEXT_QUERY_KIND)
-    chips.value.push({
-      id: generateChipId(),
-      kind: TEXT_QUERY_KIND,
-      term: inputText,
-    })
-    currentInput.value = ''
   }
 
   inputRef.value?.blur()
@@ -593,17 +601,10 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   // ---- Tab ----
-  // If the user has typed free text (no category active), Tab commits it as a chip
-  // so they can continue adding category filters.
+  // If the user has typed free text (no category active), Tab commits it as keyword chips
+  // so they can continue adding keywords or category filters.
   if (event.key === 'Tab' && !selectedCategoryKind.value && currentInput.value.trim()) {
-    const term = currentInput.value.trim()
-    chips.value = chips.value.filter((c) => c.kind !== TEXT_QUERY_KIND)
-    chips.value.push({
-      id: generateChipId(),
-      kind: TEXT_QUERY_KIND,
-      term,
-    })
-    currentInput.value = ''
+    commitInputAsTextChips()
     showCategoryMenu.value = true
     categoryMenuActiveIndex.value = -1
     event.preventDefault()
@@ -918,7 +919,10 @@ defineExpose({
           or press
         </span>
         <Keycap size="small">Tab</Keycap>
-        <span>to add category filters</span>
+        <span>
+          to add as keywords. Results must contain <strong class="text-gray-700 dark:text-gray-200">all</strong> keywords;
+          wrap in "quotes" for an exact phrase.
+        </span>
       </div>
     </div>
 

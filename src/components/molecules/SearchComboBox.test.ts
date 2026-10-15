@@ -89,7 +89,7 @@ describe('SearchComboBox', () => {
         ],
       })
 
-      expect(chipLabels(w)).toEqual(['Model author: Noble', 'sodium channel'])
+      expect(chipLabels(w)).toEqual(['Model author: Noble', 'sodium', 'channel'])
     })
 
     it('rebuilds chips when the initial search params change', async () => {
@@ -422,20 +422,20 @@ describe('SearchComboBox', () => {
       expect((getInput(w).element as HTMLInputElement).value).toBe('')
     })
 
-    it('emits filters with the typed text replacing an existing free-text chip', async () => {
+    it('emits filters with the typed text added to existing free-text chips', async () => {
       const w = await mountComboBox({
         inOverlay: true,
-        initialQuery: 'old query',
+        initialQuery: 'cardiac',
         initialFilters: [{ kind: 'model_author', term: 'Noble' }],
       })
 
-      await getInput(w).setValue('new query')
+      await getInput(w).setValue('myocyte')
       await press(w, 'Enter')
 
       expect(w.emitted('querySearch')?.[0]).toEqual([
-        { query: 'new query', filters: [{ kind: 'model_author', term: 'Noble' }] },
+        { query: 'cardiac myocyte', filters: [{ kind: 'model_author', term: 'Noble' }] },
       ])
-      expect(chipLabels(w)).toEqual(['Model author: Noble', 'new query'])
+      expect(chipLabels(w)).toEqual(['Model author: Noble', 'cardiac', 'myocyte'])
     })
 
     it('emits the existing free-text chip when nothing is typed', async () => {
@@ -464,9 +464,66 @@ describe('SearchComboBox', () => {
       expect(chipLabels(w)).toEqual(['calcium'])
       expect((getInput(w).element as HTMLInputElement).value).toBe('')
       expect(categoryOptions(w)).toHaveLength(4)
-      expect(getInput(w).attributes('placeholder')).toBe(
-        'Type to replace search query or add a category below…',
-      )
+      expect(getInput(w).attributes('placeholder')).toBe('Add another keyword or a category below…')
+    })
+
+    it('adds keywords from successive Tabs instead of replacing them', async () => {
+      const w = await mountComboBox()
+
+      await getInput(w).setValue('cardiac')
+      await press(w, 'Tab')
+      await getInput(w).setValue('myocyte')
+      await press(w, 'Tab')
+
+      expect(chipLabels(w)).toEqual(['cardiac', 'myocyte'])
+      await w.get('button[aria-label="Search"]').trigger('click')
+      expect(w.emitted('querySearch')?.[0]).toEqual([
+        { query: 'cardiac myocyte', filters: undefined },
+      ])
+    })
+
+    it('splits space-separated text into separate keyword chips', async () => {
+      const w = await mountComboBox()
+
+      await getInput(w).setValue('cardiac myocyte cardiac')
+      await press(w, 'Tab')
+
+      expect(chipLabels(w)).toEqual(['cardiac', 'myocyte'])
+    })
+
+    it('keeps quoted text as a single exact phrase chip', async () => {
+      const w = await mountComboBox()
+
+      await getInput(w).setValue('"cardiac myocyte"')
+      await press(w, 'Tab')
+
+      expect(chipLabels(w)).toEqual(['"cardiac myocyte"'])
+      await press(w, 'Enter')
+      expect(w.emitted('querySearch')?.[0]).toEqual([
+        { query: '"cardiac myocyte"', filters: undefined },
+      ])
+    })
+
+    it('rebuilds keyword and phrase chips from the initial query', async () => {
+      const w = await mountComboBox({ inOverlay: true, initialQuery: 'calcium "cardiac myocyte"' })
+
+      expect(chipLabels(w)).toEqual(['calcium', '"cardiac myocyte"'])
+    })
+
+    it('adds new keywords next to existing ones when a filter chip comes after them', async () => {
+      const w = await mountComboBox()
+
+      await getInput(w).setValue('cardiac')
+      await press(w, 'Tab')
+      await selectCategory(w, 'Model author')
+      await termOptions(w)[0]?.trigger('click')
+      await nextTick()
+      await getInput(w).setValue('myocyte')
+      await press(w, 'Tab')
+
+      const labels = chipLabels(w)
+      expect(labels.slice(0, 2)).toEqual(['cardiac', 'myocyte'])
+      expect(labels).toHaveLength(3)
     })
 
     it('emits a search when the search button is clicked', async () => {

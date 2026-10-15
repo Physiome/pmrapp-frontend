@@ -3,6 +3,7 @@ import { exposures, workspaces } from '@/mocks/search'
 import type { SearchResult } from '@/types/search'
 import { ensureTrailingSlash } from './path'
 import {
+  buildQueryFromTokens,
   buildQuerySearchQuery,
   buildSearchQuery,
   filterItemsByQuery,
@@ -12,7 +13,50 @@ import {
   isValidTerm,
   normaliseSearchText,
   parseQueryFiltersFromQuery,
+  parseQueryTokens,
 } from './search'
+
+describe('parseQueryTokens', () => {
+  it('splits bare words into separate tokens', () => {
+    expect(parseQueryTokens('cardiac myocyte')).toEqual(['cardiac', 'myocyte'])
+  })
+
+  it('keeps a quoted phrase as one token with its quotes', () => {
+    expect(parseQueryTokens('"cardiac myocyte"')).toEqual(['"cardiac myocyte"'])
+  })
+
+  it('mixes words and phrases', () => {
+    expect(parseQueryTokens('calcium "cardiac myocyte" ion')).toEqual([
+      'calcium',
+      '"cardiac myocyte"',
+      'ion',
+    ])
+  })
+
+  it('closes an unclosed quote at the end of the text', () => {
+    expect(parseQueryTokens('calcium "cardiac myocyte')).toEqual(['calcium', '"cardiac myocyte"'])
+  })
+
+  it('skips empty quotes and unwraps a quoted single word', () => {
+    expect(parseQueryTokens('"" "cardiac"')).toEqual(['cardiac'])
+  })
+
+  it('collapses whitespace and removes case-insensitive duplicates', () => {
+    expect(parseQueryTokens('  Cardiac   cardiac "cardiac   myocyte" "Cardiac Myocyte" ')).toEqual([
+      'Cardiac',
+      '"cardiac myocyte"',
+    ])
+  })
+
+  it('returns no tokens for blank text', () => {
+    expect(parseQueryTokens('   ')).toEqual([])
+  })
+
+  it('round-trips through buildQueryFromTokens', () => {
+    const query = 'calcium "cardiac myocyte"'
+    expect(buildQueryFromTokens(parseQueryTokens(query))).toBe(query)
+  })
+})
 
 describe('filterItemsByQuery', () => {
   it('returns filtered workspace results by search text', () => {
