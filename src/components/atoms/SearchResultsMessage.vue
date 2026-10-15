@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { SEARCH_KIND_LABEL_MAP, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
 import type { SearchFilter, SearchResult } from '@/types/search'
 import { formatKindLabel, formatNumber, formatSearchKey } from '@/utils/format'
+import { parseQueryTokens } from '@/utils/search'
 
 interface Props {
   results: SearchResult[]
@@ -58,6 +59,13 @@ const formatTerms = (terms: string[]) => {
     .join('')
 }
 
+// The query as it is searched: one term per word or quoted phrase, matching the keyword chips.
+const queryTokens = computed(() => parseQueryTokens(props.query ?? ''))
+
+const hasQuery = computed(() => queryTokens.value.length > 0)
+
+const formattedQuery = computed(() => formatTerms(queryTokens.value))
+
 const formatFiltersHtml = computed(() => {
   return groupedFilters.value
     .map((group, i) => {
@@ -78,12 +86,12 @@ const messageNoSearch = 'Perform a search to see results.'
 const messageNoResults = computed(() => {
   let message = 'No results for'
 
-  if (props.query?.trim()) {
-    message += ` ${formatSearchKey(props.query)}`
+  if (hasQuery.value) {
+    message += ` ${formattedQuery.value}`
   }
 
   if (groupedFilters.value.length > 0) {
-    message += props.query?.trim() ? ' with ' : ' '
+    message += hasQuery.value ? ' with ' : ' '
     message += formatFiltersHtml.value
   }
 
@@ -96,12 +104,12 @@ const messageWithResults = computed(() => {
     resultsCount.value === 1 ? '1 result' : `${formatNumber(resultsCount.value)} results`
   let message = `<strong class="text-gray-700 dark:text-gray-200">${countText}</strong>`
 
-  if (props.query?.trim()) {
-    message += ` for ${formatSearchKey(props.query)}`
+  if (hasQuery.value) {
+    message += ` for ${formattedQuery.value}`
   }
 
   if (groupedFilters.value.length > 0) {
-    message += props.query?.trim() ? ' with ' : ' for '
+    message += hasQuery.value ? ' with ' : ' for '
     message += formatFiltersHtml.value
   }
 
