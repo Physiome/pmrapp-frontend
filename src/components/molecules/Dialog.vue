@@ -7,6 +7,7 @@ const props = defineProps<{
   title?: string
   position?: 'center' | 'top'
   isStatic?: boolean
+  overflowContent?: boolean
 }>()
 
 const emit = defineEmits<(e: 'close') => void>()
@@ -15,11 +16,12 @@ const dialogRef = ref<HTMLElement | null>(null)
 
 let isMouseDownOnBackdrop = false
 
-const dialogClasses = [
+const dialogClasses = computed(() => [
   'relative flex w-full h-full md:h-auto md:max-h-[calc(100vh-4rem)] md:max-w-4xl flex-col',
   'bg-white dark:bg-gray-800 shadow-lg',
-  'rounded-lg overflow-hidden focus-visible:outline-none',
-]
+  'rounded-lg focus-visible:outline-none',
+  props.overflowContent !== false ? 'overflow-hidden' : 'overflow-visible',
+])
 
 const positionClasses = computed(() => {
   return props.position === 'top' ? 'items-start md:pt-8' : 'items-center'
@@ -47,7 +49,8 @@ const handleBackdropMouseUp = (event: MouseEvent) => {
 }
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && !props.isStatic) {
+  // Skip Escape already handled by a child (e.g. a combobox stepping back a level).
+  if (event.key === 'Escape' && !event.defaultPrevented && !props.isStatic) {
     emit('close')
   }
 }
@@ -93,7 +96,7 @@ onUnmounted(() => {
         <h2 v-if="title" class="text-lg font-semibold">{{ title }}</h2>
         <CloseButton @click="emit('close')" v-if="!props.isStatic" />
       </div>
-      <div class="min-h-0 flex-1 p-4 overflow-y-auto">
+      <div class="min-h-0 flex-1 p-4" :class="overflowContent !== false ? 'overflow-y-auto' : 'overflow-visible'">
         <slot />
       </div>
     </div>

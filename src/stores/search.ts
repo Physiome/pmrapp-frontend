@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getSearchService } from '@/services'
-import type { IndexKindResponse, SearchQueryRequest, SearchResult } from '@/types/search'
+import type {
+  IndexKindResponse,
+  SearchFilter,
+  SearchQueryRequest,
+  SearchResult,
+} from '@/types/search'
 
 const CACHE_TTL = 30 * 60 * 1000 // 30 minutes in milliseconds
 const SEARCH_RESULTS_CACHE_MAX_SIZE = 200 // Keep up to 200 cached kind/term search entries.
@@ -38,6 +43,9 @@ export const useSearchStore = defineStore('search', () => {
   const error = ref<string | null>(null)
   const searchResultsCache = ref<Map<string, SearchResultCache>>(new Map())
   const searchQueryCache = ref<Map<string, SearchQueryCache>>(new Map())
+  // Chip order from the last search bar submission (free-text chips use TEXT_QUERY_KIND),
+  // so the bar can be rebuilt in the order the user added the chips.
+  const lastChipOrder = ref<SearchFilter[]>([])
 
   const pruneExpiredEntries = <T extends TimedCacheEntry>(cache: Map<string, T>, now: number) => {
     for (const [key, entry] of cache.entries()) {
@@ -243,5 +251,6 @@ export const useSearchStore = defineStore('search', () => {
     fetchCategories,
     searchIndexTerm,
     searchQuery,
+    lastChipOrder,
   }
 })

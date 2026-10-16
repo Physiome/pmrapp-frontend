@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
 import RefreshIcon from '@/components/icons/RefreshIcon.vue'
-import SearchInput from '@/components/molecules/SearchInput.vue'
 import SearchResults from '@/components/molecules/SearchResults.vue'
 import SortDropdown from '@/components/molecules/SortDropdown.vue'
 import { SEARCH_KIND_NAMES } from '@/constants/search'
@@ -22,6 +21,7 @@ import {
   SORT_OPTIONS_GROUPED,
   sortSearchResults,
 } from '@/utils/sort'
+import SearchComboBox from '../molecules/SearchComboBox.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,7 +36,7 @@ const searchQueryParam = computed(() => getQueryTextFromRouteQuery(route.query))
 const searchResults = ref<SearchResult[]>([])
 const isLoading = ref(false)
 const resultsError = ref<string | null>(null)
-const searchInputRef = ref<InstanceType<typeof SearchInput> | null>(null)
+const searchComboBoxRef = ref<InstanceType<typeof SearchComboBox> | null>(null)
 
 const sortQuery = route.query.sort
 const initialSort: SortOption =
@@ -47,7 +47,7 @@ watch(
   () => globalState.isSearchFocusRequested,
   (isRequested) => {
     if (isRequested) {
-      searchInputRef.value?.searchInputRef?.focus()
+      searchComboBoxRef.value?.focusInput()
       globalState.consumeSearchFocus()
     }
   },
@@ -126,13 +126,6 @@ const loadResults = async (forceRefresh = false) => {
   }
 }
 
-const handleSearch = (searchKind: string, searchTerm: string) => {
-  router.push({
-    path: '/search',
-    query: buildQuerySearchQuery('', [{ kind: searchKind, term: searchTerm }], route.query),
-  })
-}
-
 const handleQuerySearch = (request: {
   query?: string
   filters?: Array<{ kind: string; term: string }>
@@ -153,17 +146,15 @@ const handleRefresh = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-    <SearchInput
-      class="w-full lg:flex-1 lg:w-auto"
-      ref="searchInputRef"
-      :initial-kind="''"
-      :initial-term="searchQueryParam"
+  <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+    <SearchComboBox
+      ref="searchComboBoxRef"
+      class="flex-1 w-full md:w-auto"
+      :initial-query="searchQueryParam"
       :initial-filters="queryFilters"
-      @search="handleSearch"
-      @querySearch="handleQuerySearch"
+      @query-search="handleQuerySearch"
     />
-    <div class="flex w-full gap-4 lg:w-auto lg:flex-row lg:items-center justify-end">
+    <div class="flex w-full gap-4 md:w-auto md:flex-row md:items-center justify-end">
       <SortDropdown
         :disabled="!(hasResults || isLoading)"
         :model-value="sortBy"

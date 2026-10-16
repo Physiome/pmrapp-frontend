@@ -32,6 +32,45 @@ export const normaliseSearchText = (text: string): string => {
 }
 
 /**
+ * Splits free text into search tokens. Bare words become separate tokens,
+ * while double-quoted text stays a single exact-match phrase with its quotes kept.
+ * An unclosed quote is treated as closed at the end of the text,
+ * a quoted single word becomes a plain word,
+ * tokens made only of single quotes (e.g. '') are skipped,
+ * and duplicates are removed case-insensitively.
+ * e.g. `calcium "cardiac  myocyte"` → ['calcium', '"cardiac myocyte"']
+ */
+export const parseQueryTokens = (text: string): string[] => {
+  const tokens: string[] = []
+  const seen = new Set<string>()
+
+  for (const match of text.matchAll(/"([^"]*)"?|([^\s"]+)/g)) {
+    let token: string
+    if (match[1] !== undefined) {
+      const phrase = match[1].replace(/\s+/g, ' ').trim()
+      if (!phrase) continue
+      token = phrase.includes(' ') ? `"${phrase}"` : phrase
+    } else {
+      token = match[2] as string
+      // Single quotes aren't phrase quotes, but a token of only quote marks (e.g. '') means nothing.
+      if (/^['‘’]+$/.test(token)) continue
+    }
+
+    const key = token.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    tokens.push(token)
+  }
+
+  return tokens
+}
+
+/**
+ * Joins search tokens back into the query string the API expects.
+ */
+export const buildQueryFromTokens = (tokens: string[]): string => tokens.join(' ')
+
+/**
  * Builds a /search query for a single filter in flat format and preserves the
  * current sort option when it is valid.
  */
