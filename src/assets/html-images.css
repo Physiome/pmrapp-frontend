@@ -45,8 +45,4 @@
   & .img-fallback-icon {
     @apply w-8 h-8;
   }
-
-  & .img-fallback-name {
-    @apply max-w-full truncate text-xs text-gray-400 dark:text-gray-500;
-  }
 }

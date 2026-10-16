@@ -56,27 +56,11 @@ export function prepareHtmlImages(html: string): string {
 }
 
 /**
- * Returns the file name of an image source, or an empty string for data URIs
- * and sources without a usable path.
- */
-function getImageFileName(src: string): string {
-  if (!src || /^\s*data:/i.test(src)) return ''
-
-  try {
-    const { pathname } = new URL(src, window.location.href)
-    return decodeURIComponent(pathname.split('/').pop() ?? '')
-  } catch {
-    return ''
-  }
-}
-
-/**
  * Builds an accessible placeholder for an image that failed to load.
- * Built with DOM APIs (not `innerHTML`) since `alt` and `src` come from user data.
+ * Built with DOM APIs so `alt` text is not interpreted as markup.
  */
 function createImageFallback(img: HTMLImageElement): HTMLElement {
   const alt = img.getAttribute('alt')?.trim()
-  const fileName = getImageFileName(img.currentSrc || img.getAttribute('src') || '')
 
   const fallback = document.createElement('span')
   fallback.className = IMAGE_FALLBACK_CLASS
@@ -100,17 +84,12 @@ function createImageFallback(img: HTMLImageElement): HTMLElement {
   icon.appendChild(path)
 
   const label = document.createElement('span')
-  label.textContent = alt ? `${IMAGE_FALLBACK_TEXT}: ${alt}` : IMAGE_FALLBACK_TEXT
+  if (alt) {
+    label.append(document.createTextNode(alt), document.createElement('br'))
+  }
+  label.append(document.createTextNode(IMAGE_FALLBACK_TEXT))
 
   fallback.append(icon, label)
-
-  if (fileName) {
-    const name = document.createElement('span')
-    name.className = `${IMAGE_FALLBACK_CLASS}-name`
-    name.textContent = fileName
-    name.title = fileName
-    fallback.appendChild(name)
-  }
 
   return fallback
 }

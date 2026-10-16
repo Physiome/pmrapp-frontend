@@ -96,7 +96,8 @@ describe('markHtmlImagesLoaded', () => {
     expect(container.querySelector('.img-frame')).toBeNull()
     expect(fallback?.getAttribute('role')).toBe('img')
     expect(fallback?.getAttribute('aria-label')).toBe('Image not available')
-    expect(fallback?.querySelector('.img-fallback-name')?.textContent).toBe('a.png')
+    expect(fallback?.textContent).toBe('Image not available')
+    expect(fallback?.querySelector('.img-fallback-name')).toBeNull()
   })
 
   it('removes the loading marker from the frame of an image in a picture', () => {
@@ -126,7 +127,7 @@ describe('markHtmlImagesLoaded', () => {
     expect(container.querySelector('.img-fallback')).not.toBeNull()
   })
 
-  it('includes the alt text in the placeholder when present', () => {
+  it('includes the alt text before the unavailable message when present', () => {
     const container = document.createElement('div')
     container.innerHTML = '<img src="b.png" alt="Model diagram" width="10" height="10">'
     markHtmlImagesLoaded(container)
@@ -134,29 +135,13 @@ describe('markHtmlImagesLoaded', () => {
     getImage(container).dispatchEvent(new Event('error'))
 
     const fallback = container.querySelector('.img-fallback')
+    const label = fallback?.querySelector('.img-fallback > span')
     expect(fallback?.getAttribute('aria-label')).toBe('Image not available: Model diagram')
-    expect(fallback?.textContent).toContain('Image not available: Model diagram')
+    expect(label?.textContent).toBe('Model diagramImage not available')
+    expect(label?.querySelector('br')).not.toBeNull()
   })
 
-  it.each([
-    'data:image/png;base64,AAAA',
-    'DATA:image/png;base64,AAAA',
-    ' Data:image/png;base64,AAAA',
-  ])('omits the file name for data URI %s', (src) => {
-    const container = document.createElement('div')
-    const img = document.createElement('img')
-    img.setAttribute('src', src)
-    container.appendChild(img)
-    markHtmlImagesLoaded(container)
-
-    img.dispatchEvent(new Event('error'))
-
-    expect(container.querySelector('.img-fallback')).not.toBeNull()
-    expect(container.querySelector('.img-fallback-name')).toBeNull()
-    expect(container.textContent).not.toContain('AAAA')
-  })
-
-  it('does not render user data as HTML in the placeholder', () => {
+  it('treats the alt text as text in the placeholder', () => {
     const container = document.createElement('div')
     const img = document.createElement('img')
     img.src = 'c.png'
@@ -168,5 +153,6 @@ describe('markHtmlImagesLoaded', () => {
 
     expect(container.querySelector('b')).toBeNull()
     expect(container.textContent).toContain('<b>bold</b>')
+    expect(container.querySelector('.img-fallback br')).not.toBeNull()
   })
 })
