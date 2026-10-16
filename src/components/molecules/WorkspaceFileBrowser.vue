@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import LoadingBox from '@/components/atoms/LoadingBox.vue'
+import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import FileIcon from '@/components/icons/FileIcon.vue'
@@ -140,7 +140,9 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
     :error="error.message"
   />
 
-  <LoadingBox v-else-if="isLoading" message="Loading files..." />
+  <div v-else-if="isLoading" class="box">
+    <SkeletonBlock :lines="5" />
+  </div>
 
   <div v-else class="box p-0! overflow-hidden">
     <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
