@@ -1,6 +1,16 @@
 import type { LocationQuery, LocationQueryRaw } from 'vue-router'
 import type { SortableEntity } from '@/types/common'
-import type { QueryFilterOptions, SearchFilter, SearchResult, TextSegment } from '@/types/search'
+import { SEARCH_KIND_LABEL_SINGULAR_MAP, SEARCH_TEXT_QUERY_KIND } from '@/constants/search'
+import type {
+  QueryFilterOptions,
+  SearchFilter,
+  SearchFilterChip,
+  SearchQueryRequest,
+  SearchResult,
+  SearchSuggestionFocusTarget,
+  SearchSuggestionPosition,
+  TextSegment,
+} from '@/types/search'
 import { ensureTrailingSlash } from '@/utils/path'
 import { DEFAULT_SORT_OPTION, isValidSortOption } from '@/utils/sort'
 
@@ -17,6 +27,43 @@ export const isValidTerm = (term: string): boolean => {
   if (trimmed.endsWith('pubmed:')) return false
   if (/^unknown([, ]+unknown)?$/i.test(trimmed)) return false
   return true
+}
+
+/**
+ * Returns the terms that partially match `query` (case-insensitive substring).
+ * Terms starting with the query are listed first, then the remaining matches,
+ * each group keeping its original order. Invalid terms and `excluded` terms
+ * (compared case-insensitively) are skipped. At most `limit` terms are returned.
+ */
+export const findMatchingTerms = (
+  terms: string[],
+  query: string,
+  excluded: string[] = [],
+  limit = 20,
+): string[] => {
+  const needle = query.trim().toLowerCase()
+  if (!needle || limit <= 0) return []
+
+  const excludedSet = new Set(excluded.map((term) => term.toLowerCase()))
+  const prefixMatches: string[] = []
+  const otherMatches: string[] = []
+
+  for (const term of terms) {
+    if (prefixMatches.length >= limit) break
+    if (!isValidTerm(term)) continue
+
+    const lowerTerm = term.toLowerCase()
+    if (excludedSet.has(lowerTerm)) continue
+
+    const index = lowerTerm.indexOf(needle)
+    if (index === 0) {
+      prefixMatches.push(term)
+    } else if (index > 0 && otherMatches.length < limit) {
+      otherMatches.push(term)
+    }
+  }
+
+  return [...prefixMatches, ...otherMatches].slice(0, limit)
 }
 
 /**
@@ -211,4 +258,120 @@ export const getSearchResultLink = (item: SearchResult): string => {
   }
 
   return ''
+}
+
+/**
+ * Returns the label shown on a search chip, e.g. "Model author: Noble".
+ * Free-text chips show the term only.
+ */
+export const getSearchChipLabel = (kind: string, term: string): string => {
+  if (kind === SEARCH_TEXT_QUERY_KIND) return term
+  const singularLabel = SEARCH_KIND_LABEL_SINGULAR_MAP[kind] || kind
+  return `${singularLabel}: ${term}`
+}
+
+/**
+ * Returns the accessible label for a search suggestion button.
+ */
+export const getSearchSuggestionAriaLabel = (kind: string, term: string): string => {
+  if (kind === SEARCH_TEXT_QUERY_KIND) return `Add free text: ${term}`
+  return `Add ${getSearchChipLabel(kind, term)}`
+}
+
+const generateSearchChipId = (): string => {
+  return `${Date.now()}:${Math.random().toString(36).slice(2, 8)}`
+}
+
+/**
+ * Creates a search chip with a unique id and its display label.
+ */
+export const createSearchChip = (kind: string, term: string): SearchFilterChip => ({
+  id: generateSearchChipId(),
+  kind,
+  term,
+  displayLabel: getSearchChipLabel(kind, term),
+})
+
+/**
+ * Builds the search request from the chips and the current input text.
+ * The typed text takes priority over an existing free-text chip as the query.
+ * Returns null when there is nothing to search for.
+ */
+export const buildSearchQueryRequestFromChips = (
+  chips: SearchFilterChip[],
+  inputText: string,
+): SearchQueryRequest | null => {
+  const existingTextChip = chips.find((c) => c.kind === SEARCH_TEXT_QUERY_KIND)
+  const queryText = inputText.trim() || existingTextChip?.term || ''
+
+  const filters: SearchFilter[] = chips
+    .filter((c) => c.kind !== SEARCH_TEXT_QUERY_KIND)
+    .map((c) => ({ kind: c.kind, term: c.term }))
+
+  if (!queryText && filters.length === 0) return null
+
+  return {
+    query: queryText || undefined,
+    filters: filters.length > 0 ? filters : undefined,
+  }
+}
+
+/**
+ * Resolves where focus moves when a navigation key is pressed on a suggestion
+ * button, given the number of visible buttons in each row.
+ * - ArrowRight/ArrowLeft move along a row, wrapping into the adjacent row.
+ * - ArrowDown/ArrowUp move to the same column in the adjacent row (clamped).
+ * - Tab/Shift+Tab step through buttons in order, returning to the input at either end.
+ * Returns null when focus should stay where it is.
+ */
+export const getNextSearchSuggestionFocus = (
+  key: string,
+  shiftKey: boolean,
+  { rowIndex, colIndex }: SearchSuggestionPosition,
+  rowLengths: number[],
+): SearchSuggestionFocusTarget | null => {
+  const lastRowIndex = rowLengths.length - 1
+  const lastColIndexOf = (row: number) => (rowLengths[row] ?? 0) - 1
+
+  switch (key) {
+    case 'ArrowRight': {
+      if (colIndex < lastColIndexOf(rowIndex)) return { rowIndex, colIndex: colIndex + 1 }
+      return { rowIndex: rowIndex < lastRowIndex ? rowIndex + 1 : 0, colIndex: 0 }
+    }
+    case 'ArrowLeft': {
+      if (colIndex > 0) return { rowIndex, colIndex: colIndex - 1 }
+      if (rowIndex > 0) return { rowIndex: rowIndex - 1, colIndex: lastColIndexOf(rowIndex - 1) }
+      return 'input'
+    }
+    case 'ArrowDown': {
+      if (rowIndex < lastRowIndex) {
+        return {
+          rowIndex: rowIndex + 1,
+          colIndex: Math.min(colIndex, lastColIndexOf(rowIndex + 1)),
+        }
+      }
+      return null
+    }
+    case 'ArrowUp': {
+      if (rowIndex > 0) {
+        return {
+          rowIndex: rowIndex - 1,
+          colIndex: Math.min(colIndex, lastColIndexOf(rowIndex - 1)),
+        }
+      }
+      return 'input'
+    }
+    case 'Tab': {
+      if (shiftKey) {
+        if (rowIndex === 0 && colIndex === 0) return 'input'
+        if (colIndex > 0) return { rowIndex, colIndex: colIndex - 1 }
+        return { rowIndex: rowIndex - 1, colIndex: lastColIndexOf(rowIndex - 1) }
+      }
+      if (rowIndex === lastRowIndex && colIndex === lastColIndexOf(rowIndex)) return 'input'
+      if (colIndex < lastColIndexOf(rowIndex)) return { rowIndex, colIndex: colIndex + 1 }
+      return { rowIndex: rowIndex + 1, colIndex: 0 }
+    }
+    default:
+      return null
+  }
 }

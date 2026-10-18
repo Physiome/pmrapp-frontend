@@ -5,6 +5,7 @@ interface Props {
   label: string
   removable?: boolean
   onRemove?: () => void
+  onClick?: () => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,20 +40,28 @@ const handleRemoveChip = () => {
     props.onRemove()
   }
 }
+
+const handleClickChip = () => {
+  if (props.onClick) {
+    props.onClick()
+  }
+}
 </script>
 
 <template>
   <div
     :class="[chipClasses, removable ? 'pl-2.5 pr-1' : 'px-2.5']"
+    @click="handleClickChip"
   >
-  <span class="truncate max-w-48 group-hover/chip:opacity-75" :class="[transitionClasses]">
+  <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
     {{ label }}
   </span>
-  <CloseButton
-    v-if="removable"
-    :class="closeButtonClasses"
-    @click="handleRemoveChip"
-    :aria-label="`Remove ${label}`"
-  />
+  <span v-if="removable" @click.stop>
+    <CloseButton
+      :class="closeButtonClasses"
+      @click="handleRemoveChip"
+      :aria-label="`Remove ${label}`"
+    />
+  </span>
   </div>
 </template>

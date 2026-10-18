@@ -4,6 +4,7 @@ import { computed } from 'vue'
 interface Props {
   term: string
   active?: boolean
+  ariaLabel?: string
 }
 
 const props = defineProps<Props>()
@@ -46,10 +47,11 @@ const handleClick = () => {
 
 <template>
   <button
+    type="button"
     :class="buttonClass"
-    :aria-label="`Search for ${term}`"
+    :aria-label="ariaLabel ?? `Search for ${term}`"
     @click="handleClick"
   >
-    {{ term }}
+    <slot>{{ term }}</slot>
   </button>
 </template>

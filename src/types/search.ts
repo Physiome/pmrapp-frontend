@@ -63,3 +63,22 @@ export interface QueryFilterOptions<T extends SortableEntity> {
   query: string
   items: T[]
 }
+
+export interface SearchFilterChip extends SearchFilter {
+  id: string
+  displayLabel: string
+}
+
+export interface SearchSuggestionRow {
+  kind: string
+  label: string
+  terms: string[]
+}
+
+export interface SearchSuggestionPosition {
+  rowIndex: number
+  colIndex: number
+}
+
+// Where focus should move next: a suggestion button, or back to the search input.
+export type SearchSuggestionFocusTarget = SearchSuggestionPosition | 'input'
