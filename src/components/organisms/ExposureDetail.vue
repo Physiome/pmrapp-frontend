@@ -2,7 +2,6 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import BackButton from '@/components/atoms/BackButton.vue'
 import Citation from '@/components/atoms/Citation.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
@@ -824,11 +823,6 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-wrap gap-2 justify-between mb-6" :class="actionToolbarWidth">
-    <BackButton
-      :label="backButtonLabel"
-      content-section="Exposure Detail"
-      :on-click="goBack"
-    />
     <ActionButton
       variant="link"
       size="md"

@@ -2,7 +2,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import BackButton from '@/components/atoms/BackButton.vue'
 import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import BugIcon from '@/components/icons/BugIcon.vue'
@@ -157,11 +156,6 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 
 <template>
   <div class="flex flex-wrap gap-2 justify-between mb-6">
-    <BackButton
-      :label="backButtonText"
-      content-section="Workspace Detail"
-      :on-click="goBack"
-    />
     <ActionButton
       variant="link"
       size="md"

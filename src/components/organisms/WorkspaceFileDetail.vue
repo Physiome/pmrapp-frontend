@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import BackButton from '@/components/atoms/BackButton.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
 import FilePanel from '@/components/atoms/FilePanel.vue'
@@ -245,12 +244,6 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 </script>
 
 <template>
-  <BackButton
-    label="Back"
-    :contentSection="pageTitle"
-    :on-click="goBack"
-  />
-
   <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" titleSize="small" />
 
   <ErrorBlock
