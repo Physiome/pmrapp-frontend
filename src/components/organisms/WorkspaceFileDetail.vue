@@ -184,7 +184,6 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
   },
 ])
 
-
 const pageTitle = computed(() => {
   const title = generateWorkspaceTitle(
     workspaceInfo.value?.workspace.description,

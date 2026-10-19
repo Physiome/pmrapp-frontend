@@ -68,7 +68,10 @@ describe('validateRequiredEnv', () => {
   })
 
   it('accepts a valid GitHub issues URL using HTTPS', () => {
-    const env = { ...validEnv, VITE_GITHUB_ISSUES_URL: 'https://github.com/Physiome/pmrapp-frontend/issues' }
+    const env = {
+      ...validEnv,
+      VITE_GITHUB_ISSUES_URL: 'https://github.com/Physiome/pmrapp-frontend/issues',
+    }
     expect(validateRequiredEnv(env).problems).toEqual([])
   })
 

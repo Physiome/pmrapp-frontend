@@ -41,6 +41,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
         workspaceInfo.value.workspace.id,
       )
     : props.alias
+
   // Inside a folder, link back to the workspace root at the same commit.
   const workspaceRoot = props.commitId
     ? {
@@ -48,6 +49,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
         params: { alias: props.alias, commitId: props.commitId },
       }
     : { name: 'workspace-detail', params: { alias: props.alias } }
+
   return [
     {
       label: 'Workspaces',
@@ -84,11 +86,11 @@ const workspaceIssueUrl = computed(() => {
   const resolved = router.resolve(
     props.commitId && props.path
       ? {
-        name: 'workspace-file-detail',
-        params: { alias: props.alias, commitId: props.commitId, path: props.path },
-      }
+          name: 'workspace-file-detail',
+          params: { alias: props.alias, commitId: props.commitId, path: props.path },
+        }
       : { name: 'workspace-detail', params: { alias: props.alias } },
-   )
+  )
   const decodedHref = decodeURIComponent(resolved.href)
   const workspaceUrl = new URL(decodedHref, window.location.origin).toString()
   const params = new URLSearchParams({

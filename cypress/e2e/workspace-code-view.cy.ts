@@ -41,11 +41,7 @@ describe('Workspace detail page', () => {
       cy.contains('a', 'Workspaces').should('exist')
       cy.get('a')
         .last()
-        .should(
-          'have.attr',
-          'href',
-          '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834',
-        )
+        .should('have.attr', 'href', '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834')
     })
   })
 })

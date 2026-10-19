@@ -410,7 +410,9 @@ describe('getSearchResultLink', () => {
   })
 
   it('appends trailing slash when aliased_uri does not end with a slash', () => {
-    const item = createSearchResult({ aliased_uri: ['/e/210f6601f6461be8443592ff071d2592/file.cellml'] })
+    const item = createSearchResult({
+      aliased_uri: ['/e/210f6601f6461be8443592ff071d2592/file.cellml'],
+    })
     expect(getSearchResultLink(item)).toBe('/e/210f6601f6461be8443592ff071d2592/file.cellml/')
   })
 

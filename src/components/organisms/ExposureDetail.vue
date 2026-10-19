@@ -117,8 +117,10 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
         false,
       )
     : props.alias
+
   // The 'view' key is the file's default view, so it gets no crumb of its own.
   const hasViewCrumb = !!props.file && !!props.view && props.view !== 'view'
+
   const items: BreadcrumbItem[] = [
     {
       label: 'Exposures',
@@ -129,6 +131,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
       to: props.file ? { name: 'exposure-detail', params: { alias: props.alias } } : undefined,
     },
   ]
+
   if (props.file) {
     items.push({
       label: props.file,
@@ -136,10 +139,12 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
       to: hasViewCrumb ? `/exposures/${props.alias}/${props.file}/` : undefined,
     })
   }
+
   if (hasViewCrumb) {
     const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view)
     items.push({ label: viewEntry?.name ?? props.view })
   }
+
   return items
 })
 
