@@ -10,11 +10,14 @@ import CodeIcon from '@/components/icons/CodeIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import PreviewIcon from '@/components/icons/PreviewIcon.vue'
+import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import { getWorkspaceService } from '@/services'
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
+import { useNavigationStore } from '@/stores/navigation'
 import { useWorkspaceStore } from '@/stores/workspace'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { WorkspaceInfo } from '@/types/workspace'
 import { trackButtonClick } from '@/utils/analytics'
 import { downloadWorkspaceFile } from '@/utils/download'
@@ -56,17 +59,6 @@ const codeWrapActive = ref(false)
 const filename = computed(() => {
   const lastSlash = props.path.lastIndexOf('/')
   return lastSlash === -1 ? props.path : props.path.substring(lastSlash + 1)
-})
-
-const backPath = computed(() => {
-  const lastSlash = props.path.lastIndexOf('/')
-  if (lastSlash === -1) {
-    // File in root - go to root workspace.
-    return `/workspace/${props.alias}`
-  }
-  // Go to parent folder.
-  const parentPath = props.path.substring(0, lastSlash)
-  return `/workspace/${props.alias}/file/${props.commitId}/${parentPath}`
 })
 
 const workspaceStore = useWorkspaceStore()
@@ -171,6 +163,28 @@ const loadWorkspaceInfo = async () => {
   }
 }
 
+const navigationStore = useNavigationStore()
+
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
+  {
+    label: 'Workspaces',
+    to: { name: 'workspaces', query: navigationStore.listingQuery.workspaces },
+  },
+  {
+    label: workspaceInfo.value
+      ? generateWorkspaceTitle(
+          workspaceInfo.value.workspace.description,
+          workspaceInfo.value.workspace.id,
+        )
+      : props.alias,
+    to: {
+      name: 'workspace-detail-alias-commit',
+      params: { alias: props.alias, commitId: props.commitId },
+    },
+  },
+])
+
+
 const pageTitle = computed(() => {
   const title = generateWorkspaceTitle(
     workspaceInfo.value?.workspace.description,
@@ -242,6 +256,8 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 </script>
 
 <template>
+  <Breadcrumbs :items="breadcrumbItems" class="mb-6" />
+
   <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" titleSize="small" />
 
   <ErrorBlock

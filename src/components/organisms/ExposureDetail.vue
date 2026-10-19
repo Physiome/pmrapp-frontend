@@ -14,6 +14,7 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
+import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
@@ -24,7 +25,9 @@ import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useExposureStore } from '@/stores/exposure'
+import { useNavigationStore } from '@/stores/navigation'
 import { useSearchStore } from '@/stores/search'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ErrorInfo } from '@/types/error'
 import type { ExposureInfo, Metadata, ViewEntry } from '@/types/exposure'
 import type { MathMLFormatOptions } from '@/types/mathml'
@@ -104,17 +107,40 @@ const router = useRouter()
 const route = useRoute()
 const searchStore = useSearchStore()
 
-const backButtonLabel = computed(() => {
-  // Need to access route.path for Vue reactivity.
-  void route.path
-  const backPath = router.options.history.state.back
-  const backPathname = typeof backPath === 'string' ? backPath.split(/[?#]/)[0] : ''
+const navigationStore = useNavigationStore()
 
-  if (backPathname === '/exposure') {
-    return 'Back to exposures'
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+  const exposureLabel = exposureInfo.value
+    ? generateExposureTitle(
+        exposureInfo.value.exposure.description,
+        exposureInfo.value.exposure.id,
+        false,
+      )
+    : props.alias
+  // The 'view' key is the file's default view, so it gets no crumb of its own.
+  const hasViewCrumb = !!props.file && !!props.view && props.view !== 'view'
+  const items: BreadcrumbItem[] = [
+    {
+      label: 'Exposures',
+      to: { name: 'exposures', query: navigationStore.listingQuery.exposures },
+    },
+    {
+      label: exposureLabel,
+      to: props.file ? { name: 'exposure-detail', params: { alias: props.alias } } : undefined,
+    },
+  ]
+  if (props.file) {
+    items.push({
+      label: props.file,
+      // Trailing slash matches the file links in the navigation sidebar.
+      to: hasViewCrumb ? `/exposures/${props.alias}/${props.file}/` : undefined,
+    })
   }
-
-  return backPath ? 'Back' : 'Back to exposures'
+  if (hasViewCrumb) {
+    const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view)
+    items.push({ label: viewEntry?.name ?? props.view })
+  }
+  return items
 })
 
 const fileBrowserPath = computed(() => {
@@ -820,7 +846,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2 justify-between mb-6" :class="actionToolbarWidth">
+  <Breadcrumbs :items="breadcrumbItems" class="mb-6" />
+
+  <div class="flex flex-wrap gap-2 justify-end mb-6" :class="actionToolbarWidth">
     <ActionButton
       variant="link"
       size="md"
