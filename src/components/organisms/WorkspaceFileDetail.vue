@@ -12,7 +12,6 @@ import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import PreviewIcon from '@/components/icons/PreviewIcon.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
-import { useBackNavigation } from '@/composables/useBackNavigation'
 import { getWorkspaceService } from '@/services'
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -70,7 +69,6 @@ const backPath = computed(() => {
   return `/workspace/${props.alias}/file/${props.commitId}/${parentPath}`
 })
 
-const { goBack } = useBackNavigation(backPath.value)
 const workspaceStore = useWorkspaceStore()
 
 const tabButtonClasses = {

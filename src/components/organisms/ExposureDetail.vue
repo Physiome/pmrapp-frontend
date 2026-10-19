@@ -19,7 +19,6 @@ import MathTransformOptions from '@/components/molecules/MathTransformOptions.vu
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WarningBlock from '@/components/molecules/WarningBlock.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
-import { useBackNavigation } from '@/composables/useBackNavigation'
 import { AVAILABLE_VIEWS, CODEGEN_LANGUAGES, DEFAULT_LICENSE } from '@/constants/exposure'
 import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
@@ -100,7 +99,6 @@ const hasPathError = computed(
   () => isFileNotFound.value || isViewNotFound.value || isLangNotFound.value,
 )
 const loadedFileTitle = ref('')
-const { goBack } = useBackNavigation('/exposure')
 
 const router = useRouter()
 const route = useRoute()
