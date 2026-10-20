@@ -1,7 +1,7 @@
 import { mount, type VueWrapper } from '@vue/test-utils'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import KeywordBrowser from '@/components/molecules/KeywordBrowser.vue'
 import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import KeywordBrowser from '@/components/molecules/KeywordBrowser.vue'
 import { useSearchStore } from '@/stores/search'
 import type { IndexKindResponse } from '@/types/search'
 

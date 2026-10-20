@@ -21,7 +21,6 @@ describe('WorkspaceFileBrowser', () => {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
           ActionButton: { template: '<button><slot /></button>' },
-          LoadingBox: true,
           ErrorBlock: true,
           FileBrowserBreadcrumb: true,
           FolderIcon: true,
@@ -54,5 +53,20 @@ describe('WorkspaceFileBrowser', () => {
     const fileCountText = wrapper.find('.text-gray-600')
     expect(fileCountText.exists()).toBe(true)
     expect(fileCountText.text()).toContain('7 items')
+  })
+
+  it('shows a skeleton while the files are loading', async () => {
+    vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockReturnValue(new Promise(() => {}))
+
+    const wrapper = mount(WorkspaceFileBrowser, {
+      props: {
+        alias: 'test-alias',
+        commitId: mockWorkspaceInfo.commit.commit_id,
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('items')
   })
 })
