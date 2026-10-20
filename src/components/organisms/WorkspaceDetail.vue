@@ -93,11 +93,11 @@ const workspaceIssueUrl = computed(() => {
   const resolved = router.resolve(
     props.commitId && props.path
       ? {
-        name: 'workspace-file-detail',
-        params: { alias: props.alias, commitId: props.commitId, path: props.path },
-      }
+          name: 'workspace-file-detail',
+          params: { alias: props.alias, commitId: props.commitId, path: props.path },
+        }
       : { name: 'workspace-detail', params: { alias: props.alias } },
-   )
+  )
   const decodedHref = decodeURIComponent(resolved.href)
   const workspaceUrl = new URL(decodedHref, window.location.origin).toString()
   const params = new URLSearchParams({
