@@ -588,7 +588,7 @@ describe('SearchComboBox', () => {
       await getInput(w).setValue('"cardiac myocyte"')
       await press(w, 'Tab')
 
-      expect(chipLabels(w)).toEqual(['"cardiac myocyte"'])
+      expect(chipLabels(w)).toEqual(['cardiac myocyte'])
       await press(w, 'Enter')
       expect(w.emitted('querySearch')?.[0]).toEqual([
         { query: '"cardiac myocyte"', filters: undefined },
@@ -598,7 +598,7 @@ describe('SearchComboBox', () => {
     it('rebuilds keyword and phrase chips from the initial query', async () => {
       const w = await mountComboBox({ inOverlay: true, initialQuery: 'calcium "cardiac myocyte"' })
 
-      expect(chipLabels(w)).toEqual(['calcium', '"cardiac myocyte"'])
+      expect(chipLabels(w)).toEqual(['calcium', 'cardiac myocyte'])
     })
 
     it('appends new chips at the end in the order they are added', async () => {

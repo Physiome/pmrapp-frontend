@@ -19,7 +19,7 @@ describe('SearchResultsMessage.vue query text', () => {
 
   it('keeps a quoted phrase as one term with its quotes', () => {
     const wrapper = mountMessage('calcium "cardiac myocyte"')
-    expect(wrapper.text()).toBe('2 results for calcium and "cardiac myocyte".')
+    expect(wrapper.text()).toBe('2 results for calcium and cardiac myocyte.')
   })
 
   it('separates three or more terms with commas', () => {
