@@ -71,6 +71,13 @@ export const parseQueryTokens = (text: string): string[] => {
 export const buildQueryFromTokens = (tokens: string[]): string => tokens.join(' ')
 
 /**
+ * Removes the surrounding double quotes of a phrase for display; the quoted term is still what is searched.
+ */
+export const stripSurroundingQuotes = (term: string): string =>
+  term.length >= 2 && term.startsWith('"') && term.endsWith('"') ? term.slice(1, -1) : term
+
+
+/**
  * Builds a /search query for a single filter in flat format and preserves the
  * current sort option when it is valid.
  */

@@ -20,7 +20,12 @@ import {
 } from '@/constants/search'
 import { useSearchStore } from '@/stores/search'
 import type { SearchFilter, SearchQueryRequest } from '@/types/search'
-import { buildQueryFromTokens, isValidTerm, parseQueryTokens } from '@/utils/search'
+import {
+  buildQueryFromTokens,
+  isValidTerm,
+  parseQueryTokens,
+  stripSurroundingQuotes,
+} from '@/utils/search'
 
 interface FilterChip {
   id: string
@@ -833,7 +838,7 @@ defineExpose({
           v-for="chip in chips"
           :key="chip.id"
           :category="getCategoryLabel(chip.kind)"
-          :label="chip.term"
+          :label="stripSurroundingQuotes(chip.term)"
           :removable="true"
           :on-remove="() => removeChip(chip.id)"
         />

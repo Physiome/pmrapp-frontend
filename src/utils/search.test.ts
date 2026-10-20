@@ -14,6 +14,7 @@ import {
   normaliseSearchText,
   parseQueryFiltersFromQuery,
   parseQueryTokens,
+  stripSurroundingQuotes,
 } from './search'
 
 describe('parseQueryTokens', () => {
@@ -59,6 +60,18 @@ describe('parseQueryTokens', () => {
   it('round-trips through buildQueryFromTokens', () => {
     const query = 'calcium "cardiac myocyte"'
     expect(buildQueryFromTokens(parseQueryTokens(query))).toBe(query)
+  })
+})
+
+describe('stripSurroundingQuotes', () => {
+  it('removes the surrounding double quotes of a phrase', () => {
+    expect(stripSurroundingQuotes('"cardiac myocyte"')).toBe('cardiac myocyte')
+  })
+
+  it('leaves unquoted terms and lone quotes unchanged', () => {
+    expect(stripSurroundingQuotes('cardiac')).toBe('cardiac')
+    expect(stripSurroundingQuotes('"')).toBe('"')
+    expect(stripSurroundingQuotes('"cardiac')).toBe('"cardiac')
   })
 })
 

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { SEARCH_KIND_LABEL_MAP, SEARCH_KIND_LABEL_SINGULAR_MAP } from '@/constants/search'
 import type { SearchFilter, SearchResult } from '@/types/search'
 import { formatKindLabel, formatNumber, formatSearchKey } from '@/utils/format'
-import { parseQueryTokens } from '@/utils/search'
+import { parseQueryTokens, stripSurroundingQuotes } from '@/utils/search'
 
 interface Props {
   results: SearchResult[]
@@ -54,7 +54,7 @@ const formatTerms = (terms: string[]) => {
     .map((term, i) => {
       const comma = i < terms.length - 2 ? ', ' : ''
       const and = i === terms.length - 2 ? (terms.length > 2 ? ', and ' : ' and ') : ''
-      return `${formatSearchKey(term)}${comma}${and}`
+      return `${formatSearchKey(stripSurroundingQuotes(term))}${comma}${and}`
     })
     .join('')
 }
