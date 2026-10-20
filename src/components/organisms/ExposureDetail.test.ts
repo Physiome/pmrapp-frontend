@@ -2,7 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
-import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ExposureDetail from '@/components/organisms/ExposureDetail.vue'
 import { TITLE } from '@/constants/global'
 import { mockExposureInfo, mockGeneratedCode, mockMetadata } from '@/mocks/exposureInfo'
@@ -110,6 +110,7 @@ describe('ExposureDetail', () => {
       global: {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
+          BreadcrumbsBar: true,
           CodeBlock: true,
           CopyButton: true,
           WrapButton: true,
@@ -149,6 +150,7 @@ describe('ExposureDetail', () => {
       global: {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
+          BreadcrumbsBar: true,
           CodeBlock: true,
           CopyButton: true,
           WrapButton: true,
@@ -203,7 +205,7 @@ describe('ExposureDetail', () => {
     it('ends at the exposure on the exposure page', async () => {
       const wrapper = await mountComponent()
 
-      expect(wrapper.findComponent(Breadcrumbs).props('items')).toEqual([
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
         { label: 'Exposures', to: { name: 'exposures', query: {} } },
         { label: mockExposureInfo.exposure.description, to: undefined },
       ])
@@ -212,7 +214,7 @@ describe('ExposureDetail', () => {
     it('ends at the file on a file page', async () => {
       const wrapper = await mountComponent({ props: { file } })
 
-      expect(wrapper.findComponent(Breadcrumbs).props('items')).toEqual([
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
         { label: 'Exposures', to: { name: 'exposures', query: {} } },
         {
           label: mockExposureInfo.exposure.description,
@@ -225,7 +227,7 @@ describe('ExposureDetail', () => {
     it('ends at the view name on a file view page', async () => {
       const wrapper = await mountComponent({ props: { file, view: 'cellml_math' } })
 
-      const items = wrapper.findComponent(Breadcrumbs).props('items')
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
       expect(items).toHaveLength(4)
       expect(items[2]).toEqual({
         label: file,
@@ -237,7 +239,7 @@ describe('ExposureDetail', () => {
     it('does not add a crumb for the default file view', async () => {
       const wrapper = await mountComponent({ props: { file, view: 'view' } })
 
-      const items = wrapper.findComponent(Breadcrumbs).props('items')
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
       expect(items).toHaveLength(3)
       expect(items[2]).toEqual({ label: file, to: undefined })
     })

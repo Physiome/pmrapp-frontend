@@ -2,7 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
-import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import WorkspaceDetail from '@/components/organisms/WorkspaceDetail.vue'
 import { GITHUB_ISSUES_URL } from '@/constants/global'
 import { mockWorkspaceInfo } from '@/mocks/workspaceInfo'
@@ -20,7 +20,7 @@ vi.mock('@/utils/analytics', () => ({
 }))
 
 const stubs = {
-  Breadcrumbs: true,
+  BreadcrumbsBar: true,
   ActionButton: {
     props: ['href', 'target', 'rel', 'contentSection', 'variant', 'size'],
     template: '<a :href="href" :target="target" :rel="rel"><slot /></a>',
@@ -79,7 +79,7 @@ describe('WorkspaceDetail', () => {
 
     await flushPromises()
 
-    expect(wrapper.findComponent(Breadcrumbs).props('items')).toEqual([
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
       { label: 'Workspaces', to: { name: 'workspaces', query: {} } },
       { label: mockWorkspaceInfo.workspace.description, to: undefined },
     ])
@@ -96,7 +96,7 @@ describe('WorkspaceDetail', () => {
 
     await flushPromises()
 
-    expect(wrapper.findComponent(Breadcrumbs).props('items')[1]).toEqual({
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[1]).toEqual({
       label: mockWorkspaceInfo.workspace.description,
       to: {
         name: 'workspace-detail-alias-commit',
@@ -114,6 +114,6 @@ describe('WorkspaceDetail', () => {
       global: { stubs },
     })
 
-    expect(wrapper.findComponent(Breadcrumbs).props('items')[1].label).toBe('test-alias')
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[1].label).toBe('test-alias')
   })
 })

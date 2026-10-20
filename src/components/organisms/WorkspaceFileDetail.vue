@@ -10,7 +10,7 @@ import CodeIcon from '@/components/icons/CodeIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import PreviewIcon from '@/components/icons/PreviewIcon.vue'
-import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import { getWorkspaceService } from '@/services'
@@ -255,7 +255,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 </script>
 
 <template>
-  <Breadcrumbs :items="breadcrumbItems" class="mb-6" />
+  <BreadcrumbsBar :items="breadcrumbItems" />
 
   <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" titleSize="small" />
 

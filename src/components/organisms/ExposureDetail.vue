@@ -14,7 +14,7 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
-import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
@@ -851,7 +851,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Breadcrumbs :items="breadcrumbItems" class="mb-6" />
+  <BreadcrumbsBar :items="breadcrumbItems" />
 
   <div class="flex flex-wrap gap-2 justify-end mb-6" :class="actionToolbarWidth">
     <ActionButton
