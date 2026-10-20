@@ -70,4 +70,18 @@ describe('Dialog', () => {
     expect(wrapper.emitted('close')).toBeTruthy()
     wrapper.unmount()
   })
+
+  it('does not emit close when Escape was already handled by a child', async () => {
+    const wrapper = mount(Dialog, {
+      props: { show: true },
+      slots: {
+        default: '<div>Content</div>',
+      },
+    })
+    const event = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })
+    event.preventDefault()
+    document.dispatchEvent(event)
+    expect(wrapper.emitted('close')).toBeFalsy()
+    wrapper.unmount()
+  })
 })
