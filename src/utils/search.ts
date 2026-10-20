@@ -76,7 +76,6 @@ export const buildQueryFromTokens = (tokens: string[]): string => tokens.join(' 
 export const stripSurroundingQuotes = (term: string): string =>
   term.length >= 2 && term.startsWith('"') && term.endsWith('"') ? term.slice(1, -1) : term
 
-
 /**
  * Builds a /search query for a single filter in flat format and preserves the
  * current sort option when it is valid.
