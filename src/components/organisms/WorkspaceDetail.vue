@@ -2,17 +2,19 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import BackButton from '@/components/atoms/BackButton.vue'
 import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
 import LoadingBox from '@/components/atoms/LoadingBox.vue'
 import BugIcon from '@/components/icons/BugIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { GITHUB_ISSUES_URL } from '@/constants/global'
 import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
+import { useNavigationStore } from '@/stores/navigation'
 import { useWorkspaceStore } from '@/stores/workspace'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
 import { generateWorkspaceTitle } from '@/utils/workspace'
@@ -30,40 +32,31 @@ const error = ref<ErrorInfo | null>(null)
 const isLoading = ref(true)
 const requestCounter = ref(0)
 
-const backPath = computed(() => {
-  if (!props.path) {
-    // Root workspace - go to workspaces listing.
-    return '/workspace'
-  }
-  // Extract parent folder path.
-  const lastSlash = props.path.lastIndexOf('/')
-  if (lastSlash === -1) {
-    // File/folder in root - go to root workspace
-    return `/workspace/${props.alias}`
-  }
-  // Go to parent folder.
-  const parentPath = props.path.substring(0, lastSlash)
-  return `/workspace/${props.alias}/file/${props.commitId}/${parentPath}`
-})
+const navigationStore = useNavigationStore()
 
-const goBack = () => {
-  const basePath = !props.path ? '/workspace' : `/workspace/${props.alias}`
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+  const workspaceLabel = workspaceInfo.value
+    ? generateWorkspaceTitle(
+        workspaceInfo.value.workspace.description,
+        workspaceInfo.value.workspace.id,
+      )
+    : props.alias
 
-  // Check browser history to preserve query state (search filters).
-  if (
-    window.history.state.back?.includes(basePath) &&
-    !window.history.state.back?.includes(`${basePath}/`)
-  ) {
-    // Go back in browser history to preserve filters.
-    router.back()
-  } else {
-    // Navigate to computed back path.
-    router.push(backPath.value)
-  }
-}
+  // Inside a folder, link back to the workspace root at the same commit.
+  const workspaceRoot = props.commitId
+    ? {
+        name: 'workspace-detail-alias-commit',
+        params: { alias: props.alias, commitId: props.commitId },
+      }
+    : { name: 'workspace-detail', params: { alias: props.alias } }
 
-const backButtonText = computed(() => {
-  return !props.path ? 'Back to workspaces' : `Back to ${props.path}`
+  return [
+    {
+      label: 'Workspaces',
+      to: { name: 'workspaces', query: navigationStore.listingQuery.workspaces },
+    },
+    { label: workspaceLabel, to: props.path ? workspaceRoot : undefined },
+  ]
 })
 
 const workspaceArchiveFilename = computed(() => {
@@ -156,12 +149,9 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2 justify-between mb-6">
-    <BackButton
-      :label="backButtonText"
-      content-section="Workspace Detail"
-      :on-click="goBack"
-    />
+  <BreadcrumbsBar :items="breadcrumbItems" />
+
+  <div class="flex flex-wrap gap-2 justify-end mb-6">
     <ActionButton
       variant="link"
       size="md"

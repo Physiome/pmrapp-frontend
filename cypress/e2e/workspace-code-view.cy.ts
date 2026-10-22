@@ -33,4 +33,15 @@ describe('Workspace detail page', () => {
     cy.get('button').contains('Code').click()
     cy.get('button[aria-label="Wrap words"]').should('not.be.disabled')
   })
+
+  it('renders the page breadcrumb', () => {
+    cy.visit('/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md')
+
+    cy.get('nav[aria-label="Breadcrumb"]').within(() => {
+      cy.contains('a', 'Workspaces').should('exist')
+      cy.get('a')
+        .last()
+        .should('have.attr', 'href', '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834')
+    })
+  })
 })
