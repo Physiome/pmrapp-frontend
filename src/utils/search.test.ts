@@ -3,6 +3,7 @@ import { exposures, workspaces } from '@/mocks/search'
 import type { SearchResult } from '@/types/search'
 import { ensureTrailingSlash } from './path'
 import {
+  buildQueryFromTokens,
   buildQuerySearchQuery,
   buildSearchQuery,
   filterItemsByQuery,
@@ -12,7 +13,67 @@ import {
   isValidTerm,
   normaliseSearchText,
   parseQueryFiltersFromQuery,
+  parseQueryTokens,
+  stripSurroundingQuotes,
 } from './search'
+
+describe('parseQueryTokens', () => {
+  it('splits bare words into separate tokens', () => {
+    expect(parseQueryTokens('cardiac myocyte')).toEqual(['cardiac', 'myocyte'])
+  })
+
+  it('keeps a quoted phrase as one token with its quotes', () => {
+    expect(parseQueryTokens('"cardiac myocyte"')).toEqual(['"cardiac myocyte"'])
+  })
+
+  it('mixes words and phrases', () => {
+    expect(parseQueryTokens('calcium "cardiac myocyte" ion')).toEqual([
+      'calcium',
+      '"cardiac myocyte"',
+      'ion',
+    ])
+  })
+
+  it('closes an unclosed quote at the end of the text', () => {
+    expect(parseQueryTokens('calcium "cardiac myocyte')).toEqual(['calcium', '"cardiac myocyte"'])
+  })
+
+  it('skips empty quotes and unwraps a quoted single word', () => {
+    expect(parseQueryTokens('"" "cardiac"')).toEqual(['cardiac'])
+  })
+
+  it('skips tokens made only of single quotes but keeps apostrophes in words', () => {
+    expect(parseQueryTokens("cardiac '' ‘’ heart's")).toEqual(['cardiac', "heart's"])
+  })
+
+  it('collapses whitespace and removes case-insensitive duplicates', () => {
+    expect(parseQueryTokens('  Cardiac   cardiac "cardiac   myocyte" "Cardiac Myocyte" ')).toEqual([
+      'Cardiac',
+      '"cardiac myocyte"',
+    ])
+  })
+
+  it('returns no tokens for blank text', () => {
+    expect(parseQueryTokens('   ')).toEqual([])
+  })
+
+  it('round-trips through buildQueryFromTokens', () => {
+    const query = 'calcium "cardiac myocyte"'
+    expect(buildQueryFromTokens(parseQueryTokens(query))).toBe(query)
+  })
+})
+
+describe('stripSurroundingQuotes', () => {
+  it('removes the surrounding double quotes of a phrase', () => {
+    expect(stripSurroundingQuotes('"cardiac myocyte"')).toBe('cardiac myocyte')
+  })
+
+  it('leaves unquoted terms and lone quotes unchanged', () => {
+    expect(stripSurroundingQuotes('cardiac')).toBe('cardiac')
+    expect(stripSurroundingQuotes('"')).toBe('"')
+    expect(stripSurroundingQuotes('"cardiac')).toBe('"cardiac')
+  })
+})
 
 describe('filterItemsByQuery', () => {
   it('returns filtered workspace results by search text', () => {
