@@ -84,6 +84,14 @@ describe('Breadcrumbs', () => {
     expect(wrapper.find('span[title="Mathematics"]').exists()).toBe(true)
   })
 
+  it('does not cap item widths, so labels truncate only when the trail overflows', () => {
+    const wrapper = mountBreadcrumbs(longTrail)
+
+    for (const el of wrapper.findAll('a, span[title]')) {
+      expect(el.classes().some((c) => c.includes('max-w-'))).toBe(false)
+    }
+  })
+
   it('does not render a collapse toggle for short trails', () => {
     const wrapper = mountBreadcrumbs(shortTrail)
 

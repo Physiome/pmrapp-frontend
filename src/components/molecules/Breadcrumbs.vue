@@ -41,8 +41,6 @@ const shrinkClasses = (item: BreadcrumbItem, index: number) => {
   return index === lastIndex.value ? 'min-w-0' : 'min-w-0 shrink-4'
 }
 
-const labelWidthClasses = 'max-w-32 sm:max-w-48 lg:max-w-72'
-
 // Collapse again when navigating to another page.
 watch(
   () => props.items,
@@ -104,7 +102,7 @@ watch(
             v-else
             :to="item.to"
             class="text-link block truncate"
-            :class="[focusClasses, labelWidthClasses]"
+            :class="focusClasses"
             :title="item.label"
           >
             {{ item.label }}
