@@ -38,10 +38,10 @@ describe('Workspace detail page', () => {
     cy.visit('/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/README.md')
 
     cy.get('nav[aria-label="Breadcrumb"]').within(() => {
-      cy.contains('a', 'Workspaces').should('exist')
       cy.get('a')
-        .last()
-        .should('have.attr', 'href', '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834')
+        .should('have.length', 1)
+        .and('have.attr', 'href', '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834')
+      cy.get('[aria-current="page"]').should('contain.text', 'README.md')
     })
   })
 })

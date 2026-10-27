@@ -151,8 +151,7 @@ describe('Exposure detail page', () => {
 
   it('renders the breadcrumb ending at the exposure.', () => {
     cy.get('nav[aria-label="Breadcrumb"]').within(() => {
-      cy.contains('a', 'Home').should('exist')
-      cy.contains('a', 'Exposures').should('exist')
+      cy.get('a').should('not.exist')
       cy.get('[aria-current="page"]').should(
         'contain.text',
         'Noble, Denyer, Brown, DiFrancesco, 1992',
@@ -163,16 +162,13 @@ describe('Exposure detail page', () => {
   it('renders the breadcrumb down to the view on a file view page.', () => {
     cy.get('aside section').contains('a', 'Mathematics').click()
     cy.get('nav[aria-label="Breadcrumb"]').within(() => {
+      cy.contains('a', 'Noble, Denyer, Brown, DiFrancesco, 1992').should(
+        'have.attr',
+        'href',
+        '/exposure/da9',
+      )
       cy.contains('a', 'noble_denyer_brown_difrancesco_1992.cellml').should('exist')
       cy.get('[aria-current="page"]').should('contain.text', 'Mathematics')
     })
-  })
-
-  it('keeps the listing filter when navigating back through the breadcrumb.', () => {
-    cy.visit('/exposure?filter=noble')
-    cy.get('a[href="/exposure/da9"]').first().click()
-    cy.get('nav[aria-label="Breadcrumb"] a').contains('Exposures').click()
-    cy.location('pathname').should('eq', '/exposure')
-    cy.location('search').should('include', 'filter=noble')
   })
 })

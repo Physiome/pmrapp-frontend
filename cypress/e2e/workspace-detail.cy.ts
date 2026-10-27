@@ -39,20 +39,11 @@ describe('Workspace detail page', () => {
 
   it('renders the breadcrumb ending at the workspace.', () => {
     cy.get('nav[aria-label="Breadcrumb"]').within(() => {
-      cy.contains('a', 'Home').should('have.attr', 'href', '/')
-      cy.contains('a', 'Workspaces').should('exist')
+      cy.get('a').should('not.exist')
       cy.get('[aria-current="page"]').should(
         'contain.text',
         'Noble, Denyer, Brown, DiFrancesco, 1992',
       )
     })
-  })
-
-  it('keeps the listing filter when navigating back through the breadcrumb.', () => {
-    cy.visit('/workspace?filter=noble')
-    cy.get('a[href="/workspace/da8"]').first().click()
-    cy.get('nav[aria-label="Breadcrumb"] a').contains('Workspaces').click()
-    cy.location('pathname').should('eq', '/workspace')
-    cy.location('search').should('include', 'filter=noble')
   })
 })
