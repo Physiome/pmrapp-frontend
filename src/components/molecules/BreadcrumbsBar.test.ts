@@ -50,11 +50,4 @@ describe('BreadcrumbsBar', () => {
     expect(target.querySelector('nav')).toBeNull()
     wrapper.unmount()
   })
-
-  it('renders a lone crumb that links back to its root', async () => {
-    const wrapper = await mountBar([{ label: 'My workspace', to: '/workspace/abc' }])
-
-    expect(target.querySelector('nav a')?.textContent).toContain('My workspace')
-    wrapper.unmount()
-  })
 })

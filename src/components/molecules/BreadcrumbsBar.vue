@@ -7,8 +7,8 @@ const props = defineProps<{
   items: BreadcrumbItem[]
 }>()
 
-// A lone unlinked crumb is just the current page, so the bar adds nothing.
-const isVisible = computed(() => props.items.length > 1 || !!props.items[0]?.to)
+// A lone crumb is just the current page, so the bar adds nothing.
+const isVisible = computed(() => props.items.length > 1)
 </script>
 
 <template>

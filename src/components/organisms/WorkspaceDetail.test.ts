@@ -84,7 +84,7 @@ describe('WorkspaceDetail', () => {
     ])
   })
 
-  it('links the workspace crumb to the root at the same commit inside a folder', async () => {
+  it('links the workspace crumb to the root at the same commit and adds each folder inside a folder', async () => {
     const workspaceStore = useWorkspaceStore()
     vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockResolvedValue(mockWorkspaceInfo)
 
@@ -95,13 +95,17 @@ describe('WorkspaceDetail', () => {
 
     await flushPromises()
 
-    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toEqual({
-      label: mockWorkspaceInfo.workspace.description,
-      to: {
-        name: 'workspace-detail-alias-commit',
-        params: { alias: 'test-alias', commitId: 'abc123' },
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
+      {
+        label: mockWorkspaceInfo.workspace.description,
+        to: {
+          name: 'workspace-detail-alias-commit',
+          params: { alias: 'test-alias', commitId: 'abc123' },
+        },
       },
-    })
+      { label: 'src', to: '/workspace/test-alias/file/abc123/src' },
+      { label: 'models' },
+    ])
   })
 
   it('uses the alias as the workspace crumb while loading', () => {

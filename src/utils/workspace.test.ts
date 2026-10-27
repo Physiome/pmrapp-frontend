@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { TITLE } from '@/constants/global'
 import { mockWorkspaceInfo } from '@/mocks/workspaceInfo'
-import { generateWorkspaceTitle } from './workspace'
+import { generateWorkspacePathBreadcrumbs, generateWorkspaceTitle } from './workspace'
 
 describe('generateWorkspaceTitle', () => {
   const { description, id } = mockWorkspaceInfo.workspace
@@ -82,5 +82,26 @@ describe('generateWorkspaceTitle', () => {
         `${description} @ ${commitId.substring(0, 12)} / file.txt – ${TITLE}`,
       )
     })
+  })
+})
+
+describe('generateWorkspacePathBreadcrumbs', () => {
+  it('returns no items for the workspace root', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', '')).toEqual([])
+  })
+
+  it('links each folder and leaves the last segment as the current page', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', 'src/models/model.cellml')).toEqual([
+      { label: 'src', to: '/workspace/abc/file/123/src' },
+      { label: 'models', to: '/workspace/abc/file/123/src/models' },
+      { label: 'model.cellml' },
+    ])
+  })
+
+  it('ignores leading, trailing and repeated slashes', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', '/src//models/')).toEqual([
+      { label: 'src', to: '/workspace/abc/file/123/src' },
+      { label: 'models' },
+    ])
   })
 })

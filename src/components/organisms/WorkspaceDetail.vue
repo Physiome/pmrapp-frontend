@@ -16,7 +16,7 @@ import { useWorkspaceStore } from '@/stores/workspace'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ErrorInfo } from '@/types/error'
 import type { WorkspaceInfo } from '@/types/workspace'
-import { generateWorkspaceTitle } from '@/utils/workspace'
+import { generateWorkspacePathBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace'
 
 const props = defineProps<{
   alias: string
@@ -47,7 +47,10 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
       }
     : { name: 'workspace-detail', params: { alias: props.alias } }
 
-  return [{ label: workspaceLabel, to: props.path ? workspaceRoot : undefined }]
+  return [
+    { label: workspaceLabel, to: props.path ? workspaceRoot : undefined },
+    ...generateWorkspacePathBreadcrumbs(props.alias, props.commitId ?? '', props.path ?? ''),
+  ]
 })
 
 const workspaceArchiveFilename = computed(() => {

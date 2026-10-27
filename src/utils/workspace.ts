@@ -1,4 +1,5 @@
 import { TITLE } from '@/constants/global'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 
 /**
  * Generate workspace page title from description or ID.
@@ -35,4 +36,29 @@ export const generateWorkspaceTitle = (
   }
 
   return withTitleSuffix ? `${title} – ${TITLE}` : title
+}
+
+/**
+ * Generate breadcrumb items for each folder and file in a workspace path.
+ *
+ * @param alias The workspace alias.
+ * @param commitId The commit the path belongs to.
+ * @param path The folder or file path within the workspace, e.g. "src/models/model.cellml".
+ * @returns One item per path segment; every segment links to its folder except the last (current page).
+ */
+export const generateWorkspacePathBreadcrumbs = (
+  alias: string,
+  commitId: string,
+  path: string,
+): BreadcrumbItem[] => {
+  const segments = path.split('/').filter(Boolean)
+
+  return segments.map((segment, index) =>
+    index === segments.length - 1
+      ? { label: segment }
+      : {
+          label: segment,
+          to: `/workspace/${alias}/file/${commitId}/${segments.slice(0, index + 1).join('/')}`,
+        },
+  )
 }

@@ -29,7 +29,7 @@ import {
   isSvgFile,
 } from '@/utils/file'
 import { renderMarkdown } from '@/utils/markdown'
-import { generateWorkspaceTitle } from '@/utils/workspace'
+import { generateWorkspacePathBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace'
 
 // Files with size above this threshold are not rendered in the preview to prevent browser freeze.
 const MAX_PREVIEW_FILE_SIZE_BYTES = 500 * 1024 // ~500 KB
@@ -175,7 +175,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
       params: { alias: props.alias, commitId: props.commitId },
     },
   },
-  { label: props.path },
+  ...generateWorkspacePathBreadcrumbs(props.alias, props.commitId, props.path),
 ])
 
 const pageTitle = computed(() => {
