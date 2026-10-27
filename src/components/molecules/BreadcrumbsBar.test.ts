@@ -44,10 +44,12 @@ describe('BreadcrumbsBar', () => {
     return wrapper
   }
 
-  it('renders nothing when the only crumb is the current page', async () => {
+  it('renders a lone crumb as the unlinked current page', async () => {
     const wrapper = await mountBar([{ label: 'My workspace' }])
 
-    expect(target.querySelector('nav')).toBeNull()
+    const current = target.querySelector('nav [aria-current="page"]')
+    expect(current?.textContent?.trim()).toBe('My workspace')
+    expect(target.querySelector('nav a')).toBeNull()
     wrapper.unmount()
   })
 })
