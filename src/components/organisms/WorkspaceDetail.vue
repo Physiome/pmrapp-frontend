@@ -12,7 +12,6 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
 import { GITHUB_ISSUES_URL } from '@/constants/global'
 import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
-import { useNavigationStore } from '@/stores/navigation'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ErrorInfo } from '@/types/error'
@@ -32,8 +31,6 @@ const error = ref<ErrorInfo | null>(null)
 const isLoading = ref(true)
 const requestCounter = ref(0)
 
-const navigationStore = useNavigationStore()
-
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   const workspaceLabel = workspaceInfo.value
     ? generateWorkspaceTitle(
@@ -50,13 +47,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
       }
     : { name: 'workspace-detail', params: { alias: props.alias } }
 
-  return [
-    {
-      label: 'Workspaces',
-      to: { name: 'workspaces', query: navigationStore.listingQuery.workspaces },
-    },
-    { label: workspaceLabel, to: props.path ? workspaceRoot : undefined },
-  ]
+  return [{ label: workspaceLabel, to: props.path ? workspaceRoot : undefined }]
 })
 
 const workspaceArchiveFilename = computed(() => {

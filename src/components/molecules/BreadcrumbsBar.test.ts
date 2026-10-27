@@ -1,6 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 
 describe('BreadcrumbsBar', () => {
   let target: HTMLDivElement
@@ -17,7 +18,9 @@ describe('BreadcrumbsBar', () => {
 
   it('renders the breadcrumbs into the layout bar under the header', async () => {
     const wrapper = mount(BreadcrumbsBar, {
-      props: { items: [{ label: 'Workspaces', to: '/workspace' }, { label: 'My workspace' }] },
+      props: {
+        items: [{ label: 'My workspace', to: '/workspace/abc' }, { label: 'model.cellml' }],
+      },
       global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } },
       attachTo: document.body,
     })
@@ -25,9 +28,33 @@ describe('BreadcrumbsBar', () => {
 
     const nav = target.querySelector('nav[aria-label="Breadcrumb"]')
     expect(nav).not.toBeNull()
-    expect(nav?.textContent).toContain('My workspace')
+    expect(nav?.textContent).toContain('model.cellml')
 
     wrapper.unmount()
     expect(target.querySelector('nav')).toBeNull()
+  })
+
+  const mountBar = async (items: BreadcrumbItem[]) => {
+    const wrapper = mount(BreadcrumbsBar, {
+      props: { items },
+      global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } },
+      attachTo: document.body,
+    })
+    await flushPromises()
+    return wrapper
+  }
+
+  it('renders nothing when the only crumb is the current page', async () => {
+    const wrapper = await mountBar([{ label: 'My workspace' }])
+
+    expect(target.querySelector('nav')).toBeNull()
+    wrapper.unmount()
+  })
+
+  it('renders a lone crumb that links back to its root', async () => {
+    const wrapper = await mountBar([{ label: 'My workspace', to: '/workspace/abc' }])
+
+    expect(target.querySelector('nav a')?.textContent).toContain('My workspace')
+    wrapper.unmount()
   })
 })

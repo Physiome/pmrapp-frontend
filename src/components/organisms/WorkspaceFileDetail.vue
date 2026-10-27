@@ -15,7 +15,6 @@ import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import { getWorkspaceService } from '@/services'
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
-import { useNavigationStore } from '@/stores/navigation'
 import { useWorkspaceStore } from '@/stores/workspace'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { WorkspaceInfo } from '@/types/workspace'
@@ -163,13 +162,7 @@ const loadWorkspaceInfo = async () => {
   }
 }
 
-const navigationStore = useNavigationStore()
-
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
-  {
-    label: 'Workspaces',
-    to: { name: 'workspaces', query: navigationStore.listingQuery.workspaces },
-  },
   {
     label: workspaceInfo.value
       ? generateWorkspaceTitle(
@@ -182,6 +175,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
       params: { alias: props.alias, commitId: props.commitId },
     },
   },
+  { label: props.path },
 ])
 
 const pageTitle = computed(() => {

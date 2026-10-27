@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon.vue'
-import HomeIcon from '@/components/icons/HomeIcon.vue'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
 
 const props = defineProps<{
@@ -11,20 +10,18 @@ const props = defineProps<{
 // Trails longer than this collapse their middle items on small screens.
 const COLLAPSE_THRESHOLD = 4
 
-// Labels this short (e.g. "Exposures", "Mathematics") never truncate.
+// Labels this short (e.g. "model.cellml", "Mathematics") never truncate.
 const SHORT_LABEL_LENGTH = 16
 
 const isExpanded = ref(false)
 const listRef = ref<HTMLOListElement | null>(null)
 
-const allItems = computed<BreadcrumbItem[]>(() => [{ label: 'Home', to: '/' }, ...props.items])
+const lastIndex = computed(() => props.items.length - 1)
 
-const lastIndex = computed(() => allItems.value.length - 1)
+const isCollapsible = computed(() => props.items.length > COLLAPSE_THRESHOLD)
 
-const isCollapsible = computed(() => allItems.value.length > COLLAPSE_THRESHOLD)
-
-// Keep "Home", the parent and the current page visible; collapse everything in between.
-const hiddenCount = computed(() => (isCollapsible.value ? allItems.value.length - 3 : 0))
+// Keep the first item, the parent and the current page visible; collapse everything in between.
+const hiddenCount = computed(() => (isCollapsible.value ? props.items.length - 3 : 0))
 
 const isCollapsedItem = (index: number) =>
   !isExpanded.value && index > 0 && index <= hiddenCount.value
@@ -39,7 +36,7 @@ const expand = async () => {
 const focusClasses = 'rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
 
 const shrinkClasses = (item: BreadcrumbItem, index: number) => {
-  if (index === 0 || item.label.length <= SHORT_LABEL_LENGTH) return 'shrink-0'
+  if (item.label.length <= SHORT_LABEL_LENGTH) return 'shrink-0'
   // Ancestors give up space first so the current page stays readable.
   return index === lastIndex.value ? 'min-w-0' : 'min-w-0 shrink-4'
 }
@@ -63,7 +60,7 @@ watch(
       class="flex items-center min-w-0 text-sm"
       :class="{ 'flex-wrap gap-y-1': isExpanded }"
     >
-      <template v-for="(item, index) in allItems" :key="index">
+      <template v-for="(item, index) in items" :key="index">
         <li
           v-if="index === 1 && hiddenCount > 0 && !isExpanded"
           class="flex items-center shrink-0 sm:hidden"
@@ -102,16 +99,6 @@ watch(
           >
             {{ item.label }}
           </span>
-
-          <RouterLink
-            v-else-if="index === 0"
-            :to="item.to"
-            class="text-link inline-flex items-center"
-            :class="focusClasses"
-          >
-            <HomeIcon class="w-4 h-4 sm:hidden" aria-hidden="true" />
-            <span class="sr-only sm:not-sr-only">{{ item.label }}</span>
-          </RouterLink>
 
           <RouterLink
             v-else

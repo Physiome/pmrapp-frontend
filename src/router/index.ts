@@ -15,7 +15,6 @@ import {
 } from '@/router/routeAliases'
 import { resolveRouteTitle } from '@/router/routeResolvers'
 import { useAuthStore } from '@/stores/auth'
-import { isListingRouteName, useNavigationStore } from '@/stores/navigation'
 import { isJwtExpired } from '@/utils/auth'
 import { getQueryTextFromRouteQuery } from '@/utils/search'
 import ExposureDetailView from '@/views/ExposureDetailView.vue'
@@ -208,10 +207,6 @@ router.beforeResolve(async (to) => {
 })
 
 router.afterEach((to) => {
-  if (isListingRouteName(to.name)) {
-    useNavigationStore().setListingQuery(to.name, to.query)
-  }
-
   const title = to.meta.title as string | undefined
   if (title) {
     document.title = title

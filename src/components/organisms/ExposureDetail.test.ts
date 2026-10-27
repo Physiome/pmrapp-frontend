@@ -208,11 +208,10 @@ describe('ExposureDetail', () => {
   describe('breadcrumbs', () => {
     const file = 'baylor_hollingworth_chandler_2002_a.cellml'
 
-    it('ends at the exposure on the exposure page', async () => {
+    it('starts and ends at the exposure on the exposure page', async () => {
       const wrapper = await mountComponent()
 
       expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
-        { label: 'Exposures', to: { name: 'exposures', query: {} } },
         { label: mockExposureInfo.exposure.description, to: undefined },
       ])
     })
@@ -221,7 +220,6 @@ describe('ExposureDetail', () => {
       const wrapper = await mountComponent({ props: { file } })
 
       expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
-        { label: 'Exposures', to: { name: 'exposures', query: {} } },
         {
           label: mockExposureInfo.exposure.description,
           to: { name: 'exposure-detail', params: { alias: mockExposureInfo.exposure_alias } },
@@ -234,20 +232,20 @@ describe('ExposureDetail', () => {
       const wrapper = await mountComponent({ props: { file, view: 'cellml_math' } })
 
       const items = wrapper.findComponent(BreadcrumbsBar).props('items')
-      expect(items).toHaveLength(4)
-      expect(items[2]).toEqual({
+      expect(items).toHaveLength(3)
+      expect(items[1]).toEqual({
         label: file,
         to: `/exposures/${mockExposureInfo.exposure_alias}/${file}/`,
       })
-      expect(items[3]).toEqual({ label: 'Mathematics' })
+      expect(items[2]).toEqual({ label: 'Mathematics' })
     })
 
     it('does not add a crumb for the default file view', async () => {
       const wrapper = await mountComponent({ props: { file, view: 'view' } })
 
       const items = wrapper.findComponent(BreadcrumbsBar).props('items')
-      expect(items).toHaveLength(3)
-      expect(items[2]).toEqual({ label: file, to: undefined })
+      expect(items).toHaveLength(2)
+      expect(items[1]).toEqual({ label: file, to: undefined })
     })
   })
 

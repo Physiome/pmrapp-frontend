@@ -80,7 +80,6 @@ describe('WorkspaceDetail', () => {
     await flushPromises()
 
     expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
-      { label: 'Workspaces', to: { name: 'workspaces', query: {} } },
       { label: mockWorkspaceInfo.workspace.description, to: undefined },
     ])
   })
@@ -96,7 +95,7 @@ describe('WorkspaceDetail', () => {
 
     await flushPromises()
 
-    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[1]).toEqual({
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toEqual({
       label: mockWorkspaceInfo.workspace.description,
       to: {
         name: 'workspace-detail-alias-commit',
@@ -114,6 +113,6 @@ describe('WorkspaceDetail', () => {
       global: { stubs },
     })
 
-    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[1].label).toBe('test-alias')
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0].label).toBe('test-alias')
   })
 })

@@ -32,7 +32,6 @@ import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
 import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useExposureStore } from '@/stores/exposure'
-import { useNavigationStore } from '@/stores/navigation'
 import { useSearchStore } from '@/stores/search'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ErrorInfo } from '@/types/error'
@@ -126,8 +125,6 @@ const router = useRouter()
 const route = useRoute()
 const searchStore = useSearchStore()
 
-const navigationStore = useNavigationStore()
-
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   const exposureLabel = exposureInfo.value
     ? generateExposureTitle(
@@ -141,10 +138,6 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   const hasViewCrumb = !!props.file && !!props.view && props.view !== 'view'
 
   const items: BreadcrumbItem[] = [
-    {
-      label: 'Exposures',
-      to: { name: 'exposures', query: navigationStore.listingQuery.exposures },
-    },
     {
       label: exposureLabel,
       to: props.file ? { name: 'exposure-detail', params: { alias: props.alias } } : undefined,
