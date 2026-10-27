@@ -141,6 +141,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
     {
       label: exposureLabel,
       to: props.file ? { name: 'exposure-detail', params: { alias: props.alias } } : undefined,
+      loading: !exposureInfo.value && isLoading.value,
     },
   ]
 

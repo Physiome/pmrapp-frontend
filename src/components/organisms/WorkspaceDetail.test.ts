@@ -80,7 +80,7 @@ describe('WorkspaceDetail', () => {
     await flushPromises()
 
     expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
-      { label: mockWorkspaceInfo.workspace.description, to: undefined },
+      { label: mockWorkspaceInfo.workspace.description, to: undefined, loading: false },
     ])
   })
 
@@ -102,13 +102,14 @@ describe('WorkspaceDetail', () => {
           name: 'workspace-detail-alias-commit',
           params: { alias: 'test-alias', commitId: 'abc123' },
         },
+        loading: false,
       },
       { label: 'src', to: '/workspace/test-alias/file/abc123/src' },
       { label: 'models' },
     ])
   })
 
-  it('uses the alias as the workspace crumb while loading', () => {
+  it('shows a loading crumb until the workspace loads', () => {
     const workspaceStore = useWorkspaceStore()
     vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockReturnValue(new Promise(() => {}))
 
@@ -117,6 +118,6 @@ describe('WorkspaceDetail', () => {
       global: { stubs },
     })
 
-    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0].label).toBe('test-alias')
+    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({ loading: true })
   })
 })

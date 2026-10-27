@@ -92,6 +92,20 @@ describe('Breadcrumbs', () => {
     }
   })
 
+  it('renders a placeholder instead of the label while it loads', () => {
+    const wrapper = mountBreadcrumbs([
+      { label: 'abc', to: '/exposure/abc', loading: true },
+      { label: 'model.cellml' },
+    ])
+    const status = wrapper.find('[role="status"]')
+
+    expect(status.exists()).toBe(true)
+    expect(status.find('.sr-only').text()).toBe('Loading…')
+    expect(wrapper.text()).not.toContain('abc')
+    expect(wrapper.findAll('a')).toHaveLength(0)
+    expect(wrapper.findAll('[aria-current]')).toHaveLength(1)
+  })
+
   it('does not render a collapse toggle for short trails', () => {
     const wrapper = mountBreadcrumbs(shortTrail)
 

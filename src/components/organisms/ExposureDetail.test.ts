@@ -212,8 +212,31 @@ describe('ExposureDetail', () => {
       const wrapper = await mountComponent()
 
       expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
-        { label: mockExposureInfo.exposure.description, to: undefined },
+        { label: mockExposureInfo.exposure.description, to: undefined, loading: false },
       ])
+    })
+
+    it('shows a loading crumb until the exposure loads', async () => {
+      vi.spyOn(exposureStore, 'getExposureInfo').mockReturnValue(new Promise(() => {}))
+
+      const wrapper = mount(ExposureDetail, {
+        props: { alias: 'test-alias', file: '', view: '' },
+        global: { stubs: { BreadcrumbsBar: true, LoadingBox: true } },
+      })
+      await nextTick()
+
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({
+        loading: true,
+      })
+    })
+
+    it('falls back to the alias when the exposure fails to load', async () => {
+      const wrapper = await mountWithError('Exposure not found')
+
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({
+        label: 'test-alias',
+        loading: false,
+      })
     })
 
     it('ends at the file on a file page', async () => {
@@ -223,6 +246,7 @@ describe('ExposureDetail', () => {
         {
           label: mockExposureInfo.exposure.description,
           to: { name: 'exposure-detail', params: { alias: mockExposureInfo.exposure_alias } },
+          loading: false,
         },
         { label: file, to: undefined },
       ])

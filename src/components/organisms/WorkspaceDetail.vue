@@ -48,7 +48,11 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
     : { name: 'workspace-detail', params: { alias: props.alias } }
 
   return [
-    { label: workspaceLabel, to: props.path ? workspaceRoot : undefined },
+    {
+      label: workspaceLabel,
+      to: props.path ? workspaceRoot : undefined,
+      loading: !workspaceInfo.value && isLoading.value,
+    },
     ...generateWorkspacePathBreadcrumbs(props.alias, props.commitId ?? '', props.path ?? ''),
   ]
 })

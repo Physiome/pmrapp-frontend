@@ -36,7 +36,7 @@ const expand = async () => {
 const focusClasses = 'rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
 
 const shrinkClasses = (item: BreadcrumbItem, index: number) => {
-  if (item.label.length <= SHORT_LABEL_LENGTH) return 'shrink-0'
+  if (item.loading || item.label.length <= SHORT_LABEL_LENGTH) return 'shrink-0'
   // Ancestors give up space first so the current page stays readable.
   return index === lastIndex.value ? 'min-w-0' : 'min-w-0 shrink-4'
 }
@@ -89,8 +89,16 @@ watch(
             aria-hidden="true"
           />
 
+          <span v-if="item.loading" class="flex items-center h-5" role="status">
+            <span
+              class="block h-3 w-32 sm:w-48 rounded bg-gray-200 dark:bg-gray-700 animate-pulse"
+              aria-hidden="true"
+            />
+            <span class="sr-only">Loading…</span>
+          </span>
+
           <span
-            v-if="!item.to"
+            v-else-if="!item.to"
             class="block truncate font-medium text-gray-800 dark:text-gray-200"
             :title="item.label"
             :aria-current="index === lastIndex ? 'page' : undefined"

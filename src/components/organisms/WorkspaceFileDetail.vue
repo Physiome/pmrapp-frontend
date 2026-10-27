@@ -174,6 +174,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
       name: 'workspace-detail-alias-commit',
       params: { alias: props.alias, commitId: props.commitId },
     },
+    loading: workspaceInfoLoading.value,
   },
   ...generateWorkspacePathBreadcrumbs(props.alias, props.commitId, props.path),
 ])
