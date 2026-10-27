@@ -235,7 +235,7 @@ describe('ExposureDetail', () => {
       expect(items).toHaveLength(3)
       expect(items[1]).toEqual({
         label: file,
-        to: `/exposures/${mockExposureInfo.exposure_alias}/${file}/`,
+        to: `/exposure/${mockExposureInfo.exposure_alias}/${file}/`,
       })
       expect(items[2]).toEqual({ label: 'Mathematics' })
     })

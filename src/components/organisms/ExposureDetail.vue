@@ -148,7 +148,7 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
     items.push({
       label: props.file,
       // Trailing slash matches the file links in the navigation sidebar.
-      to: hasViewCrumb ? `/exposures/${props.alias}/${props.file}/` : undefined,
+      to: hasViewCrumb ? `/exposure/${props.alias}/${props.file}/` : undefined,
     })
   }
 
