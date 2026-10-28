@@ -104,4 +104,12 @@ describe('generateWorkspacePathBreadcrumbs', () => {
       { label: 'models' },
     ])
   })
+
+  it('encodes special characters in folder links', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', 'a#b/x?y/model.cellml')).toEqual([
+      { label: 'a#b', to: '/workspace/abc/file/123/a%23b' },
+      { label: 'x?y', to: '/workspace/abc/file/123/a%23b/x%3Fy' },
+      { label: 'model.cellml' },
+    ])
+  })
 })

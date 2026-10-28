@@ -49,6 +49,7 @@ import { formatYear } from '@/utils/format'
 import { markHtmlImagesLoaded, prepareHtmlImages } from '@/utils/html'
 import { formatLicenceUrl } from '@/utils/licence'
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer'
+import { encodePathSegments } from '@/utils/path'
 import { buildSearchQuery, isValidTerm } from '@/utils/search'
 
 type ExposureFileEntry = ExposureInfo['files'][number]
@@ -146,13 +147,10 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   ]
 
   if (props.file) {
-    // Encode each segment so characters like '#' or '?' in a name stay part of the path.
-    const encodedFile = props.file.split('/').map(encodeURIComponent).join('/')
-
     items.push({
       label: props.file,
       // Trailing slash matches the file links in the navigation sidebar.
-      to: hasViewCrumb ? `/exposure/${props.alias}/${encodedFile}/` : undefined,
+      to: hasViewCrumb ? `/exposure/${props.alias}/${encodePathSegments(props.file)}/` : undefined,
     })
   }
 

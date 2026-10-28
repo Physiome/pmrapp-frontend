@@ -49,3 +49,11 @@ export const ensureTrailingSlash = (path: string): string => {
   if (!trimmed) return ''
   return `${trimmed.replace(/\/+$/, '')}/`
 }
+
+/**
+ * Encodes each segment of a path for use in a URL, keeping the '/' separators.
+ * Characters like '#', '?' or '%' in a file or folder name then stay part of the path.
+ */
+export const encodePathSegments = (path: string): string => {
+  return path.split('/').map(encodeURIComponent).join('/')
+}
