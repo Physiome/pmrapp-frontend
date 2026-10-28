@@ -41,6 +41,19 @@ export const generateWorkspaceTitle = (
 }
 
 /**
+ * Generate the route path of a folder or file in a workspace at a given commit.
+ *
+ * @param alias The workspace alias.
+ * @param commitId The commit the path belongs to.
+ * @param path The folder or file path within the workspace, or an empty string for the root.
+ * @returns The path with each segment URL-encoded, e.g. "/workspace/abc/file/123/sub%20dir".
+ */
+export const getWorkspacePathLink = (alias: string, commitId: string, path: string): string => {
+  const root = `/workspace/${alias}/file/${commitId}`
+  return path ? `${root}/${encodePathSegments(path)}` : root
+}
+
+/**
  * Generate breadcrumb items for each folder and file in a workspace path.
  *
  * @param alias The workspace alias.
@@ -60,7 +73,7 @@ export const generateWorkspacePathBreadcrumbs = (
       ? { label: segment.name }
       : {
           label: segment.name,
-          to: `/workspace/${alias}/file/${commitId}/${encodePathSegments(segment.path)}`,
+          to: getWorkspacePathLink(alias, commitId, segment.path),
         },
   )
 }

@@ -46,4 +46,19 @@ describe('Workspace detail page', () => {
       )
     })
   })
+
+  it('renders the in-box file path in a folder and links back to the root.', () => {
+    cy.visit('/workspace/add')
+    cy.get('ul.divide-y a').contains('mapclient workflow').click({ force: true })
+
+    cy.get('nav[aria-label="File path"]').within(() => {
+      cy.get('[aria-current="page"]').should('contain.text', 'mapclient workflow')
+      cy.contains('a', 'Files').click({ force: true })
+    })
+
+    cy.location('pathname').should('match', /^\/workspace\/add\/file\/[0-9a-f]+$/)
+    cy.get('nav[aria-label="File path"]').should('not.exist')
+    cy.get('ul.divide-y a').contains('mapclient workflow').should('exist')
+  })
 })
+

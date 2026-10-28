@@ -77,8 +77,14 @@ describe('WorkspaceFileBrowser', () => {
     expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true)
   })
 
-  it('leaves the path to the top breadcrumbs bar on standalone workspace pages', async () => {
+  it('shows the in-box path on standalone workspace pages', async () => {
     const wrapper = await mountComponent({ path: 'src/models' })
+
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true)
+  })
+
+  it('does not show the in-box path at the workspace root', async () => {
+    const wrapper = await mountComponent()
 
     expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(false)
   })

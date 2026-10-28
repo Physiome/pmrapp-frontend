@@ -5,6 +5,7 @@ import {
   generateWorkspaceBreadcrumbs,
   generateWorkspacePathBreadcrumbs,
   generateWorkspaceTitle,
+  getWorkspacePathLink,
 } from './workspace'
 
 describe('generateWorkspaceTitle', () => {
@@ -151,5 +152,17 @@ describe('generateWorkspaceBreadcrumbs', () => {
     const [root] = generateWorkspaceBreadcrumbs(null, 'abc', '123', 'src', true)
 
     expect(root).toMatchObject({ label: 'abc', loading: true })
+  })
+})
+
+describe('getWorkspacePathLink', () => {
+  it('links to the workspace root at the commit for an empty path', () => {
+    expect(getWorkspacePathLink('abc', '123', '')).toBe('/workspace/abc/file/123')
+  })
+
+  it('encodes each segment of a nested path', () => {
+    expect(getWorkspacePathLink('abc', '123', 'a#b/x y')).toBe(
+      '/workspace/abc/file/123/a%23b/x%20y',
+    )
   })
 })

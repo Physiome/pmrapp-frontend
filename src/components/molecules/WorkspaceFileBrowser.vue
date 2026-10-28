@@ -146,9 +146,10 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 
   <div v-else class="box p-0! overflow-hidden">
     <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
-      <!-- Standalone workspace pages show the path in the top breadcrumbs bar instead. -->
       <FileBrowserBreadcrumb
-        v-if="props.path && props.onPathChange"
+        v-if="props.path"
+        :alias="props.alias"
+        :commit-id="props.commitId"
         :path="props.path"
         :on-path-change="props.onPathChange"
       />
