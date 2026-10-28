@@ -150,6 +150,21 @@ describe('Breadcrumbs', () => {
     wrapper.unmount()
   })
 
+  it('moves focus to the first revealed link while the first item is loading', async () => {
+    const [first, ...rest] = longTrail
+    const wrapper = mount(Breadcrumbs, {
+      props: { items: [{ ...first, loading: true }, ...rest] },
+      global: { stubs: { RouterLink: { template: '<a href="#"><slot /></a>' } } },
+      attachTo: document.body,
+    })
+
+    await wrapper.find('button').trigger('click')
+    await nextTick()
+
+    expect(document.activeElement?.textContent?.trim()).toBe('src')
+    wrapper.unmount()
+  })
+
   it('collapses again when the items change', async () => {
     const wrapper = mountBreadcrumbs(longTrail)
 

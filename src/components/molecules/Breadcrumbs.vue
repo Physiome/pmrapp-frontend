@@ -27,10 +27,11 @@ const isCollapsedItem = (index: number) =>
   !isExpanded.value && index > 0 && index <= hiddenCount.value
 
 // The toggle disappears once clicked, so move focus to the first revealed link.
+// Look it up by item index: the first item is not always a link (e.g. while it loads).
 const expand = async () => {
   isExpanded.value = true
   await nextTick()
-  listRef.value?.querySelectorAll<HTMLElement>('a')[1]?.focus()
+  listRef.value?.querySelector<HTMLElement>('[data-index="1"] a')?.focus()
 }
 
 const focusClasses = 'rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
@@ -77,6 +78,7 @@ watch(
         </li>
 
         <li
+          :data-index="index"
           class="items-center py-1"
           :class="[
             isCollapsedItem(index) ? 'hidden sm:flex' : 'flex',
