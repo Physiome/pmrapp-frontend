@@ -53,7 +53,6 @@ const trailKey = computed(() =>
 
 // Collapse again when navigating to another page.
 watch(trailKey, () => {
-  console.log('trailKey', trailKey.value)
   isExpanded.value = false
 })
 </script>
