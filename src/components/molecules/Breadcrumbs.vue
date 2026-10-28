@@ -42,14 +42,20 @@ const shrinkClasses = (item: BreadcrumbItem, index: number) => {
   return index === lastIndex.value ? 'min-w-0' : 'min-w-0 shrink-4'
 }
 
-// Collapse again when navigating to another page.
-watch(
-  () => props.items,
-  () => {
-    isExpanded.value = false
-  },
-  { deep: true },
+// Identifies the page by where the crumbs point, not by their labels,
+// so a label that finishes loading (or a parent recomputing the same items) doesn't count as navigation.
+// The current page's label is kept to tell sibling files apart.
+const trailKey = computed(() =>
+  JSON.stringify(
+    props.items.map((item, index) => item.to ?? (index === lastIndex.value ? item.label : '')),
+  ),
 )
+
+// Collapse again when navigating to another page.
+watch(trailKey, () => {
+  console.log('trailKey', trailKey.value)
+  isExpanded.value = false
+})
 </script>
 
 <template>

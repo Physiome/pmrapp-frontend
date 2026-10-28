@@ -173,4 +173,24 @@ describe('Breadcrumbs', () => {
 
     expect(wrapper.find('button').exists()).toBe(true)
   })
+
+  it('stays expanded when the parent passes an equal list of items', async () => {
+    const wrapper = mountBreadcrumbs(longTrail)
+
+    await wrapper.find('button').trigger('click')
+    await wrapper.setProps({ items: longTrail.map((item) => ({ ...item })) })
+
+    expect(wrapper.find('button').exists()).toBe(false)
+  })
+
+  it('stays expanded when the first item finishes loading', async () => {
+    const [first, ...rest] = longTrail
+    const wrapper = mountBreadcrumbs([{ ...first, label: 'abc', loading: true }, ...rest])
+
+    await wrapper.find('button').trigger('click')
+    await wrapper.setProps({ items: longTrail })
+
+    expect(wrapper.find('button').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Baylor, Hollingworth, Chandler, 2002')
+  })
 })
