@@ -264,6 +264,17 @@ describe('ExposureDetail', () => {
       expect(items[2]).toEqual({ label: 'Mathematics' })
     })
 
+    it('encodes special characters in the file link but keeps folder separators', async () => {
+      const specialFile = 'sub dir/model#v2?x%.cellml'
+      const wrapper = await mountComponent({ props: { file: specialFile, view: 'cellml_math' } })
+
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
+      expect(items[1]).toEqual({
+        label: specialFile,
+        to: `/exposure/${mockExposureInfo.exposure_alias}/sub%20dir/model%23v2%3Fx%25.cellml/`,
+      })
+    })
+
     it('does not add a crumb for the default file view', async () => {
       const wrapper = await mountComponent({ props: { file, view: 'view' } })
 

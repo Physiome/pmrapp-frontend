@@ -146,10 +146,13 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   ]
 
   if (props.file) {
+    // Encode each segment so characters like '#' or '?' in a name stay part of the path.
+    const encodedFile = props.file.split('/').map(encodeURIComponent).join('/')
+
     items.push({
       label: props.file,
       // Trailing slash matches the file links in the navigation sidebar.
-      to: hasViewCrumb ? `/exposure/${props.alias}/${props.file}/` : undefined,
+      to: hasViewCrumb ? `/exposure/${props.alias}/${encodedFile}/` : undefined,
     })
   }
 
