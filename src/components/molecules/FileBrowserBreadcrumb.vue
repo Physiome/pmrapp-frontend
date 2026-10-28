@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { getPathSegments } from '@/utils/path'
 
 const props = defineProps<{
   path: string
   onPathChange: (path: string | undefined) => void
 }>()
 
-const pathSegments = computed(() => props.path.split('/').filter(Boolean))
+const pathSegments = computed(() => getPathSegments(props.path))
 </script>
 
 <template>
@@ -25,12 +26,12 @@ const pathSegments = computed(() => props.path.split('/').filter(Boolean))
         v-if="index < pathSegments.length - 1"
         type="button"
         class="text-link truncate text-left cursor-pointer"
-        @click="props.onPathChange(pathSegments.slice(0, index + 1).join('/'))"
+        @click="props.onPathChange(segment.path)"
       >
-        {{ segment }}
+        {{ segment.name }}
       </button>
       <span v-else class="text-gray-800 dark:text-gray-200 font-medium truncate" aria-current="page">
-        {{ segment }}
+        {{ segment.name }}
       </span>
     </template>
   </nav>

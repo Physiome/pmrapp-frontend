@@ -57,3 +57,15 @@ export const ensureTrailingSlash = (path: string): string => {
 export const encodePathSegments = (path: string): string => {
   return path.split('/').map(encodeURIComponent).join('/')
 }
+
+/**
+ * Splits a path into its segments, each with the path up to and including it.
+ * Leading, trailing and repeated slashes are ignored.
+ *
+ * @example getPathSegments('src/models') // [{ name: 'src', path: 'src' }, { name: 'models', path: 'src/models' }]
+ */
+export const getPathSegments = (path: string): { name: string; path: string }[] => {
+  const names = path.split('/').filter(Boolean)
+
+  return names.map((name, index) => ({ name, path: names.slice(0, index + 1).join('/') }))
+}

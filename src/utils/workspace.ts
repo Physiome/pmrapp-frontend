@@ -1,7 +1,7 @@
 import { TITLE } from '@/constants/global'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { WorkspaceInfo } from '@/types/workspace'
-import { encodePathSegments } from '@/utils/path'
+import { encodePathSegments, getPathSegments } from '@/utils/path'
 
 /**
  * Generate workspace page title from description or ID.
@@ -53,14 +53,14 @@ export const generateWorkspacePathBreadcrumbs = (
   commitId: string,
   path: string,
 ): BreadcrumbItem[] => {
-  const segments = path.split('/').filter(Boolean)
+  const segments = getPathSegments(path)
 
   return segments.map((segment, index) =>
     index === segments.length - 1
-      ? { label: segment }
+      ? { label: segment.name }
       : {
-          label: segment,
-          to: `/workspace/${alias}/file/${commitId}/${encodePathSegments(segments.slice(0, index + 1).join('/'))}`,
+          label: segment.name,
+          to: `/workspace/${alias}/file/${commitId}/${encodePathSegments(segment.path)}`,
         },
   )
 }
