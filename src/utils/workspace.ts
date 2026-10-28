@@ -1,5 +1,6 @@
 import { TITLE } from '@/constants/global'
 import type { BreadcrumbItem } from '@/types/breadcrumb'
+import type { WorkspaceInfo } from '@/types/workspace'
 import { encodePathSegments } from '@/utils/path'
 
 /**
@@ -62,4 +63,37 @@ export const generateWorkspacePathBreadcrumbs = (
           to: `/workspace/${alias}/file/${commitId}/${encodePathSegments(segments.slice(0, index + 1).join('/'))}`,
         },
   )
+}
+
+/**
+ * Generate the breadcrumb trail for a workspace page: the workspace itself,
+ * then each folder and file in the path.
+ *
+ * @param info The workspace info, or null while it loads or if it failed to load.
+ * @param alias The workspace alias, used as the label until the info is available.
+ * @param commitId The commit being viewed, or an empty string for the latest commit.
+ * @param path The folder or file path within the workspace, or an empty string for the root.
+ * @param loading Whether the workspace info is still loading.
+ * @returns The workspace crumb, linked to the root unless it is the current page, followed by the path crumbs.
+ */
+export const generateWorkspaceBreadcrumbs = (
+  info: WorkspaceInfo | null,
+  alias: string,
+  commitId: string,
+  path: string,
+  loading: boolean,
+): BreadcrumbItem[] => {
+  // Link back to the workspace root at the same commit when there is one.
+  const workspaceRoot = commitId
+    ? { name: 'workspace-detail-alias-commit', params: { alias, commitId } }
+    : { name: 'workspace-detail', params: { alias } }
+
+  return [
+    {
+      label: info ? generateWorkspaceTitle(info.workspace.description, info.workspace.id) : alias,
+      to: path ? workspaceRoot : undefined,
+      loading,
+    },
+    ...generateWorkspacePathBreadcrumbs(alias, commitId, path),
+  ]
 }
