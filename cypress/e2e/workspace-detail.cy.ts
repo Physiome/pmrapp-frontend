@@ -60,5 +60,19 @@ describe('Workspace detail page', () => {
     cy.get('nav[aria-label="File path"]').should('not.exist')
     cy.get('ul.divide-y a').contains('mapclient workflow').should('exist')
   })
+
+  it('fits a breadcrumb of short folder names on a phone screen.', () => {
+    cy.viewport(375, 800)
+    // A missing folder path still renders the trail: "da8 › 3 folders of 16 characters".
+    cy.visit('/workspace/da8/file/abc123/aaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbb/cccccccccccccccc')
+    cy.get('nav[aria-label="Breadcrumb"] [role="status"]', { timeout: 15000 }).should('not.exist')
+
+    cy.document().then((doc) => {
+      expect(doc.documentElement.scrollWidth).to.be.at.most(doc.documentElement.clientWidth)
+    })
+    cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').then(($current) => {
+      expect($current[0].getBoundingClientRect().right).to.be.at.most(375)
+    })
+  })
 })
 

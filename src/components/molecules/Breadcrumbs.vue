@@ -10,7 +10,7 @@ const props = defineProps<{
 // Trails longer than this collapse their middle items on small screens.
 const COLLAPSE_THRESHOLD = 4
 
-// Labels this short (e.g. "model.cellml", "Mathematics") never truncate.
+// Ancestors with labels this short (e.g. "src", "models") give up space after longer ones.
 const SHORT_LABEL_LENGTH = 16
 
 const isExpanded = ref(false)
@@ -37,9 +37,11 @@ const expand = async () => {
 const focusClasses = 'rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
 
 const shrinkClasses = (item: BreadcrumbItem, index: number) => {
-  if (item.loading || item.label.length <= SHORT_LABEL_LENGTH) return 'shrink-0'
-  // Ancestors give up space first so the current page stays readable.
-  return index === lastIndex.value ? 'min-w-0' : 'min-w-0 shrink-4'
+  if (item.loading) return 'shrink-0'
+  // The current page shrinks least so it stays readable.
+  if (index === lastIndex.value) return 'min-w-0'
+  // Ancestors give up space first, long labels before short ones.
+  return item.label.length > SHORT_LABEL_LENGTH ? 'min-w-0 shrink-4' : 'min-w-0 shrink-2'
 }
 
 // Identifies the page by where the crumbs point, not by their labels,

@@ -92,6 +92,24 @@ describe('Breadcrumbs', () => {
     }
   })
 
+  it('lets every loaded item shrink, ancestors before the current page', () => {
+    const wrapper = mountBreadcrumbs([
+      { label: 'abc', loading: true },
+      { label: 'A label longer than sixteen', to: '/a' },
+      { label: 'short label', to: '/b' },
+      { label: 'model.cellml' },
+    ])
+    const shrink = (index: number) => {
+      const classes = wrapper.find(`li[data-index="${index}"]`).classes()
+      return classes.filter((c) => c.startsWith('shrink') || c === 'min-w-0')
+    }
+
+    expect(shrink(0)).toEqual(['shrink-0'])
+    expect(shrink(1)).toEqual(['min-w-0', 'shrink-4'])
+    expect(shrink(2)).toEqual(['min-w-0', 'shrink-2'])
+    expect(shrink(3)).toEqual(['min-w-0'])
+  })
+
   it('renders a placeholder instead of the label while it loads', () => {
     const wrapper = mountBreadcrumbs([
       { label: 'abc', to: '/exposure/abc', loading: true },
