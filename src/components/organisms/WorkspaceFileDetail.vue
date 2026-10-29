@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import BackButton from '@/components/atoms/BackButton.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
 import FilePanel from '@/components/atoms/FilePanel.vue'
@@ -11,9 +10,9 @@ import CodeIcon from '@/components/icons/CodeIcon.vue'
 import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import PreviewIcon from '@/components/icons/PreviewIcon.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
-import { useBackNavigation } from '@/composables/useBackNavigation'
 import { getWorkspaceService } from '@/services'
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -29,7 +28,7 @@ import {
   isSvgFile,
 } from '@/utils/file'
 import { renderMarkdown } from '@/utils/markdown'
-import { generateWorkspaceTitle } from '@/utils/workspace'
+import { generateWorkspaceBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace'
 
 // Files with size above this threshold are not rendered in the preview to prevent browser freeze.
 const MAX_PREVIEW_FILE_SIZE_BYTES = 500 * 1024 // ~500 KB
@@ -60,18 +59,6 @@ const filename = computed(() => {
   return lastSlash === -1 ? props.path : props.path.substring(lastSlash + 1)
 })
 
-const backPath = computed(() => {
-  const lastSlash = props.path.lastIndexOf('/')
-  if (lastSlash === -1) {
-    // File in root - go to root workspace.
-    return `/workspace/${props.alias}`
-  }
-  // Go to parent folder.
-  const parentPath = props.path.substring(0, lastSlash)
-  return `/workspace/${props.alias}/file/${props.commitId}/${parentPath}`
-})
-
-const { goBack } = useBackNavigation(backPath.value)
 const workspaceStore = useWorkspaceStore()
 
 const tabButtonClasses = {
@@ -174,6 +161,16 @@ const loadWorkspaceInfo = async () => {
   }
 }
 
+const breadcrumbItems = computed(() =>
+  generateWorkspaceBreadcrumbs(
+    workspaceInfo.value,
+    props.alias,
+    props.commitId,
+    props.path,
+    workspaceInfoLoading.value,
+  ),
+)
+
 const pageTitle = computed(() => {
   const title = generateWorkspaceTitle(
     workspaceInfo.value?.workspace.description,
@@ -245,11 +242,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 </script>
 
 <template>
-  <BackButton
-    label="Back"
-    :contentSection="pageTitle"
-    :on-click="goBack"
-  />
+  <BreadcrumbsBar :items="breadcrumbItems" />
 
   <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" titleSize="small" />
 

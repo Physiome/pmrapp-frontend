@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ExposureDetail from '@/components/organisms/ExposureDetail.vue'
 import { TITLE } from '@/constants/global'
 import { mockExposureInfo, mockGeneratedCode, mockMetadata } from '@/mocks/exposureInfo'
@@ -22,15 +23,7 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({
     push: mockRouterPush,
     replace: mockRouterReplace,
-    back: vi.fn(),
     resolve: vi.fn(() => ({ href: '/exposure/test-alias' })),
-    options: {
-      history: {
-        state: {
-          back: '/exposure',
-        },
-      },
-    },
     currentRoute: {
       value: {
         query: {},
@@ -123,7 +116,7 @@ describe('ExposureDetail', () => {
       global: {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
-          BackButton: true,
+          BreadcrumbsBar: true,
           CodeBlock: true,
           CopyButton: true,
           WrapButton: true,
@@ -163,7 +156,7 @@ describe('ExposureDetail', () => {
       global: {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
-          BackButton: true,
+          BreadcrumbsBar: true,
           CodeBlock: true,
           CopyButton: true,
           WrapButton: true,
@@ -210,6 +203,85 @@ describe('ExposureDetail', () => {
     const title = wrapper.find('h1')
     expect(title.exists()).toBe(true)
     expect(title.text()).toBe(`${titleText}`)
+  })
+
+  describe('breadcrumbs', () => {
+    const file = 'baylor_hollingworth_chandler_2002_a.cellml'
+
+    it('starts and ends at the exposure on the exposure page', async () => {
+      const wrapper = await mountComponent()
+
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
+        { label: mockExposureInfo.exposure.description, to: undefined, loading: false },
+      ])
+    })
+
+    it('shows a loading crumb until the exposure loads', async () => {
+      vi.spyOn(exposureStore, 'getExposureInfo').mockReturnValue(new Promise(() => {}))
+
+      const wrapper = mount(ExposureDetail, {
+        props: { alias: 'test-alias', file: '', view: '' },
+        global: { stubs: { BreadcrumbsBar: true, LoadingBox: true } },
+      })
+      await nextTick()
+
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({
+        loading: true,
+      })
+    })
+
+    it('falls back to the alias when the exposure fails to load', async () => {
+      const wrapper = await mountWithError('Exposure not found')
+
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({
+        label: 'test-alias',
+        loading: false,
+      })
+    })
+
+    it('ends at the file on a file page', async () => {
+      const wrapper = await mountComponent({ props: { file } })
+
+      expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
+        {
+          label: mockExposureInfo.exposure.description,
+          to: { name: 'exposure-detail', params: { alias: mockExposureInfo.exposure_alias } },
+          loading: false,
+        },
+        { label: file, to: undefined },
+      ])
+    })
+
+    it('ends at the view name on a file view page', async () => {
+      const wrapper = await mountComponent({ props: { file, view: 'cellml_math' } })
+
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
+      expect(items).toHaveLength(3)
+      expect(items[1]).toEqual({
+        label: file,
+        to: `/exposure/${mockExposureInfo.exposure_alias}/${file}/`,
+      })
+      expect(items[2]).toEqual({ label: 'Mathematics' })
+    })
+
+    it('encodes special characters in the file link but keeps folder separators', async () => {
+      const specialFile = 'sub dir/model#v2?x%.cellml'
+      const wrapper = await mountComponent({ props: { file: specialFile, view: 'cellml_math' } })
+
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
+      expect(items[1]).toEqual({
+        label: specialFile,
+        to: `/exposure/${mockExposureInfo.exposure_alias}/sub%20dir/model%23v2%3Fx%25.cellml/`,
+      })
+    })
+
+    it('does not add a crumb for the default file view', async () => {
+      const wrapper = await mountComponent({ props: { file, view: 'view' } })
+
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
+      expect(items).toHaveLength(2)
+      expect(items[1]).toEqual({ label: file, to: undefined })
+    })
   })
 
   it('shows "Generate code" as page title when codegen view is active', async () => {

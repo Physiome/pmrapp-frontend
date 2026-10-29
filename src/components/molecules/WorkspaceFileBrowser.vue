@@ -148,12 +148,12 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
     <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
       <FileBrowserBreadcrumb
         v-if="props.path"
-        :alias="alias"
+        :alias="props.alias"
         :commit-id="props.commitId"
         :path="props.path"
-        :on-path-change="onPathChange"
+        :on-path-change="props.onPathChange"
       />
-      <span class="text-gray-600 dark:text-gray-400 shrink-0">
+      <span class="text-gray-600 dark:text-gray-400 shrink-0 ml-auto">
         {{ fileCountText }}
       </span>
     </div>

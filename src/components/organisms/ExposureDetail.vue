@@ -2,7 +2,6 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ActionButton from '@/components/atoms/ActionButton.vue'
-import BackButton from '@/components/atoms/BackButton.vue'
 import Citation from '@/components/atoms/Citation.vue'
 import CodeBlock from '@/components/atoms/CodeBlock.vue'
 import CopyButton from '@/components/atoms/CopyButton.vue'
@@ -17,12 +16,12 @@ import DownloadIcon from '@/components/icons/DownloadIcon.vue'
 import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
 import LoadingIcon from '@/components/icons/LoadingIcon.vue'
 import WarningIcon from '@/components/icons/WarningIcon.vue'
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
 import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
 import PageHeader from '@/components/molecules/PageHeader.vue'
 import WarningBlock from '@/components/molecules/WarningBlock.vue'
 import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
-import { useBackNavigation } from '@/composables/useBackNavigation'
 import {
   AVAILABLE_VIEWS,
   CODEGEN_LANGUAGES,
@@ -34,6 +33,7 @@ import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
 import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
 import { useExposureStore } from '@/stores/exposure'
 import { useSearchStore } from '@/stores/search'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ErrorInfo } from '@/types/error'
 import type { ExposureInfo, Metadata, ViewEntry } from '@/types/exposure'
 import type { MathMLFormatOptions } from '@/types/mathml'
@@ -49,6 +49,7 @@ import { formatYear } from '@/utils/format'
 import { markHtmlImagesLoaded, prepareHtmlImages } from '@/utils/html'
 import { formatLicenceUrl } from '@/utils/licence'
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer'
+import { encodePathSegments } from '@/utils/path'
 import { buildSearchQuery, isValidTerm } from '@/utils/search'
 
 type ExposureFileEntry = ExposureInfo['files'][number]
@@ -120,23 +121,45 @@ const hasPathError = computed(
   () => isFileNotFound.value || isViewNotFound.value || isLangNotFound.value,
 )
 const loadedFileTitle = ref('')
-const { goBack } = useBackNavigation('/exposure')
 
 const router = useRouter()
 const route = useRoute()
 const searchStore = useSearchStore()
 
-const backButtonLabel = computed(() => {
-  // Need to access route.path for Vue reactivity.
-  void route.path
-  const backPath = router.options.history.state.back
-  const backPathname = typeof backPath === 'string' ? backPath.split(/[?#]/)[0] : ''
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+  const exposureLabel = exposureInfo.value
+    ? generateExposureTitle(
+        exposureInfo.value.exposure.description,
+        exposureInfo.value.exposure.id,
+        false,
+      )
+    : props.alias
 
-  if (backPathname === '/exposure') {
-    return 'Back to exposures'
+  // The 'view' key is the file's default view, so it gets no crumb of its own.
+  const hasViewCrumb = !!props.file && !!props.view && props.view !== 'view'
+
+  const items: BreadcrumbItem[] = [
+    {
+      label: exposureLabel,
+      to: props.file ? { name: 'exposure-detail', params: { alias: props.alias } } : undefined,
+      loading: !exposureInfo.value && isLoading.value,
+    },
+  ]
+
+  if (props.file) {
+    items.push({
+      label: props.file,
+      // Trailing slash matches the file links in the navigation sidebar.
+      to: hasViewCrumb ? `/exposure/${props.alias}/${encodePathSegments(props.file)}/` : undefined,
+    })
   }
 
-  return backPath ? 'Back' : 'Back to exposures'
+  if (hasViewCrumb) {
+    const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view)
+    items.push({ label: viewEntry?.name ?? props.view })
+  }
+
+  return items
 })
 
 const fileBrowserPath = computed(() => {
@@ -919,12 +942,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2 justify-between mb-6" :class="actionToolbarWidth">
-    <BackButton
-      :label="backButtonLabel"
-      content-section="Exposure Detail"
-      :on-click="goBack"
-    />
+  <BreadcrumbsBar :items="breadcrumbItems" />
+
+  <div class="flex flex-wrap gap-2 justify-end mb-6" :class="actionToolbarWidth">
     <ActionButton
       variant="link"
       size="md"

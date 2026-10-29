@@ -36,4 +36,43 @@ describe('Workspace detail page', () => {
     cy.get('ul.divide-y').should('exist')
     cy.get('ul.divide-y > li').should('have.length', 7)
   })
+
+  it('renders the breadcrumb ending at the workspace.', () => {
+    cy.get('nav[aria-label="Breadcrumb"]').within(() => {
+      cy.get('a').should('not.exist')
+      cy.get('[aria-current="page"]').should(
+        'contain.text',
+        'Noble, Denyer, Brown, DiFrancesco, 1992',
+      )
+    })
+  })
+
+  it('renders the in-box file path in a folder and links back to the root.', () => {
+    cy.visit('/workspace/add')
+    cy.get('ul.divide-y a').contains('mapclient workflow').click({ force: true })
+
+    cy.get('nav[aria-label="File path"]').within(() => {
+      cy.get('[aria-current="page"]').should('contain.text', 'mapclient workflow')
+      cy.contains('a', 'Files').click({ force: true })
+    })
+
+    cy.location('pathname').should('match', /^\/workspace\/add\/file\/[0-9a-f]+$/)
+    cy.get('nav[aria-label="File path"]').should('not.exist')
+    cy.get('ul.divide-y a').contains('mapclient workflow').should('exist')
+  })
+
+  it('fits a breadcrumb of short folder names on a phone screen.', () => {
+    cy.viewport(375, 800)
+    // A missing folder path still renders the trail: "da8 › 3 folders of 16 characters".
+    cy.visit('/workspace/da8/file/abc123/aaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbb/cccccccccccccccc')
+    cy.get('nav[aria-label="Breadcrumb"] [role="status"]', { timeout: 15000 }).should('not.exist')
+
+    cy.document().then((doc) => {
+      expect(doc.documentElement.scrollWidth).to.be.at.most(doc.documentElement.clientWidth)
+    })
+    cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').then(($current) => {
+      expect($current[0].getBoundingClientRect().right).to.be.at.most(375)
+    })
+  })
 })
+

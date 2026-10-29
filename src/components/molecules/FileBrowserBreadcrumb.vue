@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { getPathSegments } from '@/utils/path'
+import { getWorkspacePathLink } from '@/utils/workspace'
 
+// Pass onPathChange to browse folders in place (e.g. inside an exposure),
+// or alias and commitId to link to the workspace folder pages.
 const props = defineProps<{
-  alias: string
-  commitId: string
   path: string
+  alias?: string
+  commitId?: string
   onPathChange?: (path: string | undefined) => void
 }>()
 
-const pathSegments = computed(() => props.path.split('/').filter(Boolean))
+const pathSegments = computed(() => getPathSegments(props.path))
+
+const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.commitId ?? '', path)
 </script>
 
 <template>
@@ -21,34 +27,34 @@ const pathSegments = computed(() => props.path.split('/').filter(Boolean))
     >
       Files
     </button>
-    <RouterLink
-      v-else
-      :to="`/workspace/${props.alias}/file/${props.commitId}`"
-      class="text-link shrink-0 truncate text-left cursor-pointer"
-    >
+    <RouterLink v-else :to="linkTo('')" class="text-link shrink-0 truncate text-left cursor-pointer">
       Files
     </RouterLink>
 
     <template v-for="(segment, index) in pathSegments" :key="index">
       <span class="text-gray-400 dark:text-gray-500 shrink-0" aria-hidden="true">/</span>
+      <span
+        v-if="index === pathSegments.length - 1"
+        class="text-gray-800 dark:text-gray-200 font-medium truncate"
+        aria-current="page"
+      >
+        {{ segment.name }}
+      </span>
       <button
-        v-if="index < pathSegments.length - 1 && props.onPathChange"
+        v-else-if="props.onPathChange"
         type="button"
         class="text-link truncate text-left cursor-pointer"
-        @click="props.onPathChange(pathSegments.slice(0, index + 1).join('/'))"
+        @click="props.onPathChange(segment.path)"
       >
-        {{ segment }}
+        {{ segment.name }}
       </button>
       <RouterLink
-        v-else-if="index < pathSegments.length - 1"
-        :to="`/workspace/${props.alias}/file/${props.commitId}/${pathSegments.slice(0, index + 1).join('/')}`"
+        v-else
+        :to="linkTo(segment.path)"
         class="text-link truncate text-left cursor-pointer"
       >
-        {{ segment }}
+        {{ segment.name }}
       </RouterLink>
-      <span v-else class="text-gray-800 dark:text-gray-200 font-medium truncate" aria-current="page">
-        {{ segment }}
-      </span>
     </template>
   </nav>
 </template>

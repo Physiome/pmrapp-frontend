@@ -49,3 +49,23 @@ export const ensureTrailingSlash = (path: string): string => {
   if (!trimmed) return ''
   return `${trimmed.replace(/\/+$/, '')}/`
 }
+
+/**
+ * Encodes each segment of a path for use in a URL, keeping the '/' separators.
+ * Characters like '#', '?' or '%' in a file or folder name then stay part of the path.
+ */
+export const encodePathSegments = (path: string): string => {
+  return path.split('/').map(encodeURIComponent).join('/')
+}
+
+/**
+ * Splits a path into its segments, each with the path up to and including it.
+ * Leading, trailing and repeated slashes are ignored.
+ *
+ * @example getPathSegments('src/models') // [{ name: 'src', path: 'src' }, { name: 'models', path: 'src/models' }]
+ */
+export const getPathSegments = (path: string): { name: string; path: string }[] => {
+  const names = path.split('/').filter(Boolean)
+
+  return names.map((name, index) => ({ name, path: names.slice(0, index + 1).join('/') }))
+}
