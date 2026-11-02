@@ -61,18 +61,53 @@ describe('Workspace detail page', () => {
     cy.get('ul.divide-y a').contains('mapclient workflow').should('exist')
   })
 
+  it('renders no breadcrumb for a folder path that does not exist.', () => {
+    // Slow the response down so the check below runs while the page is loading.
+    cy.intercept('POST', '**/api/get_workspace_info', (req) => {
+      req.on('response', (res) => {
+        res.setDelay(1000)
+      })
+    })
+    cy.visit('/workspace/da8/file/abc123/aaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbb')
+
+    cy.contains('Loading workspace').should('exist')
+    cy.get('nav[aria-label="Breadcrumb"]').should('not.exist')
+
+    cy.contains('Workspace not found').should('exist')
+    cy.get('nav[aria-label="Breadcrumb"]').should('not.exist')
+  })
+
   it('fits a breadcrumb of short folder names on a phone screen.', () => {
     cy.viewport(375, 800)
-    // A missing folder path still renders the trail: "da8 › 3 folders of 16 characters".
+    // Stub the folder so every crumb is short: "Workspace 43 › 3 folders of 16 characters".
+    cy.intercept('POST', '**/api/get_workspace_info', {
+      inner: {
+        workspace: {
+          id: 43,
+          url: 'https://models.physiomeproject.org/workspace/da8/',
+          superceded_by_id: null,
+          description: '',
+          long_description: '',
+          created_ts: 0,
+          exposures: null,
+        },
+        commit: { commit_id: 'abc123', author: '', committer: '' },
+        path: 'aaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbb/cccccccccccccccc',
+        target: { TreeInfo: { filecount: 0, entries: [] } },
+      },
+    })
     cy.visit('/workspace/da8/file/abc123/aaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbb/cccccccccccccccc')
-    cy.get('nav[aria-label="Breadcrumb"] [role="status"]', { timeout: 15000 }).should('not.exist')
+    cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
+      'contain.text',
+      'cccccccccccccccc',
+    )
 
-    cy.document().then((doc) => {
-      expect(doc.documentElement.scrollWidth).to.be.at.most(doc.documentElement.clientWidth)
+    // Measure the trail itself: other content on the page may overflow for unrelated reasons.
+    cy.get('nav[aria-label="Breadcrumb"] ol').then(($list) => {
+      expect($list[0].scrollWidth).to.be.at.most($list[0].clientWidth)
     })
     cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').then(($current) => {
       expect($current[0].getBoundingClientRect().right).to.be.at.most(375)
     })
   })
 })
-

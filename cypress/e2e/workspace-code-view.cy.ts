@@ -45,6 +45,14 @@ describe('Workspace detail page', () => {
     })
   })
 
+  it('renders no breadcrumb for a file that does not exist', () => {
+    cy.visit('/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834/missing/file.txt')
+
+    // The path resolves to neither a file nor a folder, so it shows the workspace error.
+    cy.contains('Workspace not found').should('exist')
+    cy.get('nav[aria-label="Breadcrumb"]').should('not.exist')
+  })
+
   it('returns to the workspace file browser when going back from a file', () => {
     cy.visit('/workspace/add', {
       onBeforeLoad(win) {
