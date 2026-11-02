@@ -242,7 +242,8 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 </script>
 
 <template>
-  <BreadcrumbsBar :items="breadcrumbItems" />
+  <!-- Wait for the page to load: the trail would link to locations that may not exist on an error page. -->
+  <BreadcrumbsBar v-if="!isLoading && !error" :items="breadcrumbItems" />
 
   <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" titleSize="small" />
 

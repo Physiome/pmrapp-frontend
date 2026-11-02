@@ -942,7 +942,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <BreadcrumbsBar :items="breadcrumbItems" />
+  <!-- Wait for the page to load: the trail would link to locations that may not exist on an error page. -->
+  <BreadcrumbsBar v-if="exposureInfo && !error" :items="breadcrumbItems" />
 
   <div class="flex flex-wrap gap-2 justify-end mb-6" :class="actionToolbarWidth">
     <ActionButton

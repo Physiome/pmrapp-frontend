@@ -216,7 +216,7 @@ describe('ExposureDetail', () => {
       ])
     })
 
-    it('shows a loading crumb until the exposure loads', async () => {
+    it('renders no breadcrumb until the exposure loads', async () => {
       vi.spyOn(exposureStore, 'getExposureInfo').mockReturnValue(new Promise(() => {}))
 
       const wrapper = mount(ExposureDetail, {
@@ -225,18 +225,13 @@ describe('ExposureDetail', () => {
       })
       await nextTick()
 
-      expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({
-        loading: true,
-      })
+      expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false)
     })
 
-    it('falls back to the alias when the exposure fails to load', async () => {
+    it('renders no breadcrumb when the exposure fails to load', async () => {
       const wrapper = await mountWithError('Exposure not found')
 
-      expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({
-        label: 'test-alias',
-        loading: false,
-      })
+      expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false)
     })
 
     it('ends at the file on a file page', async () => {

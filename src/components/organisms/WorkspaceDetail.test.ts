@@ -109,7 +109,7 @@ describe('WorkspaceDetail', () => {
     ])
   })
 
-  it('shows a loading crumb until the workspace loads', () => {
+  it('renders no breadcrumb until the workspace loads', () => {
     const workspaceStore = useWorkspaceStore()
     vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockReturnValue(new Promise(() => {}))
 
@@ -118,6 +118,21 @@ describe('WorkspaceDetail', () => {
       global: { stubs },
     })
 
-    expect(wrapper.findComponent(BreadcrumbsBar).props('items')[0]).toMatchObject({ loading: true })
+    expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false)
+  })
+
+  it('renders no breadcrumb when the folder fails to load', async () => {
+    const workspaceStore = useWorkspaceStore()
+    vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockRejectedValue(new Error('Workspace not found'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const wrapper = mount(WorkspaceDetail, {
+      props: { alias: 'test-alias', commitId: 'abc123', path: 'missing/folder' },
+      global: { stubs },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false)
   })
 })
