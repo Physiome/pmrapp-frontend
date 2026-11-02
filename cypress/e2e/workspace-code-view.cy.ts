@@ -51,16 +51,22 @@ describe('Workspace detail page', () => {
         cy.spy(win.console, 'error').as('consoleError')
       },
     })
-    cy.get('a.text-link').contains('human_body_Layout1_thumbnail.jpeg').click({ force: true })
-    cy.get('img[alt="human_body_Layout1_thumbnail.jpeg"]').should('exist')
+    cy.get('a.text-link').contains('README.rst').click({ force: true })
+    cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
+      'contain.text',
+      'README.rst',
+    )
     // Wait for the workspace crumb to become a link before leaving.
     cy.get('nav[aria-label="Breadcrumb"] a').should('exist')
 
     cy.go('back')
 
     cy.location('pathname').should('eq', '/workspace/add')
-    cy.get('a.text-link').contains('human_body_Layout1_thumbnail.jpeg').should('exist')
-    cy.get('img[alt="human_body_Layout1_thumbnail.jpeg"]').should('not.exist')
+    cy.get('a.text-link').contains('README.rst').should('exist')
+    cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
+      'not.contain.text',
+      'README.rst',
+    )
     // The file view must not render with the folder's route params on the way out.
     cy.get('@consoleError').should('not.have.been.calledWithMatch', /Missing required param/)
   })
