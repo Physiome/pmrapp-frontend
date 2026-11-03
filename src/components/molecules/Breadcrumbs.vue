@@ -74,7 +74,7 @@ watch(trailKey, () => {
           <ChevronRightIcon class="w-3 h-3 mx-1.5 text-gray-400 dark:text-gray-500 shrink-0" aria-hidden="true" />
           <button
             type="button"
-            class="text-link px-1 py-1 leading-none"
+            class="text-link text-link-primary px-1 py-1 leading-none"
             :class="focusClasses"
             :aria-label="`Show ${hiddenCount} more breadcrumb ${hiddenCount === 1 ? 'item' : 'items'}`"
             :aria-expanded="isExpanded"
@@ -118,7 +118,7 @@ watch(trailKey, () => {
           <RouterLink
             v-else
             :to="item.to"
-            class="text-link block truncate"
+            class="text-link text-link-primary block truncate"
             :class="focusClasses"
             :title="item.label"
           >

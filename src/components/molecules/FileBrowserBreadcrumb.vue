@@ -22,12 +22,12 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
     <button
       v-if="props.onPathChange"
       type="button"
-      class="text-link shrink-0 truncate text-left cursor-pointer"
+      class="text-link text-link-primary shrink-0 truncate text-left cursor-pointer"
       @click="props.onPathChange(undefined)"
     >
       Files
     </button>
-    <RouterLink v-else :to="linkTo('')" class="text-link shrink-0 truncate text-left cursor-pointer">
+    <RouterLink v-else :to="linkTo('')" class="text-link text-link-primary shrink-0 truncate text-left cursor-pointer">
       Files
     </RouterLink>
 
@@ -43,7 +43,7 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
       <button
         v-else-if="props.onPathChange"
         type="button"
-        class="text-link truncate text-left cursor-pointer"
+        class="text-link text-link-primary truncate text-left cursor-pointer"
         @click="props.onPathChange(segment.path)"
       >
         {{ segment.name }}
@@ -51,7 +51,7 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
       <RouterLink
         v-else
         :to="linkTo(segment.path)"
-        class="text-link truncate text-left cursor-pointer"
+        class="text-link text-link-primary truncate text-left cursor-pointer"
       >
         {{ segment.name }}
       </RouterLink>
