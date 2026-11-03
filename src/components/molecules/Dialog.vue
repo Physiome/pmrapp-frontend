@@ -59,7 +59,7 @@ watch(
   () => props.show,
   (newVal) => {
     if (newVal) {
-      nextTick(() => {
+      nextTick().then(() => {
         dialogRef.value?.focus()
       })
       document.addEventListener('keydown', handleKeyDown)

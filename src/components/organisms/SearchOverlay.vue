@@ -22,7 +22,7 @@ watch(
   () => props.show,
   (show) => {
     if (show) {
-      nextTick(() => {
+      nextTick().then(() => {
         searchComboBoxRef.value?.focusInput()
       })
     }
