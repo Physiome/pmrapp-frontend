@@ -86,7 +86,7 @@ function getTermOptionId(index: number): string {
 
 // Emits the current dropdown height whenever it changes (used by SearchOverlay to grow the dialog).
 function emitDropdownHeight() {
-  nextTick(() => {
+  nextTick().then(() => {
     const el = categoryMenuRef.value ?? termSuggestionsRef.value ?? freeTextHintRef.value
     emit('dropdownHeightChange', el ? el.offsetHeight : 0)
   })
@@ -336,7 +336,7 @@ const statusMessage = computed(() => {
 // Keep the active option visible when arrow-navigating a scrollable list.
 watch(comboboxActiveDescendant, (id) => {
   if (!id) return
-  nextTick(() => {
+  nextTick().then(() => {
     document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
   })
 })
@@ -385,7 +385,7 @@ function generateChipId(): string {
 }
 
 function focusInput() {
-  nextTick(() => {
+  nextTick().then(() => {
     inputRef.value?.focus()
   })
 }
