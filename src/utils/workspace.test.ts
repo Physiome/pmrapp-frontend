@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { TITLE } from '@/constants/global'
 import { mockWorkspaceInfo } from '@/mocks/workspaceInfo'
-import { generateWorkspaceTitle } from './workspace'
+import {
+  generateWorkspaceBreadcrumbs,
+  generateWorkspacePathBreadcrumbs,
+  generateWorkspaceTitle,
+  getWorkspacePathLink,
+} from './workspace'
 
 describe('generateWorkspaceTitle', () => {
   const { description, id } = mockWorkspaceInfo.workspace
@@ -82,5 +87,82 @@ describe('generateWorkspaceTitle', () => {
         `${description} @ ${commitId.substring(0, 12)} / file.txt – ${TITLE}`,
       )
     })
+  })
+})
+
+describe('generateWorkspacePathBreadcrumbs', () => {
+  it('returns no items for the workspace root', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', '')).toEqual([])
+  })
+
+  it('links each folder and leaves the last segment as the current page', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', 'src/models/model.cellml')).toEqual([
+      { label: 'src', to: '/workspace/abc/file/123/src' },
+      { label: 'models', to: '/workspace/abc/file/123/src/models' },
+      { label: 'model.cellml' },
+    ])
+  })
+
+  it('ignores leading, trailing and repeated slashes', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', '/src//models/')).toEqual([
+      { label: 'src', to: '/workspace/abc/file/123/src' },
+      { label: 'models' },
+    ])
+  })
+
+  it('encodes special characters in folder links', () => {
+    expect(generateWorkspacePathBreadcrumbs('abc', '123', 'a#b/x?y/model.cellml')).toEqual([
+      { label: 'a#b', to: '/workspace/abc/file/123/a%23b' },
+      { label: 'x?y', to: '/workspace/abc/file/123/a%23b/x%3Fy' },
+      { label: 'model.cellml' },
+    ])
+  })
+})
+
+describe('generateWorkspaceBreadcrumbs', () => {
+  const { description } = mockWorkspaceInfo.workspace
+
+  it('ends at the unlinked workspace crumb on the workspace root', () => {
+    expect(generateWorkspaceBreadcrumbs(mockWorkspaceInfo, 'abc', '', '', false)).toEqual([
+      { label: description, to: undefined, loading: false },
+    ])
+  })
+
+  it('links the workspace crumb to the root at the same commit inside a path', () => {
+    expect(
+      generateWorkspaceBreadcrumbs(mockWorkspaceInfo, 'abc', '123', 'src/model.cellml', false),
+    ).toEqual([
+      {
+        label: description,
+        to: { name: 'workspace-detail-alias-commit', params: { alias: 'abc', commitId: '123' } },
+        loading: false,
+      },
+      { label: 'src', to: '/workspace/abc/file/123/src' },
+      { label: 'model.cellml' },
+    ])
+  })
+
+  it('links the workspace crumb to the latest root when there is no commit', () => {
+    const [root] = generateWorkspaceBreadcrumbs(mockWorkspaceInfo, 'abc', '', 'src', false)
+
+    expect(root.to).toEqual({ name: 'workspace-detail', params: { alias: 'abc' } })
+  })
+
+  it('falls back to the alias and passes the loading flag through without info', () => {
+    const [root] = generateWorkspaceBreadcrumbs(null, 'abc', '123', 'src', true)
+
+    expect(root).toMatchObject({ label: 'abc', loading: true })
+  })
+})
+
+describe('getWorkspacePathLink', () => {
+  it('links to the workspace root at the commit for an empty path', () => {
+    expect(getWorkspacePathLink('abc', '123', '')).toBe('/workspace/abc/file/123')
+  })
+
+  it('encodes each segment of a nested path', () => {
+    expect(getWorkspacePathLink('abc', '123', 'a#b/x y')).toBe(
+      '/workspace/abc/file/123/a%23b/x%20y',
+    )
   })
 })

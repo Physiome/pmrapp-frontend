@@ -60,6 +60,15 @@ watch(() => [alias.value, commitId.value, path.value], loadWorkspaceInfo)
 </script>
 
 <template>
-  <WorkspaceFileDetail v-if="isWorkspaceFile" :alias="alias" :commit-id="commitId" :path="path" />
+  <!--
+    `isWorkspaceFile` lags behind the route until the new info loads, so check the `path` too:
+    a route without a `path` is always the workspace root (e.g. going back from a file).
+  -->
+  <WorkspaceFileDetail
+    v-if="isWorkspaceFile && path"
+    :alias="alias"
+    :commit-id="commitId"
+    :path="path"
+  />
   <WorkspaceDetail v-else :alias="alias" :commit-id="commitId" :path="path" />
 </template>

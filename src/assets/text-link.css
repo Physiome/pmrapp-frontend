@@ -9,3 +9,12 @@
     color: var(--link-hover);
   }
 }
+
+/* Primary-coloured links in both themes, for trails where links must stand out from plain text (e.g. breadcrumbs). */
+.text-link-primary {
+  color: var(--primary);
+
+  &:hover {
+    color: var(--primary-hover);
+  }
+}

@@ -9,13 +9,14 @@ import { useWorkspaceStore } from '@/stores/workspace'
 describe('WorkspaceFileBrowser', () => {
   let workspaceStore: ReturnType<typeof useWorkspaceStore>
 
-  const mountComponent = async () => {
+  const mountComponent = async (extraProps: Record<string, unknown> = {}) => {
     vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockResolvedValue(mockWorkspaceInfo)
 
     const wrapper = mount(WorkspaceFileBrowser, {
       props: {
         alias: 'test-alias',
         commitId: mockWorkspaceInfo.commit.commit_id,
+        ...extraProps,
       },
       global: {
         stubs: {
@@ -68,5 +69,23 @@ describe('WorkspaceFileBrowser', () => {
 
     expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
     expect(wrapper.text()).not.toContain('items')
+  })
+
+  it('shows the in-box path when browsing folders in place', async () => {
+    const wrapper = await mountComponent({ path: 'src/models', onPathChange: vi.fn() })
+
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true)
+  })
+
+  it('shows the in-box path on standalone workspace pages', async () => {
+    const wrapper = await mountComponent({ path: 'src/models' })
+
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true)
+  })
+
+  it('does not show the in-box path at the workspace root', async () => {
+    const wrapper = await mountComponent()
+
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(false)
   })
 })
