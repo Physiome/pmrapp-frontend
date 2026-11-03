@@ -54,7 +54,7 @@ const handleCopyHTML = async () => {
     const htmlContent = props.text.replaceAll('\n', '<br>')
     const tempElement = document.createElement('div')
     tempElement.innerHTML = props.text
-    const plainTextContent = tempElement.textContent || tempElement.innerText || ''
+    const plainTextContent = tempElement.textContent ?? ''
 
     const htmlBlob = new Blob([htmlContent], { type: 'text/html' })
     const textBlob = new Blob([plainTextContent], { type: 'text/plain' })

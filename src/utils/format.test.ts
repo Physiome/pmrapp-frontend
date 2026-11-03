@@ -73,7 +73,7 @@ describe('formatSearchKey', () => {
     )
   })
 
-  it('returns formatted and escaped HTML for HTML string', () => {
+  it('returns formatted and escaped HTML for HTML tag string', () => {
     const results = formatSearchKey('<h1>Cells</h1>')
 
     expect(results).toBe(
@@ -81,7 +81,7 @@ describe('formatSearchKey', () => {
     )
   })
 
-  it('returns formatted and escaped HTML for HTML string', () => {
+  it('returns formatted and escaped HTML for script tag with quotes', () => {
     const results = formatSearchKey('<script>alert("hello")</script>')
 
     expect(results).toBe(

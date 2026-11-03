@@ -86,7 +86,7 @@ const show = () => {
     positioned.value = false
 
     // Wait for DOM to render the teleported popover, then measure and position it.
-    nextTick(() => {
+    nextTick().then(() => {
       requestAnimationFrame(() => {
         updatePosition()
       })
