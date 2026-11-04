@@ -258,9 +258,9 @@ onMounted(() => {
           <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" />
           <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" />
         </div>
-        <span class="text-sm text-gray-600 dark:text-gray-400"
-          >Available with enhanced capabilities</span
-        >
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          Available with enhanced capabilities
+        </span>
       </div>
     </div>
   </section>
