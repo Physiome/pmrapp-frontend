@@ -16,6 +16,11 @@ const authService = getAuthService()
 
 const isGitHubUser = computed(() => authStore.loginMethod === 'github')
 
+const avatarClasses = [
+  'flex flex-shrink-0 items-center justify-center w-16 h-16 overflow-hidden',
+  'rounded-full bg-primary text-white text-xl font-bold select-none',
+]
+
 const showLogOutConfirm = ref(false)
 const showDisconnectGitHubConfirm = ref(false)
 
@@ -62,7 +67,7 @@ const cancelDisconnectGitHub = () => {
   <div class="max-w-2xl mx-auto space-y-6">
     <!-- Avatar and display name. -->
     <div class="box flex items-center gap-5">
-      <div class="avatar" aria-hidden="true">
+      <div :class="avatarClasses" aria-hidden="true">
         <img v-if="authStore.avatarUrl" :src="authStore.avatarUrl" alt="" class="avatar-img" />
         <UserIcon v-else class="w-8 h-8" />
       </div>
@@ -150,10 +155,6 @@ const cancelDisconnectGitHub = () => {
 <style scoped>
 @import "@/assets/label.css";
 @import "@/assets/box.css";
-
-.avatar {
-  @apply flex-shrink-0 w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold select-none overflow-hidden;
-}
 
 .avatar-img {
   @apply w-full h-full object-cover;

@@ -38,6 +38,21 @@ const navLinkClasses = [
   'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors',
 ]
 
+// Primary-coloured strip along the top of the header, sitting below the notification bar.
+const headerClasses = [
+  'bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]',
+  "before:content-[''] before:absolute before:left-0 before:right-0",
+  'before:top-(--notification-bar-height) before:h-[6px] before:bg-primary',
+]
+
+// Vertical divider line to the left of the user dropdown.
+const userDropdownDividerClasses = [
+  'relative text-center pl-4',
+  "before:content-[''] before:absolute before:left-0 before:top-1/2",
+  'before:h-6 before:w-px before:-translate-y-1/2 before:transform',
+  'before:bg-gray-300 dark:before:bg-gray-600',
+]
+
 const handleSearchClick = () => {
   isMobileMenuOpen.value = false
 
@@ -72,9 +87,7 @@ watch(
 </script>
 
 <template>
-  <header
-    class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]"
-  >
+  <header :class="headerClasses">
     <PreviewBanner />
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <RouterLink to="/" class="flex items-center" aria-label="Home">
@@ -131,7 +144,7 @@ watch(
               </li>
             </ul>
           </li>
-          <li v-if="props.showUserDropdown" class="user-dropdown-divider pl-4">
+          <li v-if="props.showUserDropdown" :class="userDropdownDividerClasses">
             <UserDropdown />
           </li>
         </ul>
@@ -144,14 +157,6 @@ watch(
 <style scoped>
 @reference "tailwindcss";
 @reference "@/assets/main.css";
-
-.header-border-top {
-  @apply before:content-[''] before:absolute before:left-0 before:right-0 before:h-[6px] before:bg-primary;
-
-  &::before {
-    top: var(--notification-bar-height);
-  }
-}
 
 .mobile-menu-icon {
   @apply relative flex h-6 w-6 flex-col items-center justify-center gap-1;
@@ -171,9 +176,5 @@ watch(
 
 .mobile-menu-icon-open .mobile-menu-icon-bar:nth-child(3) {
   transform: translateY(-6px) rotate(-45deg);
-}
-
-.user-dropdown-divider {
-  @apply relative text-center before:content-[''] before:absolute before:left-0 before:top-1/2 before:h-6 before:-translate-y-1/2 before:transform before:w-px before:bg-gray-300 dark:before:bg-gray-600;
 }
 </style>
