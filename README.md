@@ -1,4 +1,4 @@
-# PMR - Frontend [![Deploy static content to Pages](https://github.com/akhuoa/pmrapp-frontend/actions/workflows/deploy.yml/badge.svg)](https://github.com/akhuoa/pmrapp-frontend/actions/workflows/deploy.yml)
+# PMR - Frontend [![Deploy static content to Pages](https://github.com/physiome/pmrapp-frontend/actions/workflows/deploy.yml/badge.svg)](https://github.com/physiome/pmrapp-frontend/actions/workflows/deploy.yml)
 
 The next-generation frontend web application for the [Physiome Model Repository](https://models.physiomeproject.org/), built with Vue 3, TypeScript, and Tailwind CSS v4.
 
