@@ -73,7 +73,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="relative flex items-center" :class="{'overflow-hidden': props.withSearchButton}">
+  <div class="relative flex items-center" :class="{ 'overflow-hidden': props.withSearchButton }">
     <div class="relative flex items-center w-full">
       <input
         ref="inputRef"
@@ -92,10 +92,7 @@ defineExpose({
         class="flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer p-1"
         :class="props.withSearchButton ? 'mr-1' : 'absolute right-2'"
       >
-        <CloseButton
-          @click="handleClear"
-          aria-label="Clear search"
-        />
+        <CloseButton @click="handleClear" aria-label="Clear search" />
       </div>
     </div>
     <button
@@ -112,5 +109,5 @@ defineExpose({
 </template>
 
 <style scoped>
-@import '@/assets/input.css';
+@import "@/assets/input.css";
 </style>

@@ -367,7 +367,9 @@ const handleClearAllFilters = (): void => {
     :class="`top-full left-0 w-full z-200 ${inOverlay ? '' : 'absolute'}`"
   >
     <div class="mt-2 box box-small overflow-hidden !shadow-none !p-0">
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div
+        class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4"
+      >
         <p class="text-gray-500 dark:text-gray-400 text-sm">
           Click a term to add it to your search or use the filter to narrow results.
         </p>
@@ -380,6 +382,7 @@ const handleClearAllFilters = (): void => {
           @keydown="handleFilterInputKeyDown"
         />
       </div>
+      <!-- biome-ignore lint/a11y/noStaticElementInteractions: delegates arrow-key navigation between the focusable chip buttons inside -->
       <div
         v-if="selectedFilterChips.length"
         class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-row flex-1 items-start justify-between gap-2"
@@ -449,7 +452,9 @@ const handleClearAllFilters = (): void => {
               <TermButton
                 v-for="(term, termIndex) in categoryGroup.terms"
                 :key="term"
-                :ref="(el) => setTermButtonRef(el, getTermIndexInFlattenedList(groupIndex, termIndex))"
+                :ref="
+                  (el) => setTermButtonRef(el, getTermIndexInFlattenedList(groupIndex, termIndex))
+                "
                 :term="term"
                 :active="hasFilter(categoryGroup.kind, term)"
                 class="focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
@@ -488,10 +493,10 @@ const handleClearAllFilters = (): void => {
 </template>
 
 <style scoped>
+@import "@/assets/box.css";
+@import "@/assets/error-box.css";
+@import "@/assets/input.css";
 @reference "tailwindcss";
-@import '@/assets/box.css';
-@import '@/assets/error-box.css';
-@import '@/assets/input.css';
 
 .sticky-container {
   container-type: scroll-state;

@@ -188,6 +188,8 @@ defineExpose({
 <template>
   <div class="relative">
     <!-- Backdrop overlay (only when not in SearchOverlay). -->
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: backdrop click-to-dismiss is a mouse convenience; Escape handles keyboard -->
+    <!-- biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click-to-dismiss is a mouse convenience; Escape handles keyboard -->
     <div
       v-if="showBackdrop"
       class="fixed inset-0 bg-gray-300/75 dark:bg-gray-700/75 md:bg-gray-600/75 md:dark:bg-gray-900/75 backdrop-blur-sm z-100"
@@ -195,7 +197,7 @@ defineExpose({
     ></div>
     <div
       class="flex flex-col md:flex-row items-center md:justify-between gap-2 w-full transition-all relative"
-      :class="{'z-200': showBackdrop}"
+      :class="{ 'z-200': showBackdrop }"
     >
       <SearchField
         ref="searchInputRef"
@@ -203,11 +205,14 @@ defineExpose({
         placeholder="Start typing to search..."
         ariaLabel="Search term"
         class="flex-1 w-full bg-background border rounded-lg relative overflow-hidden"
-        :class="isSearchFocused ? 'ring-1 ring-primary border-primary' : 'border-gray-200 dark:border-gray-700'"
+        :class="
+          isSearchFocused
+            ? 'ring-1 ring-primary border-primary'
+            : 'border-gray-200 dark:border-gray-700'
+        "
         input-class="flex-1 min-w-0 outline-none focus:ring-0 px-4 py-2"
         :with-search-button="true"
-        :filtersCount="selectedFilters.length"
-        :searchEnabled="selectedFilters.length > 0"
+        :search-enabled="selectedFilters.length > 0"
         @focus="focusSearchInput"
         @blur="blurSearchInput"
         @search="handleQuerySearch"
@@ -250,4 +255,3 @@ defineExpose({
     />
   </div>
 </template>
-

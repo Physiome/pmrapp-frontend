@@ -83,7 +83,13 @@ const buttonClasses =
     v-if="href"
     ref="buttonEl"
     :href="href"
-    :class="[variantClasses[variant], sizeClasses[size], disabledClasses[variant], buttonClasses, customClasses]"
+    :class="[
+      variantClasses[variant],
+      sizeClasses[size],
+      disabledClasses[variant],
+      buttonClasses,
+      customClasses,
+    ]"
     :download="download || undefined"
     :target="target"
     :rel="rel"
@@ -107,7 +113,13 @@ const buttonClasses =
   <button
     v-else
     ref="buttonEl"
-    :class="[variantClasses[variant], sizeClasses[size], disabledClasses[variant], buttonClasses, customClasses]"
+    :class="[
+      variantClasses[variant],
+      sizeClasses[size],
+      disabledClasses[variant],
+      buttonClasses,
+      customClasses,
+    ]"
     :type="type"
     :disabled="disabled"
     @click="handleClick"

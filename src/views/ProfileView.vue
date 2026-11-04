@@ -4,9 +4,6 @@ import Profile from '@/components/organisms/Profile.vue'
 </script>
 
 <template>
-  <PageHeader
-    title="Profile"
-    centered
-  />
+  <PageHeader title="Profile" centered />
   <Profile />
 </template>

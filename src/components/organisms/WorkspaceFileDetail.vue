@@ -245,13 +245,9 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
   <!-- Wait for the page to load: the trail would link to locations that may not exist on an error page. -->
   <BreadcrumbsBar v-if="!isLoading && !error" :items="breadcrumbItems" />
 
-  <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" titleSize="small" />
+  <PageHeader v-if="!workspaceInfoLoading" :title="pageTitle" title-size="small" />
 
-  <ErrorBlock
-    v-if="error"
-    title="Error loading file"
-    :error="error"
-  />
+  <ErrorBlock v-if="error" title="Error loading file" :error="error" />
 
   <LoadingBox v-else-if="isLoading" message="Loading file..." />
 
@@ -289,13 +285,19 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
         </div>
         <WrapButton
           v-if="shouldShowAsText && !isTooLargeForPreview"
-          :disabled="!shouldShowAsText || isTooLargeForPreview || ((isSvg || isMarkdown) ? !isCodeViewVisible : false)"
+          :disabled="
+            !shouldShowAsText ||
+            isTooLargeForPreview ||
+            (isSvg || isMarkdown ? !isCodeViewVisible : false)
+          "
           :active="codeWrapActive"
           @click="toggleCodeWrap"
         />
         <CopyButton
           v-if="shouldShowAsText && !isTooLargeForPreview"
-          :disabled="!shouldShowAsText || isTooLargeForPreview || (isSvg ? !isCodeViewVisible : false)"
+          :disabled="
+            !shouldShowAsText || isTooLargeForPreview || (isSvg ? !isCodeViewVisible : false)
+          "
           :text="fileContent"
           title="Copy code"
         />
@@ -303,7 +305,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
           v-if="canShowOpenCORButton"
           variant="icon"
           size="sm"
-          :contentSection="pageTitle"
+          :content-section="pageTitle"
           :href="openCORFileURL"
           target="_blank"
           rel="noopener noreferrer"
@@ -316,7 +318,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
         <ActionButton
           variant="icon"
           size="sm"
-          :contentSection="pageTitle"
+          :content-section="pageTitle"
           :href="downloadUrl"
           :download="filename"
           @click.prevent="downloadWorkspaceFileDetail"
@@ -329,19 +331,30 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
       </template>
 
       <!-- SVG Rendered View -->
-      <div :id="previewPanelId" role="tabpanel" v-if="isSvg && shouldShowPreview"
+      <div
+        :id="previewPanelId"
+        role="tabpanel"
+        v-if="isSvg && shouldShowPreview"
         class="flex justify-center p-4 bg-gray-50 dark:bg-white rounded-b"
       >
         <img :src="fileBlobUrl" :alt="path" class="max-w-full h-auto" />
       </div>
 
       <!-- Markdown Preview -->
-      <div :id="previewPanelId" role="tabpanel" v-else-if="isMarkdown && shouldShowPreview" class="p-4">
+      <div
+        :id="previewPanelId"
+        role="tabpanel"
+        v-else-if="isMarkdown && shouldShowPreview"
+        class="p-4"
+      >
         <div class="max-w-none" v-html="renderedMarkdown"></div>
       </div>
 
       <!-- Image View -->
-      <div v-else-if="isImage && imageDataUrl" class="flex justify-center p-4 bg-gray-50 dark:bg-white rounded-b">
+      <div
+        v-else-if="isImage && imageDataUrl"
+        class="flex justify-center p-4 bg-gray-50 dark:bg-white rounded-b"
+      >
         <img :src="imageDataUrl" :alt="path" class="max-w-full h-auto" />
       </div>
 
@@ -351,14 +364,17 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
       </div>
 
       <!-- Code/Text View (Too Large) -->
-      <div v-else-if="shouldShowAsText && isTooLargeForPreview" class="text-center py-8 text-gray-500 dark:text-gray-400">
+      <div
+        v-else-if="shouldShowAsText && isTooLargeForPreview"
+        class="text-center py-8 text-gray-500 dark:text-gray-400"
+      >
         <p class="mb-4">This file is too large to preview in the browser.</p>
         <ActionButton
           variant="primary"
           size="lg"
           :href="downloadUrl"
           :download="filename"
-          :contentSection="pageTitle"
+          :content-section="pageTitle"
         >
           <DownloadIcon class="w-4 h-4" />
           Download
@@ -367,11 +383,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 
       <!-- Code/Text View -->
       <div :id="codePanelId" role="tabpanel" v-else-if="shouldShowAsText" class="relative">
-        <CodeBlock
-          :code="fileContent"
-          :filename="filename"
-          :startWrapped="codeWrapActive"
-        />
+        <CodeBlock :code="fileContent" :filename="filename" :start-wrapped="codeWrapActive" />
       </div>
 
       <!-- Binary/Unknown File Type -->
@@ -382,7 +394,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
           size="lg"
           :href="downloadUrl"
           :download="filename"
-          :contentSection="pageTitle"
+          :content-section="pageTitle"
         >
           <DownloadIcon class="w-4 h-4" />
           Download

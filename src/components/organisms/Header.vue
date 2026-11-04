@@ -72,7 +72,9 @@ watch(
 </script>
 
 <template>
-  <header class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]">
+  <header
+    class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]"
+  >
     <PreviewBanner />
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <RouterLink to="/" class="flex items-center" aria-label="Home">
@@ -106,7 +108,11 @@ watch(
               content-section="Header navigation"
             >
               <span class="sr-only">Toggle navigation menu</span>
-              <span class="mobile-menu-icon" :class="{ 'mobile-menu-icon-open': isMobileMenuOpen }" aria-hidden="true">
+              <span
+                class="mobile-menu-icon"
+                :class="{ 'mobile-menu-icon-open': isMobileMenuOpen }"
+                aria-hidden="true"
+              >
                 <span class="mobile-menu-icon-bar" />
                 <span class="mobile-menu-icon-bar" />
                 <span class="mobile-menu-icon-bar" />
@@ -136,17 +142,11 @@ watch(
 </template>
 
 <style scoped>
-@reference 'tailwindcss';
-@reference '@/assets/main.css';
+@reference "tailwindcss";
+@reference "@/assets/main.css";
 
 .header-border-top {
-  @apply
-    before:content-['']
-    before:absolute
-    before:left-0
-    before:right-0
-    before:h-[6px]
-    before:bg-primary;
+  @apply before:content-[''] before:absolute before:left-0 before:right-0 before:h-[6px] before:bg-primary;
 
   &::before {
     top: var(--notification-bar-height);
@@ -174,18 +174,6 @@ watch(
 }
 
 .user-dropdown-divider {
-  @apply
-    relative
-    text-center
-    before:content-['']
-    before:absolute
-    before:left-0
-    before:top-1/2
-    before:h-6
-    before:-translate-y-1/2
-    before:transform
-    before:w-px
-    before:bg-gray-300
-    dark:before:bg-gray-600;
+  @apply relative text-center before:content-[''] before:absolute before:left-0 before:top-1/2 before:h-6 before:-translate-y-1/2 before:transform before:w-px before:bg-gray-300 dark:before:bg-gray-600;
 }
 </style>

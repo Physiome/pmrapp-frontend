@@ -60,19 +60,10 @@ const cancelDisconnectGitHub = () => {
 
 <template>
   <div class="max-w-2xl mx-auto space-y-6">
-
     <!-- Avatar and display name. -->
     <div class="box flex items-center gap-5">
-      <div
-        class="avatar"
-        aria-hidden="true"
-      >
-        <img
-          v-if="authStore.avatarUrl"
-          :src="authStore.avatarUrl"
-          alt="Profile picture"
-          class="avatar-img"
-        />
+      <div class="avatar" aria-hidden="true">
+        <img v-if="authStore.avatarUrl" :src="authStore.avatarUrl" alt="" class="avatar-img" />
         <UserIcon v-else class="w-8 h-8" />
       </div>
       <div class="min-w-0">
@@ -112,8 +103,8 @@ const cancelDisconnectGitHub = () => {
         type="button"
         variant="secondary"
         size="md"
-        contentSection="profile_page"
-        customClasses="!border-gray-300 dark:!border-gray-600 !text-foreground hover:!text-foreground"
+        content-section="profile_page"
+        custom-classes="!border-gray-300 dark:!border-gray-600 !text-foreground hover:!text-foreground"
         @click="confirmDisconnectGitHub"
       >
         <GitHubIcon class="w-4 h-4" />
@@ -126,14 +117,13 @@ const cancelDisconnectGitHub = () => {
         type="button"
         variant="secondary"
         size="md"
-        contentSection="profile_page"
+        content-section="profile_page"
         @click="confirmLogOut"
       >
         <LogoutIcon class="w-4 h-4" />
         Log out
       </ActionButton>
     </section>
-
   </div>
 
   <ConfirmDialog
@@ -158,12 +148,11 @@ const cancelDisconnectGitHub = () => {
 </template>
 
 <style scoped>
-@import '@/assets/label.css';
-@import '@/assets/box.css';
+@import "@/assets/label.css";
+@import "@/assets/box.css";
 
 .avatar {
-  @apply flex-shrink-0 w-16 h-16 rounded-full bg-primary text-white
-         flex items-center justify-center text-xl font-bold select-none overflow-hidden;
+  @apply flex-shrink-0 w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold select-none overflow-hidden;
 }
 
 .avatar-img {

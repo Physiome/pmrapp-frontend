@@ -3,7 +3,7 @@ import { nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Dialog from '@/components/molecules/Dialog.vue'
 import { SEARCH_KIND_NAMES } from '@/constants/search'
-import { buildQuerySearchQuery, buildSearchQuery, parseQueryFiltersFromQuery } from '@/utils/search'
+import { buildQuerySearchQuery, parseQueryFiltersFromQuery } from '@/utils/search'
 import SearchComboBox from '../molecules/SearchComboBox.vue'
 
 const props = defineProps<{
@@ -79,6 +79,9 @@ const getInitialTerm = (): string => {
       @dropdown-height-change="(h) => (dropdownSpacerHeight = h)"
     />
     <!-- Spacer that grows the dialog to accommodate the absolute-positioned dropdown -->
-    <div :style="{ height: dropdownSpacerHeight > 0 ? `${dropdownSpacerHeight}px` : '0' }" aria-hidden="true" />
+    <div
+      :style="{ height: dropdownSpacerHeight > 0 ? `${dropdownSpacerHeight}px` : '0' }"
+      aria-hidden="true"
+    />
   </Dialog>
 </template>

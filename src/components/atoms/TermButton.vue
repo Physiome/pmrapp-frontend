@@ -46,6 +46,7 @@ const handleClick = () => {
 
 <template>
   <button
+    type="button"
     :class="buttonClass"
     :aria-label="`Search for ${term}`"
     @click="handleClick"

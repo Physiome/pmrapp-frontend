@@ -41,7 +41,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-@import '@/assets/button.css';
+@import "@/assets/button.css";
 
 .fade-enter-active,
 .fade-leave-active {

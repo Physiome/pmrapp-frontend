@@ -4,9 +4,6 @@ import Login from '@/components/organisms/Login.vue'
 </script>
 
 <template>
-  <PageHeader
-    title="Login"
-    centered
-  />
+  <PageHeader title="Login" centered />
   <Login />
 </template>

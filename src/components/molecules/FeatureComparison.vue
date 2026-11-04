@@ -145,12 +145,11 @@ onMounted(() => {
 <template>
   <LoadingBox v-if="isLoading" message="Loading latest data..." />
 
-  <ErrorBlock
-    v-else-if="errorMessage"
-    title="Feature Comparison Error"
-    :error="errorMessage"
-  />
+  <ErrorBlock v-else-if="errorMessage" title="Feature Comparison Error" :error="errorMessage" />
 
+  <!-- biome-ignore-start lint/a11y/useSemanticElements: CSS-grid layout that deliberately exposes ARIA table semantics on div/ul/li -->
+  <!-- biome-ignore-start lint/a11y/useFocusableInteractive: CSS-grid layout that deliberately exposes ARIA table semantics on div/ul/li -->
+  <!-- biome-ignore-start lint/a11y/noNoninteractiveElementToInteractiveRole: CSS-grid layout that deliberately exposes ARIA table semantics on div/ul/li -->
   <div v-else class="box p-0!" role="table">
     <div :class="headerRowClasses" role="row">
       <div class="flex-1 grid gap-4" :style="{ gridTemplateColumns }">
@@ -158,7 +157,9 @@ onMounted(() => {
           v-for="header in tableHeaders"
           :key="header"
           class="font-semibold text-gray-900 dark:text-gray-100 capitalize"
-          :class="iconColumns.includes(header) ? 'grid place-items-center text-center' : 'text-left'"
+          :class="
+            iconColumns.includes(header) ? 'grid place-items-center text-center' : 'text-left'
+          "
           role="columnheader"
         >
           {{ header }}
@@ -194,11 +195,15 @@ onMounted(() => {
               <CheckmarkIcon
                 v-if="String(row[header]).trim().toLowerCase() === 'yes'"
                 class="w-5 h-5 text-green-600 dark:text-green-400"
+                role="img"
+                aria-hidden="false"
                 aria-label="Yes"
               />
               <CrossIcon
                 v-else-if="String(row[header]).trim().toLowerCase() === 'no'"
                 class="w-5 h-5 text-red-600 dark:text-red-400"
+                role="img"
+                aria-hidden="false"
                 aria-label="No"
               />
               <div
@@ -228,33 +233,41 @@ onMounted(() => {
     </ul>
   </div>
 
+  <!-- biome-ignore-end lint/a11y/useSemanticElements: CSS-grid layout that deliberately exposes ARIA table semantics on div/ul/li -->
+  <!-- biome-ignore-end lint/a11y/useFocusableInteractive: CSS-grid layout that deliberately exposes ARIA table semantics on div/ul/li -->
+  <!-- biome-ignore-end lint/a11y/noNoninteractiveElementToInteractiveRole: CSS-grid layout that deliberately exposes ARIA table semantics on div/ul/li -->
+
   <!-- Legend -->
-  <div class="py-4 px-0" aria-label="Legend" v-if="!isLoading && !errorMessage">
-    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+  <section class="py-4 px-0" aria-label="Legend" v-if="!isLoading && !errorMessage">
+    <div
+      class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+    >
       <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Legend</div>
       <div class="grid gap-2" style="grid-template-columns: auto 1fr;">
         <div class="flex justify-center">
-          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Available" />
+          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" />
         </div>
         <span class="text-sm text-gray-600 dark:text-gray-400">Available</span>
 
         <div class="flex justify-center">
-          <CrossIcon class="w-5 h-5 text-red-600 dark:text-red-400" aria-label="Not available" />
+          <CrossIcon class="w-5 h-5 text-red-600 dark:text-red-400" />
         </div>
         <span class="text-sm text-gray-600 dark:text-gray-400">Not available</span>
 
         <div class="flex justify-center gap-1">
-          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Enhanced" />
-          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" aria-label="Enhanced" />
+          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" />
+          <CheckmarkIcon class="w-5 h-5 text-green-600 dark:text-green-400" />
         </div>
-        <span class="text-sm text-gray-600 dark:text-gray-400">Available with enhanced capabilities</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400"
+          >Available with enhanced capabilities</span
+        >
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 
 .header-row {
   top: calc(var(--notification-bar-height) + 76px);

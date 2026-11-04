@@ -69,15 +69,8 @@ const segments = computed<Segment[]>(() => {
 
 <template>
   <span>
-    <template
-      v-for="(segment, index) in segments"
-      :key="`${index}-${segment.value}`"
-    >
-      <a
-        v-if="segment.isLinked"
-        :href="`mailto:${segment.email}`"
-        class="text-link"
-      >
+    <template v-for="(segment, index) in segments" :key="`${index}-${segment.value}`">
+      <a v-if="segment.isLinked" :href="`mailto:${segment.email}`" class="text-link">
         {{ segment.value }}
       </a>
       <span v-else>{{ segment.value }}</span>
@@ -86,5 +79,5 @@ const segments = computed<Segment[]>(() => {
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
+@import "@/assets/text-link.css";
 </style>

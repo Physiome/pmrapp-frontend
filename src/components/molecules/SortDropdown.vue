@@ -117,12 +117,13 @@ onUnmounted(() => {
             :class="{ 'border-b border-gray-200 dark:border-gray-700': index < options.length - 1 }"
           >
             <button
+              type="button"
               v-for="option in group.options"
               :key="option.value"
               role="menuitem"
               class="w-full text-left px-3 py-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
               :class="{
-                'bg-gray-100 dark:bg-gray-700': isOptionSelected(option)
+                'bg-gray-100 dark:bg-gray-700': isOptionSelected(option),
               }"
               @click="handleSelectOption(option.value, option.type)"
             >
@@ -143,4 +144,3 @@ onUnmounted(() => {
     </transition>
   </div>
 </template>
-

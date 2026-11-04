@@ -18,8 +18,11 @@
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "bunx --bun biome lint --fix --error-on-warnings --max-diagnostics=none",
-    "format": "bunx --bun biome format --fix --max-diagnostics=none"
+    "lint": "biome lint --write --error-on-warnings --max-diagnostics=none",
+    "format": "biome format --write --max-diagnostics=none",
+    "check": "biome format --write --max-diagnostics=none && biome check --write --error-on-warnings --max-diagnostics=none",
+    "format:ci": "biome format --max-diagnostics=none",
+    "check:ci": "biome ci --error-on-warnings --max-diagnostics=none"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

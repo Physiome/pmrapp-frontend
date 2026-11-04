@@ -1,4 +1,13 @@
-<script setup lang="ts" generic="T extends { alias: string; entity: { id: number; created_ts: number; description: string | null } }">
+<script
+  setup
+  lang="ts"
+  generic="
+    T extends {
+      alias: string
+      entity: { id: number; created_ts: number; description: string | null }
+    },
+  "
+>
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ListContent from '@/components/molecules/ListContent.vue'
@@ -145,8 +154,7 @@ watch(
               <mark v-if="segment.highlighted" class="text-highlight">{{ segment.text }}</mark>
               <span v-else>{{ segment.text }}</span>
             </template>
-            ·
-            Created on {{ formatDate(item.entity.created_ts) }}
+            · Created on {{ formatDate(item.entity.created_ts) }}
           </small>
         </p>
       </ListItem>

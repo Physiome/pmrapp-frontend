@@ -134,18 +134,16 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 </script>
 
 <template>
-  <ErrorBlock
-    v-if="error"
-    :title="error.title"
-    :error="error.message"
-  />
+  <ErrorBlock v-if="error" :title="error.title" :error="error.message" />
 
   <div v-else-if="isLoading" class="box">
     <SkeletonBlock :lines="5" />
   </div>
 
   <div v-else class="box p-0! overflow-hidden">
-    <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
+    <div
+      class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4"
+    >
       <FileBrowserBreadcrumb
         v-if="props.path"
         :alias="props.alias"
@@ -165,8 +163,14 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
       >
         <div class="px-4 py-3 flex items-center justify-between">
           <div class="flex items-center gap-3 flex-1 min-w-0">
-            <FolderIcon v-if="entry.kind === 'tree'" class="text-gray-500 dark:text-gray-400 flex-shrink-0 w-4 h-4" />
-            <GitIcon v-else-if="entry.kind === 'commit'" class="text-gray-500 dark:text-gray-400 flex-shrink-0 w-4 h-4" />
+            <FolderIcon
+              v-if="entry.kind === 'tree'"
+              class="text-gray-500 dark:text-gray-400 flex-shrink-0 w-4 h-4"
+            />
+            <GitIcon
+              v-else-if="entry.kind === 'commit'"
+              class="text-gray-500 dark:text-gray-400 flex-shrink-0 w-4 h-4"
+            />
             <FileIcon v-else class="text-gray-500 dark:text-gray-400 flex-shrink-0 w-4 h-4" />
 
             <RouterLink
@@ -177,6 +181,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
               {{ entry.name }}
             </RouterLink>
             <button
+              type="button"
               v-else-if="entry.kind === 'tree' && onFolderClick"
               class="text-link font-medium truncate text-left cursor-pointer"
               @click="onFolderClick(entry.name)"
@@ -185,7 +190,7 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             </button>
             <RouterLink
               v-else
-              :to="`/workspace/${alias}/file/${workspaceInfo?.commit.commit_id}/${(path ? path + '/' : '') + entry.name}`"
+              :to="`/workspace/${alias}/file/${workspaceInfo?.commit.commit_id}/${path ? `${path}/` : ''}${entry.name}`"
               class="text-link font-medium truncate text-left cursor-pointer"
             >
               {{ entry.name }}
@@ -228,6 +233,6 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
-@import '@/assets/box.css';
+@import "@/assets/text-link.css";
+@import "@/assets/box.css";
 </style>

@@ -1,5 +1,6 @@
 <template>
   <svg
+    aria-hidden="true"
     class="animate-spin"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"

@@ -68,9 +68,7 @@ const searchFieldInputClass = computed(() => {
 
 <template>
   <div :class="{ 'box box-small': inSidebar }">
-    <h2 class="text-3xl font-bold mb-6" v-if="!inSidebar">
-      Browse by keyword
-    </h2>
+    <h2 class="text-3xl font-bold mb-6" v-if="!inSidebar">Browse by keyword</h2>
 
     <div v-if="searchStore.isLoading" class="text-center py-8">
       <p class="text-gray-500 dark:text-gray-400">Loading categories...</p>
@@ -86,12 +84,9 @@ const searchFieldInputClass = computed(() => {
         v-for="category in filteredKeywordCategories"
         :key="category.kind"
         class="p-4!"
-        :class="{ 'box': !inSidebar }"
+        :class="{ box: !inSidebar }"
       >
-        <div
-          class="flex items-center mb-4 gap-4"
-          :class="{ 'justify-end mb-4': !inSidebar }"
-        >
+        <div class="flex items-center mb-4 gap-4" :class="{ 'justify-end mb-4': !inSidebar }">
           <SearchField
             v-if="category.kindInfo"
             :model-value="categoryFilters.get(category.kind) || ''"
@@ -102,9 +97,7 @@ const searchFieldInputClass = computed(() => {
           />
         </div>
 
-        <div v-if="category.loading" class="text-gray-500 dark:text-gray-400">
-          Loading...
-        </div>
+        <div v-if="category.loading" class="text-gray-500 dark:text-gray-400">Loading...</div>
 
         <div v-else-if="category.error" class="text-red-600 dark:text-red-400">
           {{ category.error }}
@@ -133,5 +126,5 @@ const searchFieldInputClass = computed(() => {
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

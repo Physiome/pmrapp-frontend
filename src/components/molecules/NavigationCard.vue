@@ -30,5 +30,5 @@ defineProps<{
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

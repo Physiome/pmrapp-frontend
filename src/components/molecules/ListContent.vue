@@ -15,9 +15,7 @@ defineProps<Props>()
 <template>
   <ErrorBlock v-if="error" :title="errorTitle" :error="error" />
 
-  <div v-else-if="isLoading" class="text-center box">
-    Loading...
-  </div>
+  <div v-else-if="isLoading" class="text-center box">Loading...</div>
 
   <div v-else-if="items.length === 0" class="text-center box">
     {{ emptyMessage }}
@@ -29,5 +27,5 @@ defineProps<Props>()
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

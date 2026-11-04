@@ -1,7 +1,7 @@
 name: Preview Site Feedback
 description: Report a bug or share feedback about the preview site.
-title: "[Preview Feedback]: "
-labels: ["bug", "preview-feedback"]
+title: '[Preview Feedback]: '
+labels: ['bug', 'preview-feedback']
 body:
   - type: markdown
     attributes:
@@ -61,4 +61,3 @@ body:
       placeholder: e.g., email@example.com or GitHub username
     validations:
       required: false
-

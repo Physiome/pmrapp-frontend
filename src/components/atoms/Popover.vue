@@ -127,6 +127,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- biome-ignore lint/a11y/noStaticElementInteractions: hover/focus wrapper that shows the popover for its focusable trigger slot -->
   <span
     ref="triggerEl"
     class="inline-flex"

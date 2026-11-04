@@ -70,14 +70,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    v-if="isVisible"
-    ref="notificationBarEl"
-    class="bg-amber-100 dark:bg-amber-900/20 relative"
-  >
+  <div v-if="isVisible" ref="notificationBarEl" class="bg-amber-100 dark:bg-amber-900/20 relative">
     <div
       ref="notificationContainerEl"
-      class="container mx-auto px-4 py-2 flex items-center justify-center gap-2 text-sm">
+      class="container mx-auto px-4 py-2 flex items-center justify-center gap-2 text-sm"
+    >
       <slot />
     </div>
     <CloseButton

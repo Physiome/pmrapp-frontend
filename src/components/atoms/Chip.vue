@@ -55,20 +55,21 @@ const handleClickChip = () => {
 </script>
 
 <template>
-  <div
-    :class="[chipClasses, removable ? 'pl-2.5 pr-1' : 'px-2.5']"
-    @click="handleClickChip"
-  >
-  <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
-    <span v-if="category" class="mr-1 text-gray-500 dark:text-gray-400">{{ category }}:</span>
-    <span :class="{ 'font-medium': category }">{{ label }}</span>
-  </span>
-  <span v-if="removable" @click.stop>
-    <CloseButton
-      :class="closeButtonClasses"
-      @click="handleRemoveChip"
-      :aria-label="`Remove ${fullLabel}`"
-    />
-  </span>
+  <!-- biome-ignore lint/a11y/noStaticElementInteractions: chip click is a mouse shortcut; the remove action is a real button -->
+  <!-- biome-ignore lint/a11y/useKeyWithClickEvents: chip click is a mouse shortcut; the remove action is a real button -->
+  <div :class="[chipClasses, removable ? 'pl-2.5 pr-1' : 'px-2.5']" @click="handleClickChip">
+    <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
+      <span v-if="category" class="mr-1 text-gray-500 dark:text-gray-400">{{ category }}:</span>
+      <span :class="{ 'font-medium': category }">{{ label }}</span>
+    </span>
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: only stops the click bubbling to the chip; the inner CloseButton is focusable -->
+    <!-- biome-ignore lint/a11y/useKeyWithClickEvents: only stops the click bubbling to the chip; the inner CloseButton is focusable -->
+    <span v-if="removable" @click.stop>
+      <CloseButton
+        :class="closeButtonClasses"
+        @click="handleRemoveChip"
+        :aria-label="`Remove ${fullLabel}`"
+      />
+    </span>
   </div>
 </template>

@@ -1,20 +1,20 @@
 version: 2
 updates:
   # 1. GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     groups:
       actions-dependencies:
         update-types: [minor, patch]
     open-pull-requests-limit: 10
 
   # 2. Bun (package.json)
-  - package-ecosystem: "bun"
-    directory: "/"
+  - package-ecosystem: 'bun'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     groups:
       bun-dependencies:
         update-types: [minor, patch]

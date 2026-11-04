@@ -39,7 +39,7 @@ const newIssueUrl = computed((): string => {
 
 <template>
   <div class="fixed bottom-8 right-8 z-40">
-    <Popover placement="left" maxWidth="320px">
+    <Popover placement="left" max-width="320px">
       <template #trigger>
         <ActionButton
           :href="newIssueUrl"
@@ -54,17 +54,18 @@ const newIssueUrl = computed((): string => {
       </template>
       <template #content>
         <p class="mb-2">
-          This website is a work in progress, so you may come across bugs or
-          unfinished features. We are working to fix these, but please feel free
-          to report any issues you find by clicking this button.
+          This website is a work in progress, so you may come across bugs or unfinished features. We
+          are working to fix these, but please feel free to report any issues you find by clicking
+          this button.
         </p>
         <p>
           Before reporting a bug, you may want to check the
           <RouterLink
             to="/feature-comparison"
             class="text-primary underline underline-offset-2 hover:opacity-80"
-          >feature-comparison</RouterLink> page, as some features may already be
-          listed there.
+            >feature-comparison</RouterLink
+          >
+          page, as some features may already be listed there.
         </p>
       </template>
     </Popover>
@@ -72,5 +73,5 @@ const newIssueUrl = computed((): string => {
 </template>
 
 <style scoped>
-@import '@/assets/button.css';
+@import "@/assets/button.css";
 </style>

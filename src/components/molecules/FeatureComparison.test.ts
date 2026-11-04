@@ -209,9 +209,12 @@ describe('FeatureComparison', () => {
     expect(legend.text()).toContain('Available')
     expect(legend.text()).toContain('Not available')
     expect(legend.text()).toContain('Available with enhanced capabilities')
-    expect(legend.find('[aria-label="Available"]').exists()).toBe(true)
-    expect(legend.find('[aria-label="Not available"]').exists()).toBe(true)
-    expect(legend.findAll('[aria-label="Enhanced"]').length).toBeGreaterThanOrEqual(2)
+    // Legend icons are decorative: the visible text next to each one is the label.
+    const legendIcons = legend.findAll('svg')
+    expect(legendIcons.length).toBe(4)
+    for (const icon of legendIcons) {
+      expect(icon.attributes('aria-hidden')).toBe('true')
+    }
   })
 
   it('strips out rows without an id', async () => {

@@ -71,7 +71,10 @@ watch(trailKey, () => {
           v-if="index === 1 && hiddenCount > 0 && !isExpanded"
           class="flex items-center shrink-0 sm:hidden"
         >
-          <ChevronRightIcon class="w-3 h-3 mx-1.5 text-gray-400 dark:text-gray-500 shrink-0" aria-hidden="true" />
+          <ChevronRightIcon
+            class="w-3 h-3 mx-1.5 text-gray-400 dark:text-gray-500 shrink-0"
+            aria-hidden="true"
+          />
           <button
             type="button"
             class="text-link text-link-primary px-1 py-1 leading-none"
@@ -87,10 +90,7 @@ watch(trailKey, () => {
         <li
           :data-index="index"
           class="items-center py-1"
-          :class="[
-            isCollapsedItem(index) ? 'hidden sm:flex' : 'flex',
-            shrinkClasses(item, index),
-          ]"
+          :class="[isCollapsedItem(index) ? 'hidden sm:flex' : 'flex', shrinkClasses(item, index)]"
         >
           <ChevronRightIcon
             v-if="index > 0"
@@ -131,5 +131,5 @@ watch(trailKey, () => {
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
+@import "@/assets/text-link.css";
 </style>

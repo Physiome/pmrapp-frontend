@@ -145,7 +145,9 @@ onUnmounted(() => {
       class="absolute right-0 mt-2 min-w-64 bg-white dark:bg-gray-800 rounded-md overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 z-50"
     >
       <ul>
-        <li class="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+        <li
+          class="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300"
+        >
           <div class="shrink-0">
             <template v-if="authStore.avatarUrl">
               <img
@@ -162,7 +164,9 @@ onUnmounted(() => {
           </div>
           <div class="flex flex-col items-start text-left min-w-0">
             <span class="text-gray-400 truncate max-w-45">{{ authStore.username }}</span>
-            <span class="font-medium truncate max-w-45" v-if="authStore.name">{{ authStore.name }}</span>
+            <span class="font-medium truncate max-w-45" v-if="authStore.name">{{
+              authStore.name
+            }}</span>
           </div>
         </li>
         <li :class="menuDividerClasses">
@@ -177,6 +181,7 @@ onUnmounted(() => {
         </li>
         <li :class="menuDividerClasses">
           <button
+            type="button"
             @click="confirmLogout"
             class="flex items-center w-full cursor-pointer px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             role="menuitem"

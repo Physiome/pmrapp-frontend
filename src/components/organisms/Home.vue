@@ -9,8 +9,8 @@ import NavigationCard from '@/components/molecules/NavigationCard.vue'
       Physiome Model Repository
     </h1>
     <p class="text-xl max-w-3xl mx-auto leading-relaxed">
-      The Physiome Model Repository serves as a public resource for storing,
-      searching, and reusing CellML models and their metadata.
+      The Physiome Model Repository serves as a public resource for storing, searching, and reusing
+      CellML models and their metadata.
     </p>
   </section>
 
@@ -34,5 +34,5 @@ import NavigationCard from '@/components/molecules/NavigationCard.vue'
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

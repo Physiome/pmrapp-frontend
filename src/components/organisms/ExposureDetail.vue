@@ -955,32 +955,25 @@ onMounted(async () => {
       content-section="Exposure Detail"
     >
       <BugIcon class="w-4 h-4" />
-      <span>Report a problem with this {{ props.file ? 'resource' : 'exposure'}}</span>
+      <span>Report a problem with this {{ props.file ? 'resource' : 'exposure' }}</span>
     </ActionButton>
   </div>
 
-  <ErrorBlock
-    v-if="error"
-    :title="error.title"
-    :error="error.message"
-  />
+  <ErrorBlock v-if="error" :title="error.title" :error="error.message" />
 
   <LoadingBox v-else-if="isLoading" message="Loading exposure..." />
 
   <div v-else-if="exposureInfo" class="flex flex-col lg:flex-row gap-8">
     <article class="w-full lg:flex-1 lg:min-w-0 space-y-6">
-      <PageHeader
-        :title="pageTitle"
-      />
+      <PageHeader :title="pageTitle" />
 
-      <WarningBlock
-        v-if="isFileNotFound"
-        title="File not found"
-      >
+      <WarningBlock v-if="isFileNotFound" title="File not found">
         <template #content>
           <div class="text-sm">
             <p>The file <strong>{{ props.file }}</strong> does not exist in this exposure.</p>
-            <p class="mt-1">The information shown on this page relates to the exposure itself, not to this file.</p>
+            <p class="mt-1">
+              The information shown on this page relates to the exposure itself, not to this file.
+            </p>
           </div>
         </template>
         <template #footer>
@@ -995,10 +988,7 @@ onMounted(async () => {
         </template>
       </WarningBlock>
 
-      <WarningBlock
-        v-else-if="isViewNotFound"
-        title="View not available"
-      >
+      <WarningBlock v-else-if="isViewNotFound" title="View not available">
         <template #content>
           <div class="text-sm">
             <p>The view <strong>{{ props.view }}</strong> is not available for this file.</p>
@@ -1016,10 +1006,7 @@ onMounted(async () => {
         </template>
       </WarningBlock>
 
-      <WarningBlock
-        v-else-if="isLangNotFound"
-        title="Language not available"
-      >
+      <WarningBlock v-else-if="isLangNotFound" title="Language not available">
         <template #content>
           <div class="text-sm">
             <p>The code generation language <strong>{{ props.lang }}</strong> is not available.</p>
@@ -1037,11 +1024,7 @@ onMounted(async () => {
         </template>
       </WarningBlock>
 
-      <ErrorBlock
-        v-else-if="viewError"
-        :title="viewError.title"
-        :error="viewError.message"
-      />
+      <ErrorBlock v-else-if="viewError" :title="viewError.title" :error="viewError.message" />
 
       <div v-else-if="isViewLoading && !hasViewContent" class="box">
         <SkeletonBlock :lines="6" />
@@ -1050,10 +1033,7 @@ onMounted(async () => {
       <div v-else-if="props.view === 'cellml_codegen'" class="relative">
         <nav>
           <ul class="space-x-2 mb-4 inline-flex">
-            <li
-              v-for="lang in CODEGEN_LANGUAGES"
-              :key="lang.name"
-            >
+            <li v-for="lang in CODEGEN_LANGUAGES" :key="lang.name">
               <ActionButton
                 :variant="generatedCodeFilename === lang.fileName ? 'primary' : 'secondary'"
                 size="sm"
@@ -1083,7 +1063,7 @@ onMounted(async () => {
           <CodeBlock
             :code="generatedCode"
             :filename="generatedCodeFilename"
-            :startWrapped="codeWrapActive"
+            :start-wrapped="codeWrapActive"
           />
         </FilePanel>
       </div>
@@ -1095,9 +1075,13 @@ onMounted(async () => {
           @update:options="mathFormatOptions = $event"
         />
         <div class="p-4 pt-0">
-          <p v-if="!mathsJSON.length" class="text-sm text-gray-500 dark:text-gray-400">No mathematics content available.</p>
+          <p v-if="!mathsJSON.length" class="text-sm text-gray-500 dark:text-gray-400">
+            No mathematics content available.
+          </p>
           <template v-else>
-            <div v-for="value in mathsJSON" :key="value[0]"
+            <div
+              v-for="value in mathsJSON"
+              :key="value[0]"
               class="mb-6 pb-6 last:mb-0 last:pb-0 border-b border-gray-200 dark:border-gray-700 last:border-0"
             >
               <h4 class="font-semibold mb-4">{{ value[0] }}</h4>
@@ -1138,7 +1122,8 @@ onMounted(async () => {
             class="text-link font-mono dark:underline dark:decoration-dotted"
           >
             {{ exposureInfo.exposure.commit_id.substring(0, 12) }}
-          </RouterLink>.
+          </RouterLink
+          >.
         </div>
       </section>
       <section
@@ -1167,8 +1152,9 @@ onMounted(async () => {
             <dt class="font-semibold mb-1">Model authors</dt>
             <dd>
               <button
+                type="button"
                 class="cursor-pointer hover:text-primary-hover transition-colors"
-                @click="handleKeywordClick('model_author', metadataJSON.model_author!)"
+                @click="handleKeywordClick('model_author', metadataJSON.model_author ?? '')"
               >
                 {{ metadataJSON.model_author }}
               </button>
@@ -1186,12 +1172,15 @@ onMounted(async () => {
           <CopyButton
             :text="formatCitation(modelCitation)"
             title="Copy citation"
-            :withHTML="true"
+            :with-html="true"
           />
         </div>
         <Citation :content="formatCitation(modelCitation)" />
       </section>
-      <section v-if="metadataJSON.keywords?.length" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+      <section
+        v-if="metadataJSON.keywords?.length"
+        class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
+      >
         <h4 class="text-lg font-semibold mb-3">Keywords</h4>
         <div class="flex flex-wrap gap-2">
           <TermButton
@@ -1202,7 +1191,10 @@ onMounted(async () => {
           />
         </div>
       </section>
-      <section v-if="openCORFiles.length > 0" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+      <section
+        v-if="openCORFiles.length > 0"
+        class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
+      >
         <h4 class="text-lg font-semibold mb-3">Views available</h4>
         <nav>
           <ul class="space-y-2">
@@ -1219,11 +1211,7 @@ onMounted(async () => {
                 <ExternalLinkIcon class="w-4 h-4" />
               </ActionButton>
             </li>
-            <li
-              class="text-sm"
-              v-for="view in availableViews"
-              :key="view.view_key"
-            >
+            <li class="text-sm" v-for="view in availableViews" :key="view.view_key">
               <ActionButton
                 variant="secondary"
                 size="sm"
@@ -1236,15 +1224,14 @@ onMounted(async () => {
           </ul>
         </nav>
       </section>
-      <section v-if="navigationFiles.length > 0" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+      <section
+        v-if="navigationFiles.length > 0"
+        class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
+      >
         <h4 class="text-lg font-semibold mb-3">Navigation</h4>
         <nav>
           <ul class="space-y-2">
-            <li
-              v-for="entry in navigationFiles"
-              :key="entry[0]"
-              class="text-sm"
-            >
+            <li v-for="entry in navigationFiles" :key="entry[0]" class="text-sm">
               <RouterLink
                 :to="`/exposure/${props.alias}/${entry[0]}/`"
                 class="inline-flex items-center gap-2 break-all transition-colors"
@@ -1274,7 +1261,11 @@ onMounted(async () => {
                 content-section="Exposure Detail"
               >
                 <DownloadIcon class="w-4 h-4" />
-                <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code> file)</span>
+                <span
+                  >Complete archive (as a
+                  <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code>
+                  file)</span
+                >
               </ActionButton>
             </li>
             <li class="text-sm">
@@ -1286,7 +1277,11 @@ onMounted(async () => {
                 content-section="Exposure Detail"
               >
                 <DownloadIcon class="w-4 h-4" />
-                <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code> file)</span>
+                <span
+                  >Complete archive (as a
+                  <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code>
+                  file)</span
+                >
               </ActionButton>
             </li>
             <li class="text-sm">
@@ -1305,18 +1300,15 @@ onMounted(async () => {
           </ul>
         </nav>
       </section>
-      <section v-if="publicationCitation" class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+      <section
+        v-if="publicationCitation"
+        class="pt-6 pb-6 border-t border-gray-200 dark:border-gray-700"
+      >
         <div class="flex flex-row justify-between mb-3">
           <h4 class="text-lg font-semibold">References</h4>
-          <CopyButton
-            :text="formatCitation(publicationCitation)"
-            title="Copy citation"
-          />
+          <CopyButton :text="formatCitation(publicationCitation)" title="Copy citation" />
         </div>
-        <Citation
-          :content="formatCitation(publicationCitation)"
-          class="mb-4"
-        />
+        <Citation :content="formatCitation(publicationCitation)" class="mb-4" />
         <div v-if="hasOtherRelatedModels" class="mb-4">
           <RouterLink
             :to="{ path: '/search', query: { citation_id: metadataJSON.citation_id } }"
@@ -1328,6 +1320,7 @@ onMounted(async () => {
         </div>
         <div class="mt-4">
           <button
+            type="button"
             @click="isCitationDetailsOpen = !isCitationDetailsOpen"
             class="text-link text-sm flex items-center gap-2 text-left"
             :aria-expanded="isCitationDetailsOpen"
@@ -1338,7 +1331,7 @@ onMounted(async () => {
               class="transition-transform duration-200"
               :class="{ 'rotate-180': isCitationDetailsOpen }"
             >
-              <ChevronDownIcon class="w-4 h-4"/>
+              <ChevronDownIcon class="w-4 h-4" />
             </span>
           </button>
           <dl
@@ -1349,8 +1342,12 @@ onMounted(async () => {
             <div v-if="metadataJSON.citation_authors">
               <dt class="font-semibold mb-1">Authors</dt>
               <dd>
-                <template v-for="(authorParts, index) in metadataJSON.citation_authors" :key="index">
+                <template
+                  v-for="(authorParts, index) in metadataJSON.citation_authors"
+                  :key="index"
+                >
                   <button
+                    type="button"
                     class="cursor-pointer hover:text-primary-hover transition-colors"
                     @click="handleCitationAuthorClick(authorParts)"
                   >
@@ -1368,8 +1365,9 @@ onMounted(async () => {
               <dt class="font-semibold mb-1">ID</dt>
               <dd>
                 <button
+                  type="button"
                   class="cursor-pointer hover:text-primary-hover transition-colors"
-                  @click="handleKeywordClick('citation_id', metadataJSON.citation_id!)"
+                  @click="handleKeywordClick('citation_id', metadataJSON.citation_id ?? '')"
                 >
                   {{ metadataJSON.citation_id }}
                 </button>
@@ -1410,19 +1408,20 @@ onMounted(async () => {
   </div>
 </template>
 
+<!-- biome-ignore lint/suspicious/useScopedStyles: html-images.css must apply globally to the rendered exposure HTML -->
 <style>
-@import '@/assets/html-images.css';
+@import "@/assets/html-images.css";
 </style>
 
 <style scoped>
-@import '@/assets/text-link.css';
-@import '@/assets/box.css';
+@import "@/assets/text-link.css";
+@import "@/assets/box.css";
 
 .code-inline {
   display: inline-block;
   padding: 0 0.25em;
   border-radius: 0.25rem;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
 }
 
 .html-view {
@@ -1436,8 +1435,8 @@ onMounted(async () => {
     @apply text-3xl font-bold mt-8 mb-8;
   }
 
-  & :deep(> h1:first-child),
-  & :deep(> div > h1:first-child) {
+  & > :deep(h1:first-child),
+  & > :deep(div > h1:first-child) {
     @apply mt-0;
   }
 
@@ -1450,9 +1449,9 @@ onMounted(async () => {
     @apply text-xl font-semibold mt-8 mb-4;
   }
 
-  & :deep(> div > h2),
-  & :deep(> div > h3),
-  & :deep(> div > h4) {
+  & > :deep(div > h2),
+  & > :deep(div > h3),
+  & > :deep(div > h4) {
     @apply mt-0;
   }
 
@@ -1477,7 +1476,8 @@ onMounted(async () => {
     @apply text-sm font-medium mb-2;
   }
 
-  & :deep(table td), & :deep(table th) {
+  & :deep(table td),
+  & :deep(table th) {
     @apply border border-gray-300 dark:border-gray-600 p-2;
   }
 
@@ -1594,7 +1594,7 @@ onMounted(async () => {
     padding-right: 0.5em;
   }
 
-  & :deep(math > mtable > mtr > mtd[data-math-operator='equals']) {
+  & :deep(math > mtable > mtr > mtd[data-math-operator="equals"]) {
     text-align: center;
     padding-left: 0.25em;
     padding-right: 0.25em;
@@ -1605,22 +1605,22 @@ onMounted(async () => {
     padding-left: 0.5em;
   }
 
-  & :deep(mtable[data-math-piecewise='true']) {
+  & :deep(mtable[data-math-piecewise="true"]) {
     border-spacing: 0.5em 0.35em;
   }
 
-  & :deep(mtable[data-math-piecewise='true'] > mtr > mtd[data-math-piecewise='expression']) {
+  & :deep(mtable[data-math-piecewise="true"] > mtr > mtd[data-math-piecewise="expression"]) {
     white-space: nowrap;
   }
 
-  & :deep(mtable[data-math-piecewise='true'] > mtr > mtd[data-math-piecewise='keyword']) {
+  & :deep(mtable[data-math-piecewise="true"] > mtr > mtd[data-math-piecewise="keyword"]) {
     text-align: left;
     white-space: nowrap;
     padding-left: 0.15em;
     padding-right: 0.35em;
   }
 
-  & :deep(mtable[data-math-piecewise='true'] > mtr > mtd[data-math-piecewise='condition']) {
+  & :deep(mtable[data-math-piecewise="true"] > mtr > mtd[data-math-piecewise="condition"]) {
     white-space: nowrap;
   }
 }

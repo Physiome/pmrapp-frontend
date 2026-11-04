@@ -113,23 +113,21 @@ const handleSubmit = async () => {
   <!-- Error message -->
   <div
     class="error-box flex items-center max-w-md mx-auto mb-4 transition-all"
-    :class="error ? 'visible opacity-100 translate-y-0 pointer-events-auto' : 'invisible opacity-0 translate-y-[100%] pointer-events-none'"
+    :class="
+      error
+        ? 'visible opacity-100 translate-y-0 pointer-events-auto'
+        : 'invisible opacity-0 translate-y-[100%] pointer-events-none'
+    "
   >
     <p class="text-sm">{{ error }}</p>
-    <CloseButton
-      @click="error = null"
-      class="ml-auto"
-      aria-label="Close error message"
-    />
+    <CloseButton @click="error = null" class="ml-auto" aria-label="Close error message" />
   </div>
 
   <div class="max-w-md mx-auto box relative">
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <!-- Username field -->
       <div>
-        <label for="username" class="label-field block mb-2">
-          Username
-        </label>
+        <label for="username" class="label-field block mb-2"> Username </label>
         <input
           ref="usernameInput"
           id="username"
@@ -145,9 +143,7 @@ const handleSubmit = async () => {
 
       <!-- Password field -->
       <div>
-        <label for="password" class="label-field block mb-2">
-          Password
-        </label>
+        <label for="password" class="label-field block mb-2"> Password </label>
         <input
           id="password"
           v-model="password"
@@ -167,7 +163,7 @@ const handleSubmit = async () => {
         size="lg"
         :disabled="isLoading || isGitHubLoading"
         class="w-full"
-        contentSection="login_page"
+        content-section="login_page"
       >
         {{ isLoading ? 'Logging in...' : 'Login' }}
       </ActionButton>
@@ -176,19 +172,16 @@ const handleSubmit = async () => {
     <div class="mt-6">
       <div class="auth-divider text-gray-600 dark:text-gray-400 mb-5">or</div>
 
-      <GitHubLogin
-        @error="error = $event"
-        @busy-change="isGitHubLoading = $event"
-      />
+      <GitHubLogin @error="error = $event" @busy-change="isGitHubLoading = $event" />
     </div>
   </div>
 </template>
 
 <style scoped>
-@import '@/assets/label.css';
-@import '@/assets/input.css';
-@import '@/assets/box.css';
-@import '@/assets/error-box.css';
+@import "@/assets/label.css";
+@import "@/assets/input.css";
+@import "@/assets/box.css";
+@import "@/assets/error-box.css";
 
 .auth-divider {
   display: flex;
@@ -199,7 +192,7 @@ const handleSubmit = async () => {
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
     background-color: currentColor;

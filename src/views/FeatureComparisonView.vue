@@ -8,7 +8,5 @@ import PageHeader from '@/components/molecules/PageHeader.vue'
     title="Feature comparison"
     description="Compare feature availability between production and preview."
   />
-
   <FeatureComparison />
 </template>
-

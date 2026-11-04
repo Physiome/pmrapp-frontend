@@ -41,10 +41,6 @@ const description = computed(() => {
 </script>
 
 <template>
-  <PageHeader
-    title="Exposure listing"
-    :description="description"
-  />
-
+  <PageHeader title="Exposure listing" :description="description" />
   <Exposures @update-filtered-count="handleFilteredCountUpdate" />
 </template>

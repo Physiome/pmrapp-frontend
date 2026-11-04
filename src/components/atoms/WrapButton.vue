@@ -26,6 +26,7 @@ const buttonTitle = computed(() => {
 
 <template>
   <button
+    type="button"
     ref="buttonRef"
     :disabled="props.disabled"
     :class="buttonClasses"
@@ -36,6 +37,8 @@ const buttonTitle = computed(() => {
     @blur="isHovered = false"
   >
     <WrapIcon class="w-4 h-4" />
-    <Tooltip :visible="isHovered && !props.disabled" :anchor-el="buttonRef">{{ buttonTitle }}</Tooltip>
+    <Tooltip :visible="isHovered && !props.disabled" :anchor-el="buttonRef">{{
+      buttonTitle
+    }}</Tooltip>
   </button>
 </template>

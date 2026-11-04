@@ -147,18 +147,12 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
     </ActionButton>
   </div>
 
-  <ErrorBlock
-    v-if="error"
-    :title="error.title"
-    :error="error.message"
-  />
+  <ErrorBlock v-if="error" :title="error.title" :error="error.message" />
 
   <LoadingBox v-else-if="isLoading" message="Loading workspace..." />
 
   <div v-else-if="workspaceInfo">
-    <PageHeader
-      :title="pageTitle"
-    />
+    <PageHeader :title="pageTitle" />
 
     <div class="mb-6 space-y-4">
       <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2">
@@ -173,7 +167,10 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
         </a>
       </div>
 
-      <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2" v-if="workspaceInfo.commit.author">
+      <div
+        class="flex flex-col lg:flex-row items-start lg:items-center gap-2"
+        v-if="workspaceInfo.commit.author"
+      >
         <span class="font-bold text-gray-600 dark:text-gray-400">Author:</span>
         <FormattedEmailText :text="workspaceInfo.commit.author" />
       </div>
@@ -189,7 +186,11 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             content-section="Workspace Detail"
           >
             <DownloadIcon class="w-4 h-4" />
-            <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code> file)</span>
+            <span
+              >Complete archive (as a
+              <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code>
+              file)</span
+            >
           </ActionButton>
           <ActionButton
             variant="secondary"
@@ -199,7 +200,11 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             content-section="Workspace Detail"
           >
             <DownloadIcon class="w-4 h-4" />
-            <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code> file)</span>
+            <span
+              >Complete archive (as a
+              <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code>
+              file)</span
+            >
           </ActionButton>
         </div>
       </div>
@@ -214,13 +219,13 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
-@import '@/assets/box.css';
+@import "@/assets/text-link.css";
+@import "@/assets/box.css";
 
 .code-inline {
   display: inline-block;
   padding: 0 0.25em;
   border-radius: 0.25rem;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
 }
 </style>

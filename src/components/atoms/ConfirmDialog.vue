@@ -46,6 +46,8 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- biome-ignore lint/a11y/noStaticElementInteractions: backdrop click-to-cancel is a mouse convenience; the dialog buttons are keyboard accessible -->
+  <!-- biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click-to-cancel is a mouse convenience; the dialog buttons are keyboard accessible -->
   <div
     v-if="show"
     class="fixed inset-0 bg-gray-800/75 dark:bg-gray-900/85 z-50 flex justify-center items-center text-left"

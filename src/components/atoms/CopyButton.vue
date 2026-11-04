@@ -6,7 +6,7 @@ import CopyIcon from '@/components/icons/CopyIcon.vue'
 const props = defineProps<{
   text: string
   title?: string
-  withHTML?: boolean
+  withHtml?: boolean
   disabled?: boolean
 }>()
 
@@ -23,7 +23,7 @@ const buttonClasses = [
 ]
 
 const handleCopy = async () => {
-  if (props.withHTML) {
+  if (props.withHtml) {
     await handleCopyHTML()
   } else {
     await handleCopyText()
@@ -88,22 +88,20 @@ onBeforeUnmount(() => {
 
 <template>
   <button
+    type="button"
     ref="buttonRef"
     :disabled="props.disabled"
     @click="handleCopy"
     :class="buttonClasses"
-    :aria-label="isCopied ? 'Copied!' : (title || 'Copy')"
+    :aria-label="isCopied ? 'Copied!' : title || 'Copy'"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @focus="isHovered = true"
     @blur="isHovered = false"
   >
     <CopyIcon class="w-4 h-4" />
-    <Tooltip
-      :visible="(isHovered || isCopied) && !props.disabled"
-      :anchor-el="buttonRef"
-    >
-      {{ isCopied ? 'Copied!' : (title || 'Copy') }}
+    <Tooltip :visible="(isHovered || isCopied) && !props.disabled" :anchor-el="buttonRef">
+      {{ isCopied ? 'Copied!' : title || 'Copy' }}
     </Tooltip>
   </button>
 </template>

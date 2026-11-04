@@ -71,46 +71,61 @@ const isIdActive = (ids: string[] | undefined) => {
               <span>
                 #{{ getExposureIdFromResourcePath(item.resource_path) }}
                 <span v-if="item.data.created_ts?.[0]">
-                  ·
-                  Created on {{ formatDate(Number(item.data.created_ts[0])) }}
+                  · Created on {{ formatDate(Number(item.data.created_ts[0])) }}
                 </span>
               </span>
               <div
                 v-if="item.data.model_author?.filter(isValidTerm).length"
                 class="flex items-center gap-1"
               >
-                <span>
-                  by
-                </span>
-                <template v-for="(author, index) in item.data.model_author.filter(isValidTerm)" :key="index">
+                <span> by </span>
+                <template
+                  v-for="(author, index) in item.data.model_author.filter(isValidTerm)"
+                  :key="index"
+                >
                   <button
+                    type="button"
                     class="cursor-pointer hover:text-link-hover transition-colors"
-                    :class="kind === 'model_author' && term.toLowerCase() === author.toLowerCase()
-                      ? textHighlightClass
-                      : ''"
+                    :class="
+                      kind === 'model_author' && term.toLowerCase() === author.toLowerCase()
+                        ? textHighlightClass
+                        : ''
+                    "
                     @click="handleAuthorClick('model_author', author)"
                   >
                     {{ author }}
                   </button>
-                  <span v-if="index < item.data.model_author.filter(isValidTerm).length - 1">, </span>
+                  <span v-if="index < item.data.model_author.filter(isValidTerm).length - 1"
+                    >,
+                  </span>
                 </template>
               </div>
             </small>
           </div>
 
           <div
-            v-if="item.data.citation_author_family_name?.length || item.data.citation_id?.filter(isValidTerm).length"
+            v-if="
+              item.data.citation_author_family_name?.length ||
+              item.data.citation_id?.filter(isValidTerm).length
+            "
             class="mt-1 flex items-center gap-1 text-gray-600 dark:text-gray-400"
           >
             <FileIcon class="w-3.5 h-3.5 flex-shrink-0" />
             <small>
               <template v-if="item.data.citation_author_family_name?.length">
-                <template v-for="(author, index) in item.data.citation_author_family_name" :key="index">
+                <template
+                  v-for="(author, index) in item.data.citation_author_family_name"
+                  :key="index"
+                >
                   <button
+                    type="button"
                     class="cursor-pointer hover:text-link-hover transition-colors"
-                    :class="kind === 'citation_author_family_name' && term.toLowerCase() === author.toLowerCase()
-                      ? textHighlightClass
-                      : ''"
+                    :class="
+                      kind === 'citation_author_family_name' &&
+                      term.toLowerCase() === author.toLowerCase()
+                        ? textHighlightClass
+                        : ''
+                    "
                     @click="handleAuthorClick('citation_author_family_name', author)"
                   >
                     {{ author }}
@@ -118,17 +133,30 @@ const isIdActive = (ids: string[] | undefined) => {
                   <span v-if="index < item.data.citation_author_family_name.length - 1">, </span>
                 </template>
               </template>
-              <span v-if="item.data.citation_author_family_name?.length && item.data.citation_id?.filter(isValidTerm).length"> · </span>
+              <span
+                v-if="
+                  item.data.citation_author_family_name?.length &&
+                  item.data.citation_id?.filter(isValidTerm).length
+                "
+              >
+                ·
+              </span>
               <template v-if="item.data.citation_id?.filter(isValidTerm).length">
-                <template v-for="(id, index) in item.data.citation_id.filter(isValidTerm)" :key="id">
+                <template
+                  v-for="(id, index) in item.data.citation_id.filter(isValidTerm)"
+                  :key="id"
+                >
                   <button
+                    type="button"
                     class="cursor-pointer hover:text-link-hover transition-colors"
                     :class="isIdActive([id]) ? textHighlightClass : ''"
                     @click="handleKeywordClick('citation_id', id)"
                   >
                     {{ id }}
                   </button>
-                  <span v-if="index < item.data.citation_id.filter(isValidTerm).length - 1">, </span>
+                  <span v-if="index < item.data.citation_id.filter(isValidTerm).length - 1"
+                    >,
+                  </span>
                 </template>
               </template>
             </small>
@@ -142,11 +170,11 @@ const isIdActive = (ids: string[] | undefined) => {
 
           <div v-if="item.data.cellml_keyword?.length" class="flex flex-wrap gap-2 mt-2">
             <TermButton
-              v-for="keyword in item.data.cellml_keyword.filter(k => k.trim())"
+              v-for="keyword in item.data.cellml_keyword.filter((k) => k.trim())"
               :key="keyword"
               :term="keyword"
               :active="kind === 'cellml_keyword' && term === keyword"
-              :class="{'pointer-events-none': kind === 'cellml_keyword' && term === keyword}"
+              :class="{ 'pointer-events-none': kind === 'cellml_keyword' && term === keyword }"
               @click="handleKeywordClick('cellml_keyword', keyword)"
             />
           </div>
@@ -157,5 +185,5 @@ const isIdActive = (ids: string[] | undefined) => {
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

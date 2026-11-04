@@ -7,15 +7,14 @@ import { PMR2_URL } from '@/constants/global'
 
 <template>
   <NotificationBar>
-    <ActionButton
-      :href="PMR2_URL"
-      variant="secondary"
-      class="absolute left-4"
-      size="sm"
-    >
+    <ActionButton :href="PMR2_URL" variant="secondary" class="absolute left-4" size="sm">
       <span class="hidden md:block">Go back to production</span>
       <span class="md:hidden flex items-center gap-1">
-        <ArrowRightIcon class="w-4 h-4 -ml-1 transform rotate-180" aria-hidden="true" focusable="false" />
+        <ArrowRightIcon
+          class="w-4 h-4 -ml-1 transform rotate-180"
+          aria-hidden="true"
+          focusable="false"
+        />
         Production
       </span>
     </ActionButton>
@@ -23,11 +22,7 @@ import { PMR2_URL } from '@/constants/global'
       <span class="hidden max-[500px]:block">Preview version.</span>
       <span class="hidden min-[501px]:block md:hidden">This is a preview version.</span>
       <span class="hidden md:block">You are viewing a preview version.</span>
-      <ActionButton
-        to="/feature-comparison"
-        variant="primary"
-        size="sm"
-      >
+      <ActionButton to="/feature-comparison" variant="primary" size="sm">
         <span class="hidden md:block">Feature comparison</span>
         <span class="md:hidden flex items-center gap-1">
           Features

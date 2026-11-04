@@ -32,19 +32,18 @@ onMounted(async () => {
     v-if="isVisible"
     class="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 shadow-[0_-12px_32px_rgba(15,23,42,0.12)] backdrop-blur dark:border-gray-800 dark:bg-slate-950/95"
   >
-    <div class="container mx-auto flex flex-col items-end gap-4 sm:gap-8 px-4 py-8 pt-12 sm:pt-8 text-gray-700 dark:text-gray-200 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="container mx-auto flex flex-col items-end gap-4 sm:gap-8 px-4 py-8 pt-12 sm:pt-8 text-gray-700 dark:text-gray-200 sm:flex-row sm:items-center sm:justify-between"
+    >
       <div class="leading-6">
-        <div class="text-xl font-semibold mb-2">This site uses cookies to improve your experience.</div>
+        <div class="text-xl font-semibold mb-2">
+          This site uses cookies to improve your experience.
+        </div>
         We use cookies to analyse traffic and understand how the Physiome Model Repository is used.
-        By accepting, closing this banner, or continuing to use the site, you consent to the use of cookies.
+        By accepting, closing this banner, or continuing to use the site, you consent to the use of
+        cookies.
       </div>
-      <button
-        type="button"
-        :class="buttonClasses"
-        @click="dismissCookieBanner"
-      >
-        Accept
-      </button>
+      <button type="button" :class="buttonClasses" @click="dismissCookieBanner">Accept</button>
     </div>
     <CloseButton
       class="absolute top-4 right-4 w-6 h-6 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"

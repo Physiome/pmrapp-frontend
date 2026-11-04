@@ -18,7 +18,10 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
 </script>
 
 <template>
-  <nav aria-label="File path" class="flex items-center gap-1 text-sm min-w-0 flex-1 overflow-hidden">
+  <nav
+    aria-label="File path"
+    class="flex items-center gap-1 text-sm min-w-0 flex-1 overflow-hidden"
+  >
     <button
       v-if="props.onPathChange"
       type="button"
@@ -27,7 +30,11 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
     >
       Files
     </button>
-    <RouterLink v-else :to="linkTo('')" class="text-link text-link-primary shrink-0 truncate text-left cursor-pointer">
+    <RouterLink
+      v-else
+      :to="linkTo('')"
+      class="text-link text-link-primary shrink-0 truncate text-left cursor-pointer"
+    >
       Files
     </RouterLink>
 
@@ -60,5 +67,5 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
+@import "@/assets/text-link.css";
 </style>

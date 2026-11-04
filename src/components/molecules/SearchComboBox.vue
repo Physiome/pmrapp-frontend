@@ -230,17 +230,6 @@ const inputMinWidth = computed(() =>
   currentInput.value ? '120px' : `min(100%, ${longestPlaceholder.value.length + 2}ch)`,
 )
 
-const helpText = computed(() => {
-  if (!isFocused.value && !props.inOverlay) return ''
-  if (selectedCategoryKind.value && selectedCategoryKind.value !== TEXT_QUERY_KIND) {
-    return 'Select or type a term from the suggestions below'
-  }
-  if (chips.value.length > 0) {
-    return 'Add another category filter below to narrow your search'
-  }
-  return 'Select a category filter below, or just type and press Enter to search. Wrap words in quotes for an exact phrase'
-})
-
 const categoryMenuItems = computed(() => {
   const input = currentInput.value.trim().toLowerCase()
   let filtered = [...SEARCH_CATEGORIES]
@@ -823,11 +812,9 @@ defineExpose({
     <!--
       Main search bar: chips + active category prefix + text input + clear button + search button
     -->
-    <div
-      :class="mainSearchBarClass"
-      @mousedown="handleSearchBarMouseDown"
-      @click="focusInput"
-    >
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: clicking the bar only forwards focus to the input, which handles the keyboard -->
+    <!-- biome-ignore lint/a11y/useKeyWithClickEvents: clicking the bar only forwards focus to the input, which handles the keyboard -->
+    <div :class="mainSearchBarClass" @mousedown="handleSearchBarMouseDown" @click="focusInput">
       <!-- Chips + input area -->
       <div class="flex-1 flex items-center flex-wrap gap-1 px-3 py-1 min-h-[2.5rem]">
         <!-- Existing filter chips -->
@@ -873,6 +860,8 @@ defineExpose({
       </div>
 
       <!-- Clear button -->
+      <!-- biome-ignore lint/a11y/noStaticElementInteractions: wrapper enlarges the click area of the focusable CloseButton inside -->
+      <!-- biome-ignore lint/a11y/useKeyWithClickEvents: wrapper enlarges the click area of the focusable CloseButton inside -->
       <div
         v-if="hasValues"
         class="flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full cursor-pointer p-1 mr-1"
@@ -894,6 +883,7 @@ defineExpose({
     </div>
 
     <!-- Category menu dropdown (shown when input is empty on focus, or after Tab) -->
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: mousedown.prevent keeps focus in the input while the listbox is clicked -->
     <div
       v-if="isCategoryListboxVisible"
       ref="categoryMenuRef"
@@ -918,14 +908,21 @@ defineExpose({
           @click="handleCategoryClick(cat)"
           @mouseenter="handleCategoryMouseEnter(index)"
         >
-          <component :is="categoryIcons[cat.value]" aria-hidden="true" class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
+          <component
+            :is="categoryIcons[cat.value]"
+            aria-hidden="true"
+            class="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400"
+          />
           <span class="font-medium text-gray-800 dark:text-gray-200 flex-1">{{ cat.label }}</span>
-          <Keycap v-if="categoryMenuActiveIndex === index" aria-hidden="true" size="small">&crarr;</Keycap>
+          <Keycap v-if="categoryMenuActiveIndex === index" aria-hidden="true" size="small"
+            >&crarr;</Keycap
+          >
         </button>
       </div>
     </div>
 
     <!-- Term suggestions dropdown (shown when typing a filter value) -->
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: mousedown.prevent keeps focus in the input while the listbox is clicked -->
     <div
       v-if="showTermSuggestions"
       ref="termSuggestionsRef"
@@ -945,7 +942,9 @@ defineExpose({
         <template v-else>
           <span>
             No
-            <span v-if="categoryPrefix" class="font-medium text-gray-700 dark:text-gray-200">{{ categoryPrefix }}</span>
+            <span v-if="categoryPrefix" class="font-medium text-gray-700 dark:text-gray-200">{{
+              categoryPrefix
+            }}</span>
             <template v-else>matches</template>
             available for
             <strong class="text-gray-700 dark:text-gray-200">{{ currentInput.trim() }}</strong>.
@@ -976,12 +975,15 @@ defineExpose({
           @mouseenter="handleTermMouseEnter(index)"
         >
           <span class="truncate flex-1">{{ term }}</span>
-          <Keycap v-if="activeSuggestionIndex === index" aria-hidden="true" size="small">&crarr;</Keycap>
+          <Keycap v-if="activeSuggestionIndex === index" aria-hidden="true" size="small"
+            >&crarr;</Keycap
+          >
         </button>
       </div>
     </div>
 
     <!-- Free-text hint (shown when user has typed text and no category/dropdown is active) -->
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: mousedown.prevent keeps focus in the input while the hint is clicked -->
     <div
       v-if="showFreeTextHint"
       :id="freeTextHintId"
@@ -994,7 +996,9 @@ defineExpose({
         <Keycap size="small" class="mx-1 align-middle">&crarr;</Keycap>
         <span>
           <template v-for="part in freeTextHintParts" :key="part.key">
-            <strong v-if="part.emphasised" class="text-gray-700 dark:text-gray-200">{{ part.text }}</strong>
+            <strong v-if="part.emphasised" class="text-gray-700 dark:text-gray-200">{{
+              part.text
+            }}</strong>
             <template v-else>{{ part.text }}</template>
           </template>
         </span>
@@ -1008,7 +1012,10 @@ defineExpose({
               tabindex="-1"
               class="font-medium text-left break-words text-gray-700 dark:text-gray-200 underline decoration-dotted hover:text-gray-900 dark:hover:text-white cursor-pointer"
               @click="applyExactPhrase"
-            >replace with {{ exactPhraseSuggestion }}</button>.
+            >
+              replace with {{ exactPhraseSuggestion }}
+            </button
+            >.
           </template>
         </span>
       </div>

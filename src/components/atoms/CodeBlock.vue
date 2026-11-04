@@ -210,10 +210,7 @@ watch(
 </script>
 
 <template>
-  <pre
-    ref="preBlock"
-    :class="preformatClass"
-  ><code
+  <pre ref="preBlock" :class="preformatClass"><code
     ref="codeBlock"
     :class="`language-${detectedLanguage}`"
   >{{ code }}</code></pre>
@@ -224,7 +221,7 @@ pre {
   margin: 0;
   padding: 1em;
   padding-left: 3.8em;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
   line-height: 1.5;
 }
 
@@ -233,6 +230,7 @@ code {
 }
 </style>
 
+<!-- biome-ignore lint/suspicious/useScopedStyles: global overrides for Prism token styles rendered outside this component -->
 <style>
 @media (prefers-color-scheme: light) {
   .token.operator,
@@ -240,6 +238,7 @@ code {
   .token.url,
   .language-css .token.string,
   .style .token.string {
+    /* biome-ignore lint/complexity/noImportantStyles: needed to override the Prism theme background */
     background: transparent !important;
   }
 }

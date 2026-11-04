@@ -17,5 +17,5 @@ defineProps<Props>()
 </template>
 
 <style scoped>
-@import '@/assets/warning-box.css';
+@import "@/assets/warning-box.css";
 </style>

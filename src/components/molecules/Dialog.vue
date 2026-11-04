@@ -77,6 +77,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- biome-ignore lint/a11y/noStaticElementInteractions: backdrop click-to-close is a mouse convenience; Escape and the close button handle keyboard -->
   <div
     v-if="show"
     class="fixed inset-0 bg-gray-800/75 dark:bg-gray-900/75 backdrop-blur-sm z-250 flex justify-center"
@@ -96,7 +97,10 @@ onUnmounted(() => {
         <h2 v-if="title" class="text-lg font-semibold">{{ title }}</h2>
         <CloseButton @click="emit('close')" v-if="!props.isStatic" />
       </div>
-      <div class="min-h-0 flex-1 p-4" :class="overflowContent !== false ? 'overflow-y-auto' : 'overflow-visible'">
+      <div
+        class="min-h-0 flex-1 p-4"
+        :class="overflowContent !== false ? 'overflow-y-auto' : 'overflow-visible'"
+      >
         <slot />
       </div>
     </div>

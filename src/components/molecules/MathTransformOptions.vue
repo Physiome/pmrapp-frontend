@@ -80,13 +80,11 @@ watch(
 </script>
 
 <template>
-  <div
-    v-if="hasMathsData"
-    :class="stickyContainer"
-  >
+  <div v-if="hasMathsData" :class="stickyContainer">
     <div :class="stickyContainerInner">
       <!-- Collapse/expand toggle button -->
       <button
+        type="button"
         :class="collapseButtonClasses"
         :aria-label="mathToolbarLabel"
         :title="mathToolbarLabel"
@@ -100,25 +98,30 @@ watch(
       </button>
 
       <template v-if="!collapsed">
-        <div
-          v-for="option in MATHML_FORMAT_OPTIONS"
-          :key="option.key"
-          class="flex"
-        >
+        <div v-for="option in MATHML_FORMAT_OPTIONS" :key="option.key" class="flex">
           <Popover>
             <template #trigger>
               <Checkbox
                 :model-value="!!options[option.key]"
                 @update:model-value="toggleOption(option.key)"
               >
-                <span class="flex items-center gap-1.5 text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                <span
+                  class="flex items-center gap-1.5 text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                >
                   <span class="text-xs sm:text-sm">{{ option.label }}</span>
                   <span
                     class="hidden md:inline-flex shrink-0 items-center rounded-full border bg-white px-1.5 py-0.5 text-xs tracking-wide text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-                    :class="!!options[option.key] ? 'border-primary': 'border-gray-200 dark:border-gray-700'"
+                    :class="
+                      options[option.key]
+                        ? 'border-primary'
+                        : 'border-gray-200 dark:border-gray-700'
+                    "
                     aria-hidden="true"
                   >
-                    <span v-html="option.preview" :class="!!options[option.key] ? 'text-primary' : ''"></span>
+                    <span
+                      v-html="option.preview"
+                      :class="options[option.key] ? 'text-primary' : ''"
+                    ></span>
                   </span>
                 </span>
               </Checkbox>
