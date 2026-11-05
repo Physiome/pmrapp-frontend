@@ -1,13 +1,13 @@
 <script setup lang="ts">
 interface Props {
-  lines?: number
-  media?: boolean
+  lines?: number;
+  media?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   lines: 3,
   media: false,
-})
+});
 </script>
 
 <template>

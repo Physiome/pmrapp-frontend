@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import PageHeader from '@/components/molecules/PageHeader.vue'
-import Login from '@/components/organisms/Login.vue'
+import PageHeader from '@/components/molecules/PageHeader.vue';
+import Login from '@/components/organisms/Login.vue';
 </script>
 
 <template>

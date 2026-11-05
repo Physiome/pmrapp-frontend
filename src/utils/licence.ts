@@ -3,7 +3,7 @@
  */
 
 interface LicenceMap {
-  [key: string]: string
+  [key: string]: string;
 }
 
 const LICENCE_NAMES: LicenceMap = {
@@ -28,7 +28,7 @@ const LICENCE_NAMES: LicenceMap = {
   'gnu.org/licenses/agpl-3.0': 'AGPL 3.0',
   'opensource.org/licenses/BSD-2-Clause': 'BSD 2-Clause License',
   'opensource.org/licenses/BSD-3-Clause': 'BSD 3-Clause License',
-}
+};
 
 /**
  * Format a licence URL to a human-readable name.
@@ -36,26 +36,26 @@ const LICENCE_NAMES: LicenceMap = {
  * @returns Human-readable licence name or the original URL if not recognised.
  */
 export const formatLicenceUrl = (licenceUrl: string): string => {
-  if (!licenceUrl) return ''
+  if (!licenceUrl) return '';
 
   // Try to find a matching licence in the map.
   for (const [key, name] of Object.entries(LICENCE_NAMES)) {
     if (licenceUrl.includes(key)) {
-      return name
+      return name;
     }
   }
 
   // If no match is found, extract domain and path for a reasonable fallback.
   try {
-    const url = new URL(licenceUrl)
-    const hostname = url.hostname.replace('www.', '')
-    const pathname = url.pathname.split('/').filter(Boolean).slice(-2).join(' ')
+    const url = new URL(licenceUrl);
+    const hostname = url.hostname.replace('www.', '');
+    const pathname = url.pathname.split('/').filter(Boolean).slice(-2).join(' ');
     if (pathname) {
-      return `${hostname} - ${pathname}`.replace(/\//g, ' ').replace(/-/g, ' ')
+      return `${hostname} - ${pathname}`.replace(/\//g, ' ').replace(/-/g, ' ');
     }
-    return hostname
+    return hostname;
   } catch {
     // If URL parsing fails, return the original URL.
-    return licenceUrl
+    return licenceUrl;
   }
-}
+};

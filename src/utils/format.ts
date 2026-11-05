@@ -5,7 +5,7 @@
  * @example formatNumber(1234567) // "1,234,567".
  */
 export function formatNumber(num: number): string {
-  return num.toLocaleString('en-NZ')
+  return num.toLocaleString('en-NZ');
 }
 
 /**
@@ -19,7 +19,7 @@ export function formatDate(timestamp: number): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  })
+  });
 }
 
 /**
@@ -29,7 +29,7 @@ export function formatDate(timestamp: number): string {
  * @example formatYear(1704499200) // "2024".
  */
 export function formatYear(timestamp: number): string {
-  return new Date(timestamp * 1000).getFullYear().toString()
+  return new Date(timestamp * 1000).getFullYear().toString();
 }
 
 /**
@@ -42,9 +42,9 @@ export function formatYear(timestamp: number): string {
  * @example formatFileCount(0) // "".
  */
 export function formatFileCount(count: number | undefined | null): string {
-  if (!count || count <= 0) return ''
-  const formatted = formatNumber(count)
-  return `${formatted} ${count === 1 ? 'item' : 'items'}`
+  if (!count || count <= 0) return '';
+  const formatted = formatNumber(count);
+  return `${formatted} ${count === 1 ? 'item' : 'items'}`;
 }
 
 const escapeHtml = (value: string): string => {
@@ -53,15 +53,15 @@ const escapeHtml = (value: string): string => {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
-}
+    .replaceAll("'", '&#39;');
+};
 
 export function formatSearchKey(key: string): string {
-  const safeKey = escapeHtml(key)
-  return `<span class="text-gray-700 dark:text-gray-200 font-semibold">${safeKey}</span>`
+  const safeKey = escapeHtml(key);
+  return `<span class="text-gray-700 dark:text-gray-200 font-semibold">${safeKey}</span>`;
 }
 
 export function formatKindLabel(label: string): string {
-  const safeLabel = escapeHtml(label)
-  return `<span class="text-gray-600 dark:text-gray-300">${safeLabel}</span>`
+  const safeLabel = escapeHtml(label);
+  return `<span class="text-gray-600 dark:text-gray-300">${safeLabel}</span>`;
 }

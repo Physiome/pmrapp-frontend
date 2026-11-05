@@ -1,13 +1,13 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
-import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
+import { mount } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
+import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue';
 
 type Case = {
-  input: string
-  expectedText: string
-  expectedLinked: boolean
-  expectedHref?: string
-}
+  input: string;
+  expectedText: string;
+  expectedLinked: boolean;
+  expectedHref?: string;
+};
 
 const cases: Case[] = [
   {
@@ -80,7 +80,7 @@ const cases: Case[] = [
     expectedText: 'author',
     expectedLinked: false,
   },
-]
+];
 
 describe('FormattedEmailText', () => {
   it.each(cases)(
@@ -90,20 +90,20 @@ describe('FormattedEmailText', () => {
         props: {
           text: input,
         },
-      })
+      });
 
       if (expectedLinked) {
-        const link = wrapper.find('a')
-        expect(link.exists()).toBe(true)
-        expect(link.text()).toBe(expectedText)
-        expect(link.attributes('href')).toBe(expectedHref)
+        const link = wrapper.find('a');
+        expect(link.exists()).toBe(true);
+        expect(link.text()).toBe(expectedText);
+        expect(link.attributes('href')).toBe(expectedHref);
       } else {
-        const link = wrapper.find('a')
-        expect(link.exists()).toBe(false)
-        expect(wrapper.text()).toBe(expectedText)
+        const link = wrapper.find('a');
+        expect(link.exists()).toBe(false);
+        expect(wrapper.text()).toBe(expectedText);
       }
 
-      wrapper.unmount()
+      wrapper.unmount();
     },
-  )
-})
+  );
+});

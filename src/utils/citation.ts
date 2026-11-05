@@ -1,4 +1,4 @@
-import type { Author, Citation } from '@/types/citation'
+import type { Author, Citation } from '@/types/citation';
 
 /**
  * Parse a full author name into an Author object.
@@ -14,27 +14,27 @@ import type { Author, Citation } from '@/types/citation'
  * @example parseFullNameToAuthor("Madonna") // { family: "Madonna" }
  */
 export function parseFullNameToAuthor(fullName: string): Author {
-  const trimmedName = fullName.trim()
+  const trimmedName = fullName.trim();
 
   if (!trimmedName) {
-    return { family: '' }
+    return { family: '' };
   }
 
-  const parts = trimmedName.split(/\s+/)
+  const parts = trimmedName.split(/\s+/);
 
   if (parts.length === 1) {
-    return { family: parts[0] }
+    return { family: parts[0] };
   }
 
   if (parts.length === 2) {
-    return { given: parts[0], family: parts[1] }
+    return { given: parts[0], family: parts[1] };
   }
 
-  const given = parts[0]
-  const family = parts[parts.length - 1]
-  const other = parts.slice(1, -1).join(' ')
+  const given = parts[0];
+  const family = parts[parts.length - 1];
+  const other = parts.slice(1, -1).join(' ');
 
-  return { family, given, other }
+  return { family, given, other };
 }
 
 /**
@@ -45,20 +45,22 @@ export function parseFullNameToAuthor(fullName: string): Author {
  */
 export const formatCitationAuthor = (authorParts: string[]): string => {
   if (authorParts.length >= 2) {
-    const [lastName, firstName, middleInitial] = authorParts
-    return middleInitial ? `${firstName} ${middleInitial}. ${lastName}` : `${firstName} ${lastName}`
+    const [lastName, firstName, middleInitial] = authorParts;
+    return middleInitial
+      ? `${firstName} ${middleInitial}. ${lastName}`
+      : `${firstName} ${lastName}`;
   }
-  return authorParts.join(' ')
-}
+  return authorParts.join(' ');
+};
 
 export const formatIndividualAuthor = (author: Author): string => {
-  const family = author.family || ''
-  const given = author.given || ''
-  const givenInitial = given ? `${given.charAt(0).toUpperCase()}.` : ''
-  const otherInitials = author.other ? `${author.other.charAt(0).toUpperCase()}.` : ''
-  const allInitials = [givenInitial, otherInitials].filter(Boolean).join(' ')
-  return `${family}${allInitials ? `, ${allInitials}` : ''}`
-}
+  const family = author.family || '';
+  const given = author.given || '';
+  const givenInitial = given ? `${given.charAt(0).toUpperCase()}.` : '';
+  const otherInitials = author.other ? `${author.other.charAt(0).toUpperCase()}.` : '';
+  const allInitials = [givenInitial, otherInitials].filter(Boolean).join(' ');
+  return `${family}${allInitials ? `, ${allInitials}` : ''}`;
+};
 
 /**
  * Format a citation object to APA style citation string.
@@ -67,17 +69,17 @@ export const formatIndividualAuthor = (author: Author): string => {
  * @returns APA formatted citation string.
  */
 export const formatCitation = (citation: Citation): string => {
-  const parts: string[] = []
+  const parts: string[] = [];
 
   const authorStrings =
     citation.authors && Array.isArray(citation.authors)
       ? citation.authors.map(formatIndividualAuthor).filter(Boolean)
-      : []
+      : [];
 
-  const year = citation.issued?.trim().split('-')[0]
-  const yearPart = year ? `(${year}).` : ''
-  const title = citation.title?.trim()
-  const titlePart = title ? ensureSentence(title) : ''
+  const year = citation.issued?.trim().split('-')[0];
+  const yearPart = year ? `(${year}).` : '';
+  const title = citation.title?.trim();
+  const titlePart = title ? ensureSentence(title) : '';
 
   if (authorStrings.length > 0) {
     const authorSection =
@@ -85,62 +87,62 @@ export const formatCitation = (citation: Citation): string => {
         ? authorStrings[0]
         : authorStrings.length === 2
           ? `${authorStrings[0]}, & ${authorStrings[1]}`
-          : `${authorStrings.slice(0, -1).join(', ')}, & ${authorStrings[authorStrings.length - 1]}`
+          : `${authorStrings.slice(0, -1).join(', ')}, & ${authorStrings[authorStrings.length - 1]}`;
 
-    parts.push(/[.!?]$/.test(authorSection) ? authorSection : `${authorSection}.`)
+    parts.push(/[.!?]$/.test(authorSection) ? authorSection : `${authorSection}.`);
 
     if (yearPart) {
-      parts.push(yearPart)
+      parts.push(yearPart);
     }
 
     if (titlePart) {
-      parts.push(titlePart)
+      parts.push(titlePart);
     }
   } else {
     if (titlePart) {
-      parts.push(titlePart)
+      parts.push(titlePart);
       if (yearPart) {
-        parts.push(yearPart)
+        parts.push(yearPart);
       }
     } else if (yearPart) {
-      parts.push(yearPart)
+      parts.push(yearPart);
     }
   }
 
   if (citation.journal) {
     if (citation.volume || citation.first_page || citation.last_page) {
-      parts.push(`${citation.journal},`)
+      parts.push(`${citation.journal},`);
     } else {
-      parts.push(ensureSentence(citation.journal))
+      parts.push(ensureSentence(citation.journal));
     }
   }
 
   if (citation.volume) {
-    let volumeSection = citation.volume
+    let volumeSection = citation.volume;
     if (citation.first_page && citation.last_page) {
-      volumeSection += `, ${citation.first_page}-${citation.last_page}`
+      volumeSection += `, ${citation.first_page}-${citation.last_page}`;
     } else if (citation.first_page) {
-      volumeSection += `, ${citation.first_page}`
+      volumeSection += `, ${citation.first_page}`;
     }
-    parts.push(`${volumeSection}.`)
+    parts.push(`${volumeSection}.`);
   } else if (citation.first_page && citation.last_page) {
-    parts.push(`${citation.first_page}-${citation.last_page}.`)
+    parts.push(`${citation.first_page}-${citation.last_page}.`);
   } else if (citation.first_page) {
-    parts.push(`${citation.first_page}.`)
+    parts.push(`${citation.first_page}.`);
   }
 
   if (citation.publisher) {
-    parts.push(ensureSentence(citation.publisher))
+    parts.push(ensureSentence(citation.publisher));
   }
 
   if (citation.url) {
-    const normalisedUrl = normaliseUrl(citation.url)
-    const anchorTag = `<a href="${normalisedUrl}" target="_blank" rel="noopener noreferrer">${normalisedUrl}</a>`
-    parts.push(anchorTag)
+    const normalisedUrl = normaliseUrl(citation.url);
+    const anchorTag = `<a href="${normalisedUrl}" target="_blank" rel="noopener noreferrer">${normalisedUrl}</a>`;
+    parts.push(anchorTag);
   }
 
-  return parts.filter(Boolean).join(' ')
-}
+  return parts.filter(Boolean).join(' ');
+};
 
 /**
  * Ensure a string ends with sentence punctuation.
@@ -148,10 +150,10 @@ export const formatCitation = (citation: Citation): string => {
  * @returns Trimmed sentence with trailing punctuation.
  */
 export const ensureSentence = (value: string): string => {
-  const trimmed = value.trim()
-  if (!trimmed) return ''
-  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`
-}
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+};
 
 /**
  * Remove query and hash from a URL for cleaner citation output.
@@ -159,20 +161,20 @@ export const ensureSentence = (value: string): string => {
  * @returns normalised URL string.
  */
 export const normaliseUrl = (url: string): string => {
-  const trimmed = url.trim()
-  if (!trimmed) return ''
+  const trimmed = url.trim();
+  if (!trimmed) return '';
 
   try {
-    const parsed = new URL(trimmed)
+    const parsed = new URL(trimmed);
 
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-      return ''
+      return '';
     }
 
-    parsed.search = ''
-    parsed.hash = ''
-    return parsed.toString()
+    parsed.search = '';
+    parsed.hash = '';
+    return parsed.toString();
   } catch {
-    return ''
+    return '';
   }
-}
+};

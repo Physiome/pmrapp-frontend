@@ -1,112 +1,112 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import ConfirmDialog from '@/components/atoms/ConfirmDialog.vue'
-import LogoutIcon from '@/components/icons/LogoutIcon.vue'
-import UserIcon from '@/components/icons/UserIcon.vue'
-import { LOGOUT_ERROR_MESSAGES } from '@/constants/auth'
-import { getAuthService } from '@/services'
-import { useAuthStore } from '@/stores/auth'
-import { useGlobalStateStore } from '@/stores/globalState'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import ConfirmDialog from '@/components/atoms/ConfirmDialog.vue';
+import LogoutIcon from '@/components/icons/LogoutIcon.vue';
+import UserIcon from '@/components/icons/UserIcon.vue';
+import { LOGOUT_ERROR_MESSAGES } from '@/constants/auth';
+import { getAuthService } from '@/services';
+import { useAuthStore } from '@/stores/auth';
+import { useGlobalStateStore } from '@/stores/globalState';
 
-const authStore = useAuthStore()
-const globalStateStore = useGlobalStateStore()
-const router = useRouter()
-const route = useRoute()
-const authService = getAuthService()
+const authStore = useAuthStore();
+const globalStateStore = useGlobalStateStore();
+const router = useRouter();
+const route = useRoute();
+const authService = getAuthService();
 
-const isOpen = ref(false)
-const dropdownRef = ref<HTMLElement | null>(null)
-const showLogoutConfirm = ref(false)
+const isOpen = ref(false);
+const dropdownRef = ref<HTMLElement | null>(null);
+const showLogoutConfirm = ref(false);
 
-const menuId = 'user-dropdown-menu'
+const menuId = 'user-dropdown-menu';
 const buttonLabel = computed(() =>
   authStore.username ? `${authStore.username} – user menu` : 'User menu',
-)
+);
 
 const menuDividerClasses = [
   'relative before:absolute before:top-0 before:left-0 before:right-0',
   'before:border-t before:border-gray-200 dark:before:border-gray-700',
-]
+];
 
 const accountButtonClasses = computed(() => {
   const buttonClasses = [
     'rounded-full ml-2',
     'bg-gray-100 dark:bg-gray-700',
     'outline-none! focus:ring-0!',
-  ]
+  ];
 
   if (authStore.avatarUrl) {
-    buttonClasses.push('block! p-0!')
+    buttonClasses.push('block! p-0!');
   }
 
-  return buttonClasses
-})
+  return buttonClasses;
+});
 
 const navLinkClasses = [
   'block rounded-md px-3 py-2',
   'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors',
-]
+];
 
 const toggleDropdown = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const closeDropdown = () => {
-  isOpen.value = false
-}
+  isOpen.value = false;
+};
 
 const confirmLogout = () => {
-  closeDropdown()
-  showLogoutConfirm.value = true
-}
+  closeDropdown();
+  showLogoutConfirm.value = true;
+};
 
 const handleLogout = async () => {
-  showLogoutConfirm.value = false
+  showLogoutConfirm.value = false;
   try {
-    await authService.logout()
-    authStore.clearAuth()
+    await authService.logout();
+    authStore.clearAuth();
     if (route.path === '/profile') {
-      router.push('/')
+      router.push('/');
     }
   } catch (error) {
-    console.error(LOGOUT_ERROR_MESSAGES.generic, error)
+    console.error(LOGOUT_ERROR_MESSAGES.generic, error);
   }
-}
+};
 
 const cancelLogout = () => {
-  showLogoutConfirm.value = false
-}
+  showLogoutConfirm.value = false;
+};
 
 const handleLoginClick = () => {
-  globalStateStore.requestLoginUsernameFocus()
-}
+  globalStateStore.requestLoginUsernameFocus();
+};
 
 const handleClickOutside = (event: MouseEvent) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-    closeDropdown()
+    closeDropdown();
   }
-}
+};
 
-const isActive = (path: string) => route.path.startsWith(path)
+const isActive = (path: string) => route.path.startsWith(path);
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener('click', handleClickOutside);
+});
 
 watch(
   () => route.fullPath,
   () => {
     if (isOpen.value) {
-      closeDropdown()
+      closeDropdown();
     }
   },
-)
+);
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>

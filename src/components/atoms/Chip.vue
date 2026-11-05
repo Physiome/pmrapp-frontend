@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import CloseButton from '@/components/atoms/CloseButton.vue'
+import { computed } from 'vue';
+import CloseButton from '@/components/atoms/CloseButton.vue';
 
 interface Props {
-  label: string
-  category?: string
-  removable?: boolean
-  onRemove?: () => void
-  onClick?: () => void
+  label: string;
+  category?: string;
+  removable?: boolean;
+  onRemove?: () => void;
+  onClick?: () => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   removable: false,
-})
+});
 
 const fullLabel = computed(() =>
   props.category ? `${props.category}: ${props.label}` : props.label,
-)
+);
 
-const transitionClasses = 'transition duration-200 ease-linear'
+const transitionClasses = 'transition duration-200 ease-linear';
 
 const chipClasses = [
   'inline-flex items-center gap-1 py-1',
@@ -29,7 +29,7 @@ const chipClasses = [
   'group/chip',
   'cursor-default',
   transitionClasses,
-].join(' ')
+].join(' ');
 
 const closeButtonClasses = [
   'w-4 h-4 p-0',
@@ -39,19 +39,19 @@ const closeButtonClasses = [
   'cursor-pointer',
   'opacity-50 group-hover/chip:opacity-100',
   transitionClasses,
-].join(' ')
+].join(' ');
 
 const handleRemoveChip = () => {
   if (props.onRemove) {
-    props.onRemove()
+    props.onRemove();
   }
-}
+};
 
 const handleClickChip = () => {
   if (props.onClick) {
-    props.onClick()
+    props.onClick();
   }
-}
+};
 </script>
 
 <template>

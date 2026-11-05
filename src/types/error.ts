@@ -1,4 +1,4 @@
 export interface ErrorInfo {
-  title: string
-  message: string
+  title: string;
+  message: string;
 }

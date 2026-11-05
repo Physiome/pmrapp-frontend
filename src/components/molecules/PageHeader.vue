@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 interface Props {
-  title: string
-  description?: string
-  centered?: boolean
-  titleSize?: 'small' | 'medium' | 'large'
+  title: string;
+  description?: string;
+  centered?: boolean;
+  titleSize?: 'small' | 'medium' | 'large';
 }
 
 const props = withDefaults(defineProps<Props>(), {
   titleSize: 'large',
-})
+});
 
 const titleFontSize = computed((): string => {
   switch (props.titleSize) {
     case 'small':
-      return 'text-2xl'
+      return 'text-2xl';
     case 'medium':
-      return 'text-3xl'
+      return 'text-3xl';
     default:
-      return 'text-4xl'
+      return 'text-4xl';
   }
-})
+});
 </script>
 
 <template>

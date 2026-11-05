@@ -1,24 +1,24 @@
-import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref } from 'vue'
-import SearchSuggestions from '@/components/molecules/SearchSuggestions.vue'
+import { mount } from '@vue/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { defineComponent, h, nextTick, ref } from 'vue';
+import SearchSuggestions from '@/components/molecules/SearchSuggestions.vue';
 
 const { mockSearchStore } = vi.hoisted(() => ({
   mockSearchStore: {
     categories: [] as Array<{
-      kind: string
-      kindInfo: { kind: { id: number; description: string }; terms: string[] } | null
-      loading: boolean
-      error: string | null
+      kind: string;
+      kindInfo: { kind: { id: number; description: string }; terms: string[] } | null;
+      loading: boolean;
+      error: string | null;
     }>,
     isLoading: false,
     fetchCategories: vi.fn<() => Promise<void>>(),
   },
-}))
+}));
 
 vi.mock('@/stores/search', () => ({
   useSearchStore: () => mockSearchStore,
-}))
+}));
 
 const SearchFieldStub = defineComponent({
   name: 'SearchField',
@@ -30,8 +30,8 @@ const SearchFieldStub = defineComponent({
   },
   emits: ['update:modelValue', 'keydown'],
   setup(props, { emit, expose }) {
-    const inputRef = ref<HTMLInputElement | null>(null)
-    expose({ inputRef })
+    const inputRef = ref<HTMLInputElement | null>(null);
+    expose({ inputRef });
 
     return () =>
       h('input', {
@@ -40,9 +40,9 @@ const SearchFieldStub = defineComponent({
         onInput: (event: Event) =>
           emit('update:modelValue', (event.target as HTMLInputElement).value),
         onKeydown: (event: KeyboardEvent) => emit('keydown', event),
-      })
+      });
   },
-})
+});
 
 const TermButtonStub = defineComponent({
   name: 'TermButton',
@@ -68,9 +68,9 @@ const TermButtonStub = defineComponent({
           onKeydown: (event: KeyboardEvent) => emit('keydown', event),
         },
         props.term,
-      )
+      );
   },
-})
+});
 
 const ChipStub = defineComponent({
   name: 'Chip',
@@ -82,9 +82,9 @@ const ChipStub = defineComponent({
   },
   emits: ['click'],
   setup(props) {
-    return () => h('button', { class: 'chip-button' }, props.label)
+    return () => h('button', { class: 'chip-button' }, props.label);
   },
-})
+});
 
 describe('SearchSuggestions', () => {
   beforeEach(() => {
@@ -98,11 +98,11 @@ describe('SearchSuggestions', () => {
         loading: false,
         error: null,
       },
-    ]
-    mockSearchStore.isLoading = false
-    mockSearchStore.fetchCategories.mockReset()
-    mockSearchStore.fetchCategories.mockResolvedValue(undefined)
-  })
+    ];
+    mockSearchStore.isLoading = false;
+    mockSearchStore.fetchCategories.mockReset();
+    mockSearchStore.fetchCategories.mockResolvedValue(undefined);
+  });
 
   it('toggles a selected term off when clicked again', async () => {
     const wrapper = mount(SearchSuggestions, {
@@ -117,28 +117,28 @@ describe('SearchSuggestions', () => {
           Chip: ChipStub,
         },
       },
-    })
+    });
 
-    await nextTick()
+    await nextTick();
 
-    const termButton = wrapper.find('.term-button')
-    expect(termButton.exists()).toBe(true)
-    expect(termButton.attributes('data-active')).toBe('false')
+    const termButton = wrapper.find('.term-button');
+    expect(termButton.exists()).toBe(true);
+    expect(termButton.attributes('data-active')).toBe('false');
 
-    await termButton.trigger('click')
-    await nextTick()
+    await termButton.trigger('click');
+    await nextTick();
 
     expect(wrapper.emitted('searchTermClick')?.[0]?.[0]).toEqual([
       { kind: 'model_author', term: 'Alpha term' },
-    ])
-    expect(wrapper.find('.term-button').attributes('data-active')).toBe('true')
+    ]);
+    expect(wrapper.find('.term-button').attributes('data-active')).toBe('true');
 
-    await wrapper.find('.term-button').trigger('click')
-    await nextTick()
+    await wrapper.find('.term-button').trigger('click');
+    await nextTick();
 
-    expect(wrapper.emitted('searchTermClick')?.[1]?.[0]).toEqual([])
-    expect(wrapper.find('.term-button').attributes('data-active')).toBe('false')
-  })
+    expect(wrapper.emitted('searchTermClick')?.[1]?.[0]).toEqual([]);
+    expect(wrapper.find('.term-button').attributes('data-active')).toBe('false');
+  });
 
   it('clears all filters when clear all button is clicked', async () => {
     const wrapper = mount(SearchSuggestions, {
@@ -157,18 +157,18 @@ describe('SearchSuggestions', () => {
           Chip: ChipStub,
         },
       },
-    })
+    });
 
-    await nextTick()
+    await nextTick();
 
-    const clearAllButton = wrapper.find('button[aria-label="Clear all filters"]')
-    expect(clearAllButton.exists()).toBe(true)
+    const clearAllButton = wrapper.find('button[aria-label="Clear all filters"]');
+    expect(clearAllButton.exists()).toBe(true);
 
-    await clearAllButton.trigger('click')
-    await nextTick()
+    await clearAllButton.trigger('click');
+    await nextTick();
 
-    expect(wrapper.emitted('searchTermClick')?.[0]?.[0]).toEqual([])
-  })
+    expect(wrapper.emitted('searchTermClick')?.[0]?.[0]).toEqual([]);
+  });
 
   it('includes clear all button in tab navigation', async () => {
     const wrapper = mount(SearchSuggestions, {
@@ -184,20 +184,20 @@ describe('SearchSuggestions', () => {
           Chip: ChipStub,
         },
       },
-    })
+    });
 
-    await nextTick()
+    await nextTick();
 
-    const clearAllButton = wrapper.find('button[aria-label="Clear all filters"]')
-    expect(clearAllButton.exists()).toBe(true)
+    const clearAllButton = wrapper.find('button[aria-label="Clear all filters"]');
+    expect(clearAllButton.exists()).toBe(true);
 
     clearAllButton.element.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
-    )
-    await nextTick()
+    );
+    await nextTick();
 
-    expect(clearAllButton.classes()).toContain('focus-visible:ring-2')
-  })
+    expect(clearAllButton.classes()).toContain('focus-visible:ring-2');
+  });
 
   it('preserves the filter input when the search input prop changes', async () => {
     const wrapper = mount(SearchSuggestions, {
@@ -212,19 +212,19 @@ describe('SearchSuggestions', () => {
           Chip: ChipStub,
         },
       },
-    })
+    });
 
-    await nextTick()
+    await nextTick();
 
-    const filterInput = wrapper.find('input')
-    await filterInput.setValue('author')
-    await nextTick()
+    const filterInput = wrapper.find('input');
+    await filterInput.setValue('author');
+    await nextTick();
 
-    expect(filterInput.element.value).toBe('author')
+    expect(filterInput.element.value).toBe('author');
 
-    await wrapper.setProps({ searchInput: 'Rodriguez' })
-    await nextTick()
+    await wrapper.setProps({ searchInput: 'Rodriguez' });
+    await nextTick();
 
-    expect(wrapper.find('input').element.value).toBe('author')
-  })
-})
+    expect(wrapper.find('input').element.value).toBe('author');
+  });
+});

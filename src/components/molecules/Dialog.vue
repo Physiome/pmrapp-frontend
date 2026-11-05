@@ -1,79 +1,79 @@
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
-import CloseButton from '@/components/atoms/CloseButton.vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue';
+import CloseButton from '@/components/atoms/CloseButton.vue';
 
 const props = defineProps<{
-  show: boolean
-  title?: string
-  position?: 'center' | 'top'
-  isStatic?: boolean
-  overflowContent?: boolean
-}>()
+  show: boolean;
+  title?: string;
+  position?: 'center' | 'top';
+  isStatic?: boolean;
+  overflowContent?: boolean;
+}>();
 
-const emit = defineEmits<(e: 'close') => void>()
+const emit = defineEmits<(e: 'close') => void>();
 
-const dialogRef = ref<HTMLElement | null>(null)
+const dialogRef = ref<HTMLElement | null>(null);
 
-let isMouseDownOnBackdrop = false
+let isMouseDownOnBackdrop = false;
 
 const dialogClasses = computed(() => [
   'relative flex w-full h-full md:h-auto md:max-h-[calc(100vh-4rem)] md:max-w-4xl flex-col',
   'bg-white dark:bg-gray-800 shadow-lg',
   'rounded-lg focus-visible:outline-none',
   props.overflowContent !== false ? 'overflow-hidden' : 'overflow-visible',
-])
+]);
 
 const positionClasses = computed(() => {
-  return props.position === 'top' ? 'items-start md:pt-8' : 'items-center'
-})
+  return props.position === 'top' ? 'items-start md:pt-8' : 'items-center';
+});
 
 const headerClasses = computed(() => {
   if (!props.title) {
-    return 'justify-end'
+    return 'justify-end';
   }
 
-  const withTitle = 'items-center border-b border-gray-200 dark:border-gray-700'
-  return props.isStatic ? `justify-center ${withTitle}` : `justify-between ${withTitle}`
-})
+  const withTitle = 'items-center border-b border-gray-200 dark:border-gray-700';
+  return props.isStatic ? `justify-center ${withTitle}` : `justify-between ${withTitle}`;
+});
 
 const handleBackdropMouseDown = (event: MouseEvent) => {
-  if (event.button !== 0) return
-  isMouseDownOnBackdrop = true
-}
+  if (event.button !== 0) return;
+  isMouseDownOnBackdrop = true;
+};
 
 const handleBackdropMouseUp = (event: MouseEvent) => {
   if (isMouseDownOnBackdrop && event.target === event.currentTarget && !props.isStatic) {
-    emit('close')
+    emit('close');
   }
-  isMouseDownOnBackdrop = false
-}
+  isMouseDownOnBackdrop = false;
+};
 
 const handleKeyDown = (event: KeyboardEvent) => {
   // Skip Escape already handled by a child (e.g. a combobox stepping back a level).
   if (event.key === 'Escape' && !event.defaultPrevented && !props.isStatic) {
-    emit('close')
+    emit('close');
   }
-}
+};
 
 watch(
   () => props.show,
   (newVal) => {
     if (newVal) {
       nextTick().then(() => {
-        dialogRef.value?.focus()
-      })
-      document.addEventListener('keydown', handleKeyDown)
+        dialogRef.value?.focus();
+      });
+      document.addEventListener('keydown', handleKeyDown);
     } else {
-      document.removeEventListener('keydown', handleKeyDown)
-      isMouseDownOnBackdrop = false
+      document.removeEventListener('keydown', handleKeyDown);
+      isMouseDownOnBackdrop = false;
     }
   },
   { immediate: true },
-)
+);
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeyDown)
-})
+  document.removeEventListener('keydown', handleKeyDown);
+});
 </script>
 
 <template>

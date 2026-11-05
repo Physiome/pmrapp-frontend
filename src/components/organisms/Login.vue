@@ -1,112 +1,112 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import CloseButton from '@/components/atoms/CloseButton.vue'
-import GitHubLogin from '@/components/molecules/GitHubLogin.vue'
-import { getAuthService } from '@/services'
-import { useAuthStore } from '@/stores/auth'
-import { useGlobalStateStore } from '@/stores/globalState'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import CloseButton from '@/components/atoms/CloseButton.vue';
+import GitHubLogin from '@/components/molecules/GitHubLogin.vue';
+import { getAuthService } from '@/services';
+import { useAuthStore } from '@/stores/auth';
+import { useGlobalStateStore } from '@/stores/globalState';
 
-const router = useRouter()
-const authStore = useAuthStore()
-const globalStateStore = useGlobalStateStore()
-const username = ref('')
-const usernameInput = ref<HTMLInputElement | null>(null)
-const password = ref('')
-const error = ref<string | null>(null)
-const isLoading = ref(false)
-const isGitHubLoading = ref(false)
-const ERROR_AUTO_HIDE_MS = 5000
-let errorTimer: ReturnType<typeof setTimeout> | null = null
+const router = useRouter();
+const authStore = useAuthStore();
+const globalStateStore = useGlobalStateStore();
+const username = ref('');
+const usernameInput = ref<HTMLInputElement | null>(null);
+const password = ref('');
+const error = ref<string | null>(null);
+const isLoading = ref(false);
+const isGitHubLoading = ref(false);
+const ERROR_AUTO_HIDE_MS = 5000;
+let errorTimer: ReturnType<typeof setTimeout> | null = null;
 
-const authService = getAuthService()
+const authService = getAuthService();
 
 const clearErrorTimer = () => {
   if (!errorTimer) {
-    return
+    return;
   }
 
-  clearTimeout(errorTimer)
-  errorTimer = null
-}
+  clearTimeout(errorTimer);
+  errorTimer = null;
+};
 
 const focusUsernameInput = () => {
-  usernameInput.value?.focus()
-}
+  usernameInput.value?.focus();
+};
 
 onMounted(() => {
-  focusUsernameInput()
+  focusUsernameInput();
 
   if (globalStateStore.isLoginUsernameFocusRequested) {
-    focusUsernameInput()
-    globalStateStore.consumeLoginUsernameFocus()
+    focusUsernameInput();
+    globalStateStore.consumeLoginUsernameFocus();
   }
-})
+});
 
 watch(
   () => globalStateStore.isLoginUsernameFocusRequested,
   (isFocusRequested) => {
     if (!isFocusRequested) {
-      return
+      return;
     }
 
-    focusUsernameInput()
-    globalStateStore.consumeLoginUsernameFocus()
+    focusUsernameInput();
+    globalStateStore.consumeLoginUsernameFocus();
   },
-)
+);
 
 watch(error, (newError) => {
-  clearErrorTimer()
+  clearErrorTimer();
 
   if (!newError) {
-    return
+    return;
   }
 
   errorTimer = setTimeout(() => {
-    error.value = null
-    errorTimer = null
-  }, ERROR_AUTO_HIDE_MS)
-})
+    error.value = null;
+    errorTimer = null;
+  }, ERROR_AUTO_HIDE_MS);
+});
 
 onBeforeUnmount(() => {
-  clearErrorTimer()
-})
+  clearErrorTimer();
+});
 
 const handleSubmit = async () => {
   if (isGitHubLoading.value) {
-    return
+    return;
   }
 
-  error.value = null
+  error.value = null;
 
   if (!username.value || !password.value) {
-    error.value = 'Please enter both username and password'
-    focusUsernameInput()
-    return
+    error.value = 'Please enter both username and password';
+    focusUsernameInput();
+    return;
   }
 
-  isLoading.value = true
+  isLoading.value = true;
 
   try {
     const token = await authService.login({
       login: username.value,
       password: password.value,
-    })
+    });
 
     // Store auth state.
-    authStore.setAuth(token, username.value)
-    authStore.setLoginMethod('password')
+    authStore.setAuth(token, username.value);
+    authStore.setLoginMethod('password');
 
     // Redirect to profile page.
-    router.push('/profile')
+    router.push('/profile');
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Login failed'
-    focusUsernameInput()
+    error.value = err instanceof Error ? err.message : 'Login failed';
+    focusUsernameInput();
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 </script>
 
 <template>

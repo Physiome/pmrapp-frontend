@@ -1,66 +1,66 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import ConfirmDialog from '@/components/atoms/ConfirmDialog.vue'
-import GitHubIcon from '@/components/icons/GitHubIcon.vue'
-import LogoutIcon from '@/components/icons/LogoutIcon.vue'
-import UserIcon from '@/components/icons/UserIcon.vue'
-import { GITHUB_AUTH_ERROR_MESSAGES, LOGOUT_ERROR_MESSAGES } from '@/constants/auth'
-import { getAuthService } from '@/services'
-import { useAuthStore } from '@/stores/auth'
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import ConfirmDialog from '@/components/atoms/ConfirmDialog.vue';
+import GitHubIcon from '@/components/icons/GitHubIcon.vue';
+import LogoutIcon from '@/components/icons/LogoutIcon.vue';
+import UserIcon from '@/components/icons/UserIcon.vue';
+import { GITHUB_AUTH_ERROR_MESSAGES, LOGOUT_ERROR_MESSAGES } from '@/constants/auth';
+import { getAuthService } from '@/services';
+import { useAuthStore } from '@/stores/auth';
 
-const authStore = useAuthStore()
-const router = useRouter()
-const authService = getAuthService()
+const authStore = useAuthStore();
+const router = useRouter();
+const authService = getAuthService();
 
-const isGitHubUser = computed(() => authStore.loginMethod === 'github')
+const isGitHubUser = computed(() => authStore.loginMethod === 'github');
 
 const avatarClasses = [
   'flex flex-shrink-0 items-center justify-center w-16 h-16 overflow-hidden',
   'rounded-full bg-primary text-white text-xl font-bold select-none',
-]
+];
 
-const showLogOutConfirm = ref(false)
-const showDisconnectGitHubConfirm = ref(false)
+const showLogOutConfirm = ref(false);
+const showDisconnectGitHubConfirm = ref(false);
 
 const confirmLogOut = () => {
-  showLogOutConfirm.value = true
-}
+  showLogOutConfirm.value = true;
+};
 
 const handleLogOut = async () => {
-  showLogOutConfirm.value = false
+  showLogOutConfirm.value = false;
   try {
-    await authService.logout()
-    authStore.clearAuth()
-    router.push('/')
+    await authService.logout();
+    authStore.clearAuth();
+    router.push('/');
   } catch (error) {
-    console.error(LOGOUT_ERROR_MESSAGES.generic, error)
+    console.error(LOGOUT_ERROR_MESSAGES.generic, error);
   }
-}
+};
 
 const cancelLogOut = () => {
-  showLogOutConfirm.value = false
-}
+  showLogOutConfirm.value = false;
+};
 
 const confirmDisconnectGitHub = () => {
-  showDisconnectGitHubConfirm.value = true
-}
+  showDisconnectGitHubConfirm.value = true;
+};
 
 const handleDisconnectGitHub = async () => {
-  showDisconnectGitHubConfirm.value = false
+  showDisconnectGitHubConfirm.value = false;
   try {
-    await authService.revokeGitHub()
-    authStore.clearAuth()
-    router.push('/')
+    await authService.revokeGitHub();
+    authStore.clearAuth();
+    router.push('/');
   } catch (error) {
-    console.error(GITHUB_AUTH_ERROR_MESSAGES.revoke, error)
+    console.error(GITHUB_AUTH_ERROR_MESSAGES.revoke, error);
   }
-}
+};
 
 const cancelDisconnectGitHub = () => {
-  showDisconnectGitHubConfirm.value = false
-}
+  showDisconnectGitHubConfirm.value = false;
+};
 </script>
 
 <template>

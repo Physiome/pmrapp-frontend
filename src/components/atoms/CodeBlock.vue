@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import Prism from 'prismjs'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import 'prismjs/components/prism-markup'
-import 'prismjs/components/prism-css'
-import 'prismjs/components/prism-c'
-import 'prismjs/components/prism-cpp'
-import 'prismjs/components/prism-fortran'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-json'
-import 'prismjs/components/prism-python'
-import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-matlab'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
-import 'prismjs/plugins/line-numbers/prism-line-numbers'
+import Prism from 'prismjs';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-fortran';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-matlab';
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+import 'prismjs/plugins/line-numbers/prism-line-numbers';
 
 const props = defineProps<{
-  code: string
-  filename: string
-  startWrapped?: boolean
-}>()
+  code: string;
+  filename: string;
+  startWrapped?: boolean;
+}>();
 
-const codeBlock = ref<HTMLElement | null>(null)
-const preBlock = ref<HTMLElement | null>(null)
-const darkThemeMediaQuery = ref<MediaQueryList | null>(null)
-const isWrapped = ref(false)
-let observer: ResizeObserver | null = null
+const codeBlock = ref<HTMLElement | null>(null);
+const preBlock = ref<HTMLElement | null>(null);
+const darkThemeMediaQuery = ref<MediaQueryList | null>(null);
+const isWrapped = ref(false);
+let observer: ResizeObserver | null = null;
 
 const preformatClass = computed(() =>
   [
@@ -36,10 +36,10 @@ const preformatClass = computed(() =>
     'text-sm!',
     'm-0!',
   ].join(' '),
-)
+);
 
 const detectedLanguage = computed(() => {
-  const ext = props.filename.split('.').pop()?.toLowerCase()
+  const ext = props.filename.split('.').pop()?.toLowerCase();
 
   // Map file extensions to Prism language names.
   const languageMap: Record<string, string> = {
@@ -72,141 +72,141 @@ const detectedLanguage = computed(() => {
     tsx: 'javascript',
     xml: 'markup',
     xul: 'markup',
-  }
+  };
 
-  return ext ? languageMap[ext] || 'plaintext' : 'none'
-})
+  return ext ? languageMap[ext] || 'plaintext' : 'none';
+});
 
 const highlightCode = async () => {
-  await nextTick()
+  await nextTick();
   if (codeBlock.value && props.code) {
     try {
       // Clear previous highlighting.
-      codeBlock.value.removeAttribute('data-highlighted')
+      codeBlock.value.removeAttribute('data-highlighted');
 
       if (detectedLanguage.value !== 'none') {
-        Prism.highlightElement(codeBlock.value)
+        Prism.highlightElement(codeBlock.value);
       }
     } catch (err) {
-      console.error('Error highlighting code:', err)
+      console.error('Error highlighting code:', err);
     }
   }
-}
+};
 
 const syncWrapAndLineNumbers = async () => {
-  if (!preBlock.value || !codeBlock.value) return
+  if (!preBlock.value || !codeBlock.value) return;
 
   // Keep wrap classes in sync after Prism mutates highlighted markup.
-  preBlock.value.classList.toggle('!whitespace-pre-wrap', isWrapped.value)
-  codeBlock.value.classList.toggle('!whitespace-pre-wrap', isWrapped.value)
+  preBlock.value.classList.toggle('!whitespace-pre-wrap', isWrapped.value);
+  codeBlock.value.classList.toggle('!whitespace-pre-wrap', isWrapped.value);
 
-  await nextTick()
+  await nextTick();
 
   // Re-check refs after await in case the component was unmounted.
-  if (!preBlock.value) return
+  if (!preBlock.value) return;
 
   if (!isWrapped.value) {
-    const lineSpans = preBlock.value.querySelectorAll('.line-numbers-rows > span')
+    const lineSpans = preBlock.value.querySelectorAll('.line-numbers-rows > span');
     lineSpans.forEach((span) => {
-      const lineSpan = span as HTMLElement
-      lineSpan.style.height = ''
-    })
+      const lineSpan = span as HTMLElement;
+      lineSpan.style.height = '';
+    });
   }
 
   if (Prism.plugins.lineNumbers?.resize) {
-    Prism.plugins.lineNumbers.resize(preBlock.value)
+    Prism.plugins.lineNumbers.resize(preBlock.value);
   }
-}
+};
 
 const refreshCodeBlock = async () => {
-  await highlightCode()
-  await syncWrapAndLineNumbers()
-}
+  await highlightCode();
+  await syncWrapAndLineNumbers();
+};
 
 const loadPrismTheme = async (isDark: boolean) => {
   // Remove existing Prism theme stylesheets.
-  const existingThemes = document.querySelectorAll('link[data-prism-theme]')
+  const existingThemes = document.querySelectorAll('link[data-prism-theme]');
   existingThemes.forEach((link) => {
-    link.remove()
-  })
+    link.remove();
+  });
 
   // Create and add new theme stylesheet.
-  const link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.setAttribute('data-prism-theme', 'true')
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.setAttribute('data-prism-theme', 'true');
 
   // Import from local node_modules.
   if (isDark) {
-    const theme = await import('prismjs/themes/prism-okaidia.css?url')
-    link.href = theme.default
+    const theme = await import('prismjs/themes/prism-okaidia.css?url');
+    link.href = theme.default;
   } else {
-    const theme = await import('prismjs/themes/prism.css?url')
-    link.href = theme.default
+    const theme = await import('prismjs/themes/prism.css?url');
+    link.href = theme.default;
   }
 
-  document.head.appendChild(link)
-}
+  document.head.appendChild(link);
+};
 
 const handleThemeChange = (e: MediaQueryListEvent) => {
-  loadPrismTheme(e.matches)
-}
+  loadPrismTheme(e.matches);
+};
 
 onMounted(() => {
   if (props.startWrapped) {
-    isWrapped.value = true
+    isWrapped.value = true;
   }
 
-  void refreshCodeBlock()
+  void refreshCodeBlock();
 
-  darkThemeMediaQuery.value = window.matchMedia('(prefers-color-scheme: dark)')
+  darkThemeMediaQuery.value = window.matchMedia('(prefers-color-scheme: dark)');
 
   // Load initial theme.
-  loadPrismTheme(darkThemeMediaQuery.value.matches)
+  loadPrismTheme(darkThemeMediaQuery.value.matches);
 
   // Listen for theme changes.
-  darkThemeMediaQuery.value.addEventListener('change', handleThemeChange)
+  darkThemeMediaQuery.value.addEventListener('change', handleThemeChange);
 
   if (preBlock.value && typeof ResizeObserver === 'function') {
     observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (Prism.plugins.lineNumbers?.resize) {
-          Prism.plugins.lineNumbers.resize(entry.target as HTMLElement)
+          Prism.plugins.lineNumbers.resize(entry.target as HTMLElement);
         }
       }
-    })
+    });
 
-    observer.observe(preBlock.value)
+    observer.observe(preBlock.value);
   }
-})
+});
 
 onBeforeUnmount(() => {
   if (darkThemeMediaQuery.value) {
-    darkThemeMediaQuery.value.removeEventListener('change', handleThemeChange)
+    darkThemeMediaQuery.value.removeEventListener('change', handleThemeChange);
   }
 
   if (observer) {
-    observer.disconnect()
+    observer.disconnect();
   }
-})
+});
 
 watch(
   () => props.code,
   () => {
-    void refreshCodeBlock()
+    void refreshCodeBlock();
   },
-)
+);
 
 watch(
   () => props.startWrapped,
   (newVal) => {
-    if (!preBlock.value || !codeBlock.value) return
+    if (!preBlock.value || !codeBlock.value) return;
 
     if (newVal !== undefined) {
-      isWrapped.value = newVal
-      void syncWrapAndLineNumbers()
+      isWrapped.value = newVal;
+      void syncWrapAndLineNumbers();
     }
   },
-)
+);
 </script>
 
 <template>

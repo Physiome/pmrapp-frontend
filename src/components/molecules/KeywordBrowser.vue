@@ -1,69 +1,69 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import SearchField from '@/components/atoms/SearchField.vue'
-import TermButton from '@/components/atoms/TermButton.vue'
-import { useSearchStore } from '@/stores/search'
-import { buildSearchQuery, isValidTerm } from '@/utils/search'
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import SearchField from '@/components/atoms/SearchField.vue';
+import TermButton from '@/components/atoms/TermButton.vue';
+import { useSearchStore } from '@/stores/search';
+import { buildSearchQuery, isValidTerm } from '@/utils/search';
 
 interface Props {
-  inSidebar: boolean
+  inSidebar: boolean;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
-const searchStore = useSearchStore()
-const router = useRouter()
-const categoryFilters = ref<Map<string, string>>(new Map())
-const cellmlKeywordKind = 'cellml_keyword'
+const searchStore = useSearchStore();
+const router = useRouter();
+const categoryFilters = ref<Map<string, string>>(new Map());
+const cellmlKeywordKind = 'cellml_keyword';
 const cellmlKeywordCategory = computed(() =>
   searchStore.categories.filter((cat) => cat.kind === cellmlKeywordKind),
-)
+);
 
 const filteredKeywordCategories = computed(() =>
   cellmlKeywordCategory.value.map((category) => ({
     ...category,
     filteredTerms: getFilteredTerms(category.kindInfo?.terms, category.kind),
   })),
-)
+);
 
 onMounted(async () => {
   if (!searchStore.isLoading && searchStore.categories.length === 0) {
-    await searchStore.fetchCategories([cellmlKeywordKind])
+    await searchStore.fetchCategories([cellmlKeywordKind]);
   }
-})
+});
 
 const handleTermClick = async (kind: string, term: string) => {
-  const currentRoute = router.currentRoute.value
-  const query = buildSearchQuery(kind, term, currentRoute.query)
+  const currentRoute = router.currentRoute.value;
+  const query = buildSearchQuery(kind, term, currentRoute.query);
   // If already on search page, replace query params to avoid duplicate navigation.
   // Otherwise, push to search page.
   if (currentRoute.path === '/search') {
-    await router.replace({ path: '/search', query })
+    await router.replace({ path: '/search', query });
   } else {
-    await router.push({ path: '/search', query })
+    await router.push({ path: '/search', query });
   }
-}
+};
 
 const getFilteredTerms = (terms: string[] | null | undefined, kind: string): string[] => {
-  const filter = categoryFilters.value.get(kind)?.toLowerCase() || ''
-  const safeTerms = terms ?? []
+  const filter = categoryFilters.value.get(kind)?.toLowerCase() || '';
+  const safeTerms = terms ?? [];
   return safeTerms.filter(
     (t) => isValidTerm(t) && (filter === '' || t.toLowerCase().includes(filter)),
-  )
-}
+  );
+};
 
 const updateFilter = (kind: string, value: string) => {
-  categoryFilters.value.set(kind, value)
-}
+  categoryFilters.value.set(kind, value);
+};
 
 const searchFieldInputClass = computed(() => {
-  const baseClass = 'input-field input-field-sm pr-10!'
+  const baseClass = 'input-field input-field-sm pr-10!';
   if (props.inSidebar) {
-    return `${baseClass} w-full`
+    return `${baseClass} w-full`;
   }
-  return baseClass
-})
+  return baseClass;
+});
 </script>
 
 <template>

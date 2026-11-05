@@ -1,7 +1,7 @@
-import { TITLE } from '@/constants/global'
-import type { BreadcrumbItem } from '@/types/breadcrumb'
-import type { WorkspaceInfo } from '@/types/workspace'
-import { encodePathSegments, getPathSegments } from '@/utils/path'
+import { TITLE } from '@/constants/global';
+import type { BreadcrumbItem } from '@/types/breadcrumb';
+import type { WorkspaceInfo } from '@/types/workspace';
+import { encodePathSegments, getPathSegments } from '@/utils/path';
 
 /**
  * Generate workspace page title from description or ID.
@@ -18,27 +18,27 @@ export const generateWorkspaceTitle = (
   path?: string,
   withTitleSuffix = false,
 ): string => {
-  let title: string
+  let title: string;
 
   // Generic title if neither description nor ID is available.
   if (!description && !id) {
-    title = 'Workspace Detail'
+    title = 'Workspace Detail';
   } else if (description && description.trim() !== '') {
     // Title using description.
-    title = description
+    title = description;
   } else {
     // Fallback title using ID.
-    title = `Workspace ${id}`
+    title = `Workspace ${id}`;
   }
 
   if (commitId && path) {
-    const truncatedCommitId = commitId.substring(0, 12)
-    const pathsWithSpace = path.split('/').join(' / ')
-    title = `${title} @ ${truncatedCommitId} / ${pathsWithSpace}`
+    const truncatedCommitId = commitId.substring(0, 12);
+    const pathsWithSpace = path.split('/').join(' / ');
+    title = `${title} @ ${truncatedCommitId} / ${pathsWithSpace}`;
   }
 
-  return withTitleSuffix ? `${title} – ${TITLE}` : title
-}
+  return withTitleSuffix ? `${title} – ${TITLE}` : title;
+};
 
 /**
  * Generate the route path of a folder or file in a workspace at a given commit.
@@ -49,9 +49,9 @@ export const generateWorkspaceTitle = (
  * @returns The path with each segment URL-encoded, e.g. "/workspace/abc/file/123/sub%20dir".
  */
 export const getWorkspacePathLink = (alias: string, commitId: string, path: string): string => {
-  const root = `/workspace/${alias}/file/${commitId}`
-  return path ? `${root}/${encodePathSegments(path)}` : root
-}
+  const root = `/workspace/${alias}/file/${commitId}`;
+  return path ? `${root}/${encodePathSegments(path)}` : root;
+};
 
 /**
  * Generate breadcrumb items for each folder and file in a workspace path.
@@ -66,7 +66,7 @@ export const generateWorkspacePathBreadcrumbs = (
   commitId: string,
   path: string,
 ): BreadcrumbItem[] => {
-  const segments = getPathSegments(path)
+  const segments = getPathSegments(path);
 
   return segments.map((segment, index) =>
     index === segments.length - 1
@@ -75,8 +75,8 @@ export const generateWorkspacePathBreadcrumbs = (
           label: segment.name,
           to: getWorkspacePathLink(alias, commitId, segment.path),
         },
-  )
-}
+  );
+};
 
 /**
  * Generate the breadcrumb trail for a workspace page: the workspace itself,
@@ -99,7 +99,7 @@ export const generateWorkspaceBreadcrumbs = (
   // Link back to the workspace root at the same commit when there is one.
   const workspaceRoot = commitId
     ? { name: 'workspace-detail-alias-commit', params: { alias, commitId } }
-    : { name: 'workspace-detail', params: { alias } }
+    : { name: 'workspace-detail', params: { alias } };
 
   return [
     {
@@ -108,5 +108,5 @@ export const generateWorkspaceBreadcrumbs = (
       loading,
     },
     ...generateWorkspacePathBreadcrumbs(alias, commitId, path),
-  ]
-}
+  ];
+};

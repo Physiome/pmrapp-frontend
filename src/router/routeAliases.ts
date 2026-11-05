@@ -1,5 +1,5 @@
 export const createAliases = (bases: string[], ...suffixes: string[]) =>
-  bases.flatMap((base) => suffixes.map((suffix) => `${base}${suffix}`))
+  bases.flatMap((base) => suffixes.map((suffix) => `${base}${suffix}`));
 
 export const createRouteAliases = (
   primaryBase: string,
@@ -8,24 +8,24 @@ export const createRouteAliases = (
 ) => [
   ...suffixes.slice(1).map((suffix) => `${primaryBase}${suffix}`),
   ...createAliases(aliasBases, ...suffixes),
-]
+];
 
-export const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias/@@file']
-export const workspaceDetailCommitSuffixes = ['/:alias/file/:commitId', '/:alias/@@file/:commitId']
+export const workspaceDetailRouteSuffixes = ['/:alias', '/:alias/file', '/:alias/@@file'];
+export const workspaceDetailCommitSuffixes = ['/:alias/file/:commitId', '/:alias/@@file/:commitId'];
 export const workspaceFileRouteSuffixes = [
   '/:alias/file/:commitId/:path(.+)',
   '/:alias/@@file/:commitId/:path(.+)',
-]
+];
 
-export const exposureAliasBases = ['/e']
-export const exposureDetailRouteSuffixes = ['/:alias', '/:alias/view']
+export const exposureAliasBases = ['/e'];
+export const exposureDetailRouteSuffixes = ['/:alias', '/:alias/view'];
 export const exposureFileRouteSuffixes = [
   '/:alias/:file',
   '/:alias/experiments/cell/:file',
   '/:alias/experiments/channel/:file',
   '/:alias/models/channels/:file',
   '/:alias/models/:file',
-]
+];
 
 export const exposureFileViewRouteSuffixes = [
   '/:alias/:file/:view',
@@ -33,7 +33,7 @@ export const exposureFileViewRouteSuffixes = [
   '/:alias/experiments/channel/:file/:view',
   '/:alias/models/channels/:file/:view',
   '/:alias/models/:file/:view',
-]
+];
 
 export const exposureFileViewLangRouteSuffixes = [
   '/:alias/:file/:view/:lang',
@@ -41,4 +41,4 @@ export const exposureFileViewLangRouteSuffixes = [
   '/:alias/experiments/channel/:file/:view/:lang',
   '/:alias/models/channels/:file/:view/:lang',
   '/:alias/models/:file/:view/:lang',
-]
+];

@@ -1,25 +1,25 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const useGlobalStateStore = defineStore('globalState', () => {
-  const isSearchFocusRequested = ref(false)
-  const isLoginUsernameFocusRequested = ref(false)
+  const isSearchFocusRequested = ref(false);
+  const isLoginUsernameFocusRequested = ref(false);
 
   const requestSearchFocus = () => {
-    isSearchFocusRequested.value = true
-  }
+    isSearchFocusRequested.value = true;
+  };
 
   const consumeSearchFocus = () => {
-    isSearchFocusRequested.value = false
-  }
+    isSearchFocusRequested.value = false;
+  };
 
   const requestLoginUsernameFocus = () => {
-    isLoginUsernameFocusRequested.value = true
-  }
+    isLoginUsernameFocusRequested.value = true;
+  };
 
   const consumeLoginUsernameFocus = () => {
-    isLoginUsernameFocusRequested.value = false
-  }
+    isLoginUsernameFocusRequested.value = false;
+  };
 
   return {
     isSearchFocusRequested,
@@ -28,5 +28,5 @@ export const useGlobalStateStore = defineStore('globalState', () => {
     consumeSearchFocus,
     requestLoginUsernameFocus,
     consumeLoginUsernameFocus,
-  }
-})
+  };
+});

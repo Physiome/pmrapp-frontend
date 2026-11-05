@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
 
-const router = useRouter()
-const hasHistory = ref(false)
+const router = useRouter();
+const hasHistory = ref(false);
 
 onMounted(() => {
   // Check if there's a previous page in history.
-  hasHistory.value = window.history.length > 2
-})
+  hasHistory.value = window.history.length > 2;
+});
 
 const goBack = () => {
-  router.back()
-}
+  router.back();
+};
 </script>
 
 <template>

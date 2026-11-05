@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue'
-import type { BreadcrumbItem } from '@/types/breadcrumb'
+import Breadcrumbs from '@/components/molecules/Breadcrumbs.vue';
+import type { BreadcrumbItem } from '@/types/breadcrumb';
 
 defineProps<{
-  items: BreadcrumbItem[]
-}>()
+  items: BreadcrumbItem[];
+}>();
 </script>
 
 <template>

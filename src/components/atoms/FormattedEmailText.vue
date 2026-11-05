@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  text: string
-}>()
+  text: string;
+}>();
 
 type Segment = {
-  value: string
-  email: string
-  isLinked: boolean
-}
+  value: string;
+  email: string;
+  isLinked: boolean;
+};
 
 const segments = computed<Segment[]>(() => {
-  const input = props.text || ''
-  if (!input) return []
+  const input = props.text || '';
+  if (!input) return [];
 
-  const trimmedInput = input.trim()
-  const validEmailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+  const trimmedInput = input.trim();
+  const validEmailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
   const wrappedEmailRegex =
-    /^(.*?)\s*(?:<\s*([^<>@\s]+@[^<>\s]+)\s*>|\(\s*([^()@\s]+@[^()\s]+)\s*\))$/
+    /^(.*?)\s*(?:<\s*([^<>@\s]+@[^<>\s]+)\s*>|\(\s*([^()@\s]+@[^()\s]+)\s*\))$/;
 
   // Handles both: "Author Name <author@email.com>" and "Author Name (author@email.com)".
-  const wrappedEmailMatch = trimmedInput.match(wrappedEmailRegex)
+  const wrappedEmailMatch = trimmedInput.match(wrappedEmailRegex);
   if (wrappedEmailMatch) {
-    const authorName = wrappedEmailMatch[1].trim()
-    const email = (wrappedEmailMatch[2] || wrappedEmailMatch[3] || '').trim()
+    const authorName = wrappedEmailMatch[1].trim();
+    const email = (wrappedEmailMatch[2] || wrappedEmailMatch[3] || '').trim();
 
     if (validEmailRegex.test(email)) {
       return [
@@ -33,7 +33,7 @@ const segments = computed<Segment[]>(() => {
           email,
           isLinked: true,
         },
-      ]
+      ];
     }
 
     // For invalid bracketed emails (e.g. user@localhost), keep only the name.
@@ -43,7 +43,7 @@ const segments = computed<Segment[]>(() => {
         email: '',
         isLinked: false,
       },
-    ]
+    ];
   }
 
   // Fallback: the entire input is a plain email address.
@@ -54,7 +54,7 @@ const segments = computed<Segment[]>(() => {
         email: trimmedInput,
         isLinked: true,
       },
-    ]
+    ];
   }
 
   return [
@@ -63,8 +63,8 @@ const segments = computed<Segment[]>(() => {
       email: '',
       isLinked: false,
     },
-  ]
-})
+  ];
+});
 </script>
 
 <template>

@@ -1,4 +1,4 @@
-import type { ExposureInfo } from '@/types/exposure'
+import type { ExposureInfo } from '@/types/exposure';
 
 export const mockExposureInfo: ExposureInfo = {
   exposure: {
@@ -368,7 +368,7 @@ export const mockExposureInfo: ExposureInfo = {
     exposures: null,
   },
   workspace_alias: 'baylor_hollingworth_chandler_2002',
-}
+};
 
 export const mockMetadata = {
   citation_bibliographicCitation: 'Journal of General Physiology',
@@ -418,7 +418,7 @@ export const mockMetadata = {
       issued: '2002-09-01',
     },
   ],
-}
+};
 
 export const mockGeneratedCode = `
 /*
@@ -457,4 +457,4 @@ void
 computeVariables(double VOI, double* CONSTANTS, double* RATES, double* STATES, double* ALGEBRAIC)
 {
 }
-`
+`;

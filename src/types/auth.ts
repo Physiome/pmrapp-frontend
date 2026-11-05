@@ -1,14 +1,14 @@
 export interface LoginCredentials {
-  login: string
-  password: string
+  login: string;
+  password: string;
 }
 
 export interface GitHubAuthData {
-  token: string
-  username: string
-  name: string
-  email: string
-  avatar_url: string
+  token: string;
+  username: string;
+  name: string;
+  email: string;
+  avatar_url: string;
 }
 
 /**
@@ -16,6 +16,6 @@ export interface GitHubAuthData {
  * The `exp` value is a Unix timestamp (seconds since epoch).
  */
 export interface JwtPayload {
-  exp: number
-  [key: string]: unknown
+  exp: number;
+  [key: string]: unknown;
 }

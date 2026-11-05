@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Keycap from '@/components/atoms/Keycap.vue'
-import { formatSearchKey } from '@/utils/format'
+import Keycap from '@/components/atoms/Keycap.vue';
+import { formatSearchKey } from '@/utils/format';
 
-withDefaults(defineProps<{ query: string; suffix?: string }>(), { suffix: '' })
+withDefaults(defineProps<{ query: string; suffix?: string }>(), { suffix: '' });
 </script>
 
 <template>

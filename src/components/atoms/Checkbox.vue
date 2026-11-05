@@ -1,22 +1,22 @@
 <script setup lang="ts">
 interface Props {
-  modelValue?: boolean
-  disabled?: boolean
+  modelValue?: boolean;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   disabled: false,
-})
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-}>()
+  'update:modelValue': [value: boolean];
+}>();
 
 const toggle = () => {
-  if (props.disabled) return
-  emit('update:modelValue', !props.modelValue)
-}
+  if (props.disabled) return;
+  emit('update:modelValue', !props.modelValue);
+};
 </script>
 
 <template>

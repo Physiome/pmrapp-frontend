@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import Papa from 'papaparse'
-import { computed, onMounted, ref } from 'vue'
-import LoadingBox from '@/components/atoms/LoadingBox.vue'
-import CheckmarkIcon from '@/components/icons/CheckmarkIcon.vue'
-import CrossIcon from '@/components/icons/CrossIcon.vue'
-import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
+import Papa from 'papaparse';
+import { computed, onMounted, ref } from 'vue';
+import LoadingBox from '@/components/atoms/LoadingBox.vue';
+import CheckmarkIcon from '@/components/icons/CheckmarkIcon.vue';
+import CrossIcon from '@/components/icons/CrossIcon.vue';
+import ErrorBlock from '@/components/molecules/ErrorBlock.vue';
 import type {
   ComparisonRow,
   ParseCompleteResults,
   ParseErrorEvent,
-} from '@/types/featureComparison'
+} from '@/types/featureComparison';
 
 interface ComparisonGroup {
-  title: string
-  rows: ComparisonRow[]
+  title: string;
+  rows: ComparisonRow[];
 }
 
-const tableData = ref<ComparisonRow[]>([])
-const tableHeaders = ref<string[]>([])
-const isLoading = ref(true)
-const errorMessage = ref('')
+const tableData = ref<ComparisonRow[]>([]);
+const tableHeaders = ref<string[]>([]);
+const isLoading = ref(true);
+const errorMessage = ref('');
 
-const SHEET_CSV_URL = import.meta.env.VITE_FEATURE_COMPARISON_SHEET_CSV_URL
+const SHEET_CSV_URL = import.meta.env.VITE_FEATURE_COMPARISON_SHEET_CSV_URL;
 
 if (!SHEET_CSV_URL) {
-  errorMessage.value = 'Feature comparison data URL is not configured.'
+  errorMessage.value = 'Feature comparison data URL is not configured.';
 }
 
 const headerRowClasses = [
@@ -34,7 +34,7 @@ const headerRowClasses = [
   'flex items-center gap-4',
   'bg-gray-50 dark:bg-gray-800',
   'rounded-t-lg border-b border-gray-200 dark:border-gray-700',
-]
+];
 
 const categoryTitleClasses = [
   'category-title',
@@ -42,7 +42,7 @@ const categoryTitleClasses = [
   'px-4 py-3',
   'bg-gray-100 dark:bg-gray-700',
   'border-t border-gray-200 dark:border-gray-700 -mt-[1px]',
-]
+];
 
 /**
  * The name of the column that holds the feature/category title.
@@ -51,7 +51,7 @@ const categoryTitleClasses = [
  */
 const featureColumn = computed(() =>
   tableHeaders.value.find((header: string) => header.toLowerCase() === 'feature'),
-)
+);
 
 /**
  * Defines the relative widths of the table columns.
@@ -63,13 +63,13 @@ const gridTemplateColumns = computed(() =>
   tableHeaders.value
     .map((header: string, index: number) => {
       if (header === featureColumn.value) {
-        return '1fr'
+        return '1fr';
       }
       // The last column is given a wider width than the middle icon columns.
-      return index === tableHeaders.value.length - 1 ? '1fr' : '0.5fr'
+      return index === tableHeaders.value.length - 1 ? '1fr' : '0.5fr';
     })
     .join(' '),
-)
+);
 
 /**
  * The set of middle columns (neither the feature column nor the last column)
@@ -80,7 +80,7 @@ const iconColumns = computed(() =>
     (header: string, index: number) =>
       header !== featureColumn.value && index !== tableHeaders.value.length - 1,
   ),
-)
+);
 
 /**
  * Groups the parsed rows by category. Rows with an integer id (e.g. 1, 2)
@@ -89,38 +89,38 @@ const iconColumns = computed(() =>
  * Rows without an id (all-null rows) are stripped out.
  */
 const groupedData = computed<ComparisonGroup[]>(() => {
-  const groups: ComparisonGroup[] = []
-  let currentGroup: ComparisonGroup | null = null
+  const groups: ComparisonGroup[] = [];
+  let currentGroup: ComparisonGroup | null = null;
 
   for (const row of tableData.value) {
-    const id = row.id
+    const id = row.id;
 
     // Skip rows without an id, such as the all-null separator rows.
     if (id === null || id === undefined || id === '') {
-      continue
+      continue;
     }
 
-    const numericId = Number(id)
+    const numericId = Number(id);
     if (Number.isInteger(numericId)) {
       // This row is a category group title.
       currentGroup = {
         title: featureColumn.value ? String(row[featureColumn.value] ?? '') : '',
         rows: [],
-      }
-      groups.push(currentGroup)
+      };
+      groups.push(currentGroup);
     } else if (currentGroup) {
       // This row belongs to the current category group.
-      currentGroup.rows.push(row)
+      currentGroup.rows.push(row);
     }
   }
 
-  return groups
-})
+  return groups;
+});
 
 onMounted(() => {
   if (!SHEET_CSV_URL) {
-    isLoading.value = false
-    return
+    isLoading.value = false;
+    return;
   }
 
   Papa.parse(SHEET_CSV_URL, {
@@ -129,17 +129,17 @@ onMounted(() => {
     dynamicTyping: true,
     skipEmptyLines: true,
     complete: (results: ParseCompleteResults) => {
-      tableData.value = results.data
-      tableHeaders.value = results.meta.fields?.filter((header: string) => header !== 'id') ?? []
-      isLoading.value = false
+      tableData.value = results.data;
+      tableHeaders.value = results.meta.fields?.filter((header: string) => header !== 'id') ?? [];
+      isLoading.value = false;
     },
     error: (error: ParseErrorEvent) => {
-      console.error('Error fetching sheet:', error)
-      errorMessage.value = 'Failed to load comparison data.'
-      isLoading.value = false
+      console.error('Error fetching sheet:', error);
+      errorMessage.value = 'Failed to load comparison data.';
+      isLoading.value = false;
     },
-  })
-})
+  });
+});
 </script>
 
 <template>

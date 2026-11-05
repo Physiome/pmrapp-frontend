@@ -1,18 +1,18 @@
-import { flushPromises, mount } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick } from 'vue'
-import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
-import ExposureDetail from '@/components/organisms/ExposureDetail.vue'
-import { TITLE } from '@/constants/global'
-import { mockExposureInfo, mockGeneratedCode, mockMetadata } from '@/mocks/exposureInfo'
-import { useExposureStore } from '@/stores/exposure'
-import { useSearchStore } from '@/stores/search'
+import { flushPromises, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue';
+import ExposureDetail from '@/components/organisms/ExposureDetail.vue';
+import { TITLE } from '@/constants/global';
+import { mockExposureInfo, mockGeneratedCode, mockMetadata } from '@/mocks/exposureInfo';
+import { useExposureStore } from '@/stores/exposure';
+import { useSearchStore } from '@/stores/search';
 
 const { mockRouterPush, mockRouterReplace } = vi.hoisted(() => ({
   mockRouterPush: vi.fn(),
   mockRouterReplace: vi.fn(),
-}))
+}));
 
 // Mock Vue Router.
 vi.mock('vue-router', () => ({
@@ -30,23 +30,23 @@ vi.mock('vue-router', () => ({
       },
     },
   }),
-}))
+}));
 
 // Mock analytics.
 vi.mock('@/utils/analytics', () => ({
   trackButtonClick: vi.fn(),
-}))
+}));
 
 // Mock MathML transformer to avoid loading the vendored polyfill bundle in tests.
 vi.mock('@/utils/mathTransformer', () => ({
   initMathPolyfills: vi.fn().mockResolvedValue(undefined),
   transformMathString: (s: string) => s,
   formatMathMLTable: (s: string) => s,
-}))
+}));
 
 describe('ExposureDetail', () => {
-  let exposureStore: ReturnType<typeof useExposureStore>
-  let searchStore: ReturnType<typeof useSearchStore>
+  let exposureStore: ReturnType<typeof useExposureStore>;
+  let searchStore: ReturnType<typeof useSearchStore>;
 
   const mountComponent = async ({
     props = {},
@@ -59,35 +59,35 @@ describe('ExposureDetail', () => {
     loadLicence = async () => 'https://creativecommons.org/licenses/by/3.0/',
   }: {
     props?: Partial<{
-      alias: string
-      file: string
-      view: string
-      lang: string
-    }>
-    stubs?: Record<string, unknown>
-    generatedCode?: string
-    mathsJSON?: string
-    exposureInfo?: typeof mockExposureInfo
-    loadHTML?: () => Promise<string>
-    loadMetadata?: () => Promise<string>
-    loadLicence?: () => Promise<string>
+      alias: string;
+      file: string;
+      view: string;
+      lang: string;
+    }>;
+    stubs?: Record<string, unknown>;
+    generatedCode?: string;
+    mathsJSON?: string;
+    exposureInfo?: typeof mockExposureInfo;
+    loadHTML?: () => Promise<string>;
+    loadMetadata?: () => Promise<string>;
+    loadLicence?: () => Promise<string>;
   } = {}) => {
-    vi.spyOn(exposureStore, 'getExposureInfo').mockResolvedValue(exposureInfo)
+    vi.spyOn(exposureStore, 'getExposureInfo').mockResolvedValue(exposureInfo);
     vi.spyOn(exposureStore, 'getExposureSafeHTML').mockImplementation(
       async (_id, _fileId, _view, filename) => {
-        if (filename === 'index.html') return loadHTML()
-        if (filename === 'license.txt') return loadLicence()
-        return ''
+        if (filename === 'index.html') return loadHTML();
+        if (filename === 'license.txt') return loadLicence();
+        return '';
       },
-    )
+    );
     vi.spyOn(exposureStore, 'getExposureRawContent').mockImplementation(
       async (_id, _fileId, _view, filename) => {
-        if (filename === 'cmeta.json') return loadMetadata()
-        if (filename === 'math.json') return mathsJSON
-        if (filename.startsWith('code.')) return generatedCode
-        return ''
+        if (filename === 'cmeta.json') return loadMetadata();
+        if (filename === 'math.json') return mathsJSON;
+        if (filename.startsWith('code.')) return generatedCode;
+        return '';
       },
-    )
+    );
     // Mock search results for other related models.
     vi.spyOn(searchStore, 'searchIndexTerm').mockResolvedValue([
       {
@@ -104,7 +104,7 @@ describe('ExposureDetail', () => {
           model_author: [],
         },
       },
-    ])
+    ]);
 
     const wrapper = mount(ExposureDetail, {
       props: {
@@ -129,23 +129,23 @@ describe('ExposureDetail', () => {
           ...stubs,
         },
       },
-    })
+    });
 
-    await flushPromises()
-    await nextTick()
+    await flushPromises();
+    await nextTick();
 
-    return wrapper
-  }
+    return wrapper;
+  };
 
   beforeEach(() => {
-    setActivePinia(createPinia())
-    exposureStore = useExposureStore()
-    searchStore = useSearchStore()
-    vi.clearAllMocks()
-  })
+    setActivePinia(createPinia());
+    exposureStore = useExposureStore();
+    searchStore = useSearchStore();
+    vi.clearAllMocks();
+  });
 
   const mountWithError = async (errorMessage: string) => {
-    vi.spyOn(exposureStore, 'getExposureInfo').mockRejectedValue(new Error(errorMessage))
+    vi.spyOn(exposureStore, 'getExposureInfo').mockRejectedValue(new Error(errorMessage));
 
     const wrapper = mount(ExposureDetail, {
       props: {
@@ -168,74 +168,74 @@ describe('ExposureDetail', () => {
           FileIcon: true,
         },
       },
-    })
+    });
 
-    await flushPromises()
-    await nextTick()
+    await flushPromises();
+    await nextTick();
 
-    return wrapper
-  }
+    return wrapper;
+  };
 
   it('shows "Exposure not found" error when getExposureInfo rejects with a not-found message', async () => {
-    const wrapper = await mountWithError('Exposure not found')
+    const wrapper = await mountWithError('Exposure not found');
 
-    const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' })
-    expect(errorBlock.exists()).toBe(true)
-    expect(errorBlock.attributes('title')).toBe('Exposure not found')
+    const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' });
+    expect(errorBlock.exists()).toBe(true);
+    expect(errorBlock.attributes('title')).toBe('Exposure not found');
     expect(errorBlock.attributes('error')).toBe(
       'The exposure you are looking for does not exist or has been removed.',
-    )
-  })
+    );
+  });
 
   it('shows generic load error when getExposureInfo rejects with an unexpected error', async () => {
-    const wrapper = await mountWithError('Network timeout')
+    const wrapper = await mountWithError('Network timeout');
 
-    const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' })
-    expect(errorBlock.exists()).toBe(true)
-    expect(errorBlock.attributes('title')).toBe('Error loading exposure')
-    expect(errorBlock.attributes('error')).toBe('Network timeout')
-  })
+    const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' });
+    expect(errorBlock.exists()).toBe(true);
+    expect(errorBlock.attributes('title')).toBe('Error loading exposure');
+    expect(errorBlock.attributes('error')).toBe('Network timeout');
+  });
 
   it('renders title with correct description', async () => {
-    const wrapper = await mountComponent()
-    const titleText = mockExposureInfo.exposure.description
+    const wrapper = await mountComponent();
+    const titleText = mockExposureInfo.exposure.description;
 
-    const title = wrapper.find('h1')
-    expect(title.exists()).toBe(true)
-    expect(title.text()).toBe(`${titleText}`)
-  })
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(true);
+    expect(title.text()).toBe(`${titleText}`);
+  });
 
   describe('breadcrumbs', () => {
-    const file = 'baylor_hollingworth_chandler_2002_a.cellml'
+    const file = 'baylor_hollingworth_chandler_2002_a.cellml';
 
     it('starts and ends at the exposure on the exposure page', async () => {
-      const wrapper = await mountComponent()
+      const wrapper = await mountComponent();
 
       expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
         { label: mockExposureInfo.exposure.description, to: undefined, loading: false },
-      ])
-    })
+      ]);
+    });
 
     it('renders no breadcrumb until the exposure loads', async () => {
-      vi.spyOn(exposureStore, 'getExposureInfo').mockReturnValue(new Promise(() => {}))
+      vi.spyOn(exposureStore, 'getExposureInfo').mockReturnValue(new Promise(() => {}));
 
       const wrapper = mount(ExposureDetail, {
         props: { alias: 'test-alias', file: '', view: '' },
         global: { stubs: { BreadcrumbsBar: true, LoadingBox: true } },
-      })
-      await nextTick()
+      });
+      await nextTick();
 
-      expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false)
-    })
+      expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false);
+    });
 
     it('renders no breadcrumb when the exposure fails to load', async () => {
-      const wrapper = await mountWithError('Exposure not found')
+      const wrapper = await mountWithError('Exposure not found');
 
-      expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false)
-    })
+      expect(wrapper.findComponent(BreadcrumbsBar).exists()).toBe(false);
+    });
 
     it('ends at the file on a file page', async () => {
-      const wrapper = await mountComponent({ props: { file } })
+      const wrapper = await mountComponent({ props: { file } });
 
       expect(wrapper.findComponent(BreadcrumbsBar).props('items')).toEqual([
         {
@@ -244,40 +244,40 @@ describe('ExposureDetail', () => {
           loading: false,
         },
         { label: file, to: undefined },
-      ])
-    })
+      ]);
+    });
 
     it('ends at the view name on a file view page', async () => {
-      const wrapper = await mountComponent({ props: { file, view: 'cellml_math' } })
+      const wrapper = await mountComponent({ props: { file, view: 'cellml_math' } });
 
-      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
-      expect(items).toHaveLength(3)
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items');
+      expect(items).toHaveLength(3);
       expect(items[1]).toEqual({
         label: file,
         to: `/exposure/${mockExposureInfo.exposure_alias}/${file}/`,
-      })
-      expect(items[2]).toEqual({ label: 'Mathematics' })
-    })
+      });
+      expect(items[2]).toEqual({ label: 'Mathematics' });
+    });
 
     it('encodes special characters in the file link but keeps folder separators', async () => {
-      const specialFile = 'sub dir/model#v2?x%.cellml'
-      const wrapper = await mountComponent({ props: { file: specialFile, view: 'cellml_math' } })
+      const specialFile = 'sub dir/model#v2?x%.cellml';
+      const wrapper = await mountComponent({ props: { file: specialFile, view: 'cellml_math' } });
 
-      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items');
       expect(items[1]).toEqual({
         label: specialFile,
         to: `/exposure/${mockExposureInfo.exposure_alias}/sub%20dir/model%23v2%3Fx%25.cellml/`,
-      })
-    })
+      });
+    });
 
     it('does not add a crumb for the default file view', async () => {
-      const wrapper = await mountComponent({ props: { file, view: 'view' } })
+      const wrapper = await mountComponent({ props: { file, view: 'view' } });
 
-      const items = wrapper.findComponent(BreadcrumbsBar).props('items')
-      expect(items).toHaveLength(2)
-      expect(items[1]).toEqual({ label: file, to: undefined })
-    })
-  })
+      const items = wrapper.findComponent(BreadcrumbsBar).props('items');
+      expect(items).toHaveLength(2);
+      expect(items[1]).toEqual({ label: file, to: undefined });
+    });
+  });
 
   it('shows "Generate code" as page title when codegen view is active', async () => {
     const wrapper = await mountComponent({
@@ -285,46 +285,46 @@ describe('ExposureDetail', () => {
         view: 'cellml_codegen',
       },
       generatedCode: mockGeneratedCode,
-    })
+    });
 
-    const title = wrapper.find('h1')
-    expect(title.exists()).toBe(true)
-    expect(title.text()).toBe('Generate code')
-  })
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(true);
+    expect(title.text()).toBe('Generate code');
+  });
 
   it('shows "Mathematics" as page title when math view is active', async () => {
     const wrapper = await mountComponent({
       props: {
         view: 'cellml_math',
       },
-    })
+    });
 
-    const title = wrapper.find('h1')
-    expect(title.exists()).toBe(true)
-    expect(title.text()).toBe('Mathematics')
-  })
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(true);
+    expect(title.text()).toBe('Mathematics');
+  });
 
   it('uses model_title from metadata as the citation title', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Citation')
+      .find((heading) => heading.text().trim() === 'Citation');
 
-    expect(sectionHeading?.exists()).toBe(true)
+    expect(sectionHeading?.exists()).toBe(true);
 
-    const citationSection = sectionHeading?.element.closest('section')
-    expect(citationSection).toBeDefined()
+    const citationSection = sectionHeading?.element.closest('section');
+    expect(citationSection).toBeDefined();
 
-    const citationBlock = citationSection?.querySelector('.group')
-    expect(citationBlock).toBeDefined()
+    const citationBlock = citationSection?.querySelector('.group');
+    expect(citationBlock).toBeDefined();
 
     // citationTitle returns metadataJSON.model_title when metadata is loaded.
-    expect(citationBlock?.textContent).toContain(mockMetadata.model_title)
-  })
+    expect(citationBlock?.textContent).toContain(mockMetadata.model_title);
+  });
 
   it('uses loaded file title from search results as the page title', async () => {
-    const fileTitle = mockMetadata.model_title
+    const fileTitle = mockMetadata.model_title;
 
     vi.spyOn(searchStore, 'searchQuery').mockResolvedValue([
       {
@@ -342,30 +342,30 @@ describe('ExposureDetail', () => {
           model_author: [],
         },
       },
-    ])
+    ]);
 
     const wrapper = await mountComponent({
       props: {
         file: 'baylor_hollingworth_chandler_2002_a.cellml',
       },
-    })
+    });
 
-    const title = wrapper.find('h1')
-    expect(title.exists()).toBe(true)
-    expect(title.text()).toBe(fileTitle)
-    expect(title.text()).toContain('Reaction A')
-  })
+    const title = wrapper.find('h1');
+    expect(title.exists()).toBe(true);
+    expect(title.text()).toBe(fileTitle);
+    expect(title.text()).toContain('Reaction A');
+  });
 
   it('renders html-view with content', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
-    const htmlView = wrapper.find('.html-view')
-    expect(htmlView.exists()).toBe(true)
+    const htmlView = wrapper.find('.html-view');
+    expect(htmlView.exists()).toBe(true);
 
-    const modelStatusHeading = htmlView.find('h4')
-    expect(modelStatusHeading.exists()).toBe(true)
-    expect(modelStatusHeading.text()).toBe('Model Status')
-  })
+    const modelStatusHeading = htmlView.find('h4');
+    expect(modelStatusHeading.exists()).toBe(true);
+    expect(modelStatusHeading.text()).toBe('Model Status');
+  });
 
   it('loads the default generated code when the codegen view is opened', async () => {
     const wrapper = await mountComponent({
@@ -390,40 +390,40 @@ describe('ExposureDetail', () => {
           template: '<button class="copy-button-stub">Copy</button>',
         },
       },
-    })
+    });
 
     expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
       mockExposureInfo.exposure.id,
       mockExposureInfo.exposure.files?.[0]?.id ?? 598,
       'cellml_codegen',
       'code.C.c',
-    )
+    );
 
-    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' })
-    expect(codeBlock.exists()).toBe(true)
-    expect(codeBlock.props('code')).toBe(mockGeneratedCode)
-    expect(codeBlock.props('filename')).toBe('code.c')
+    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
+    expect(codeBlock.exists()).toBe(true);
+    expect(codeBlock.props('code')).toBe(mockGeneratedCode);
+    expect(codeBlock.props('filename')).toBe('code.c');
 
-    const codegenView = wrapper.find('article > div.relative')
-    expect(codegenView.exists()).toBe(true)
+    const codegenView = wrapper.find('article > div.relative');
+    expect(codegenView.exists()).toBe(true);
 
-    const wrapButton = codegenView.findComponent({ name: 'WrapButton' })
-    expect(wrapButton.exists()).toBe(true)
-    expect(wrapButton.props('active')).toBeFalsy()
+    const wrapButton = codegenView.findComponent({ name: 'WrapButton' });
+    expect(wrapButton.exists()).toBe(true);
+    expect(wrapButton.props('active')).toBeFalsy();
 
-    const copyButton = codegenView.findComponent({ name: 'CopyButton' })
-    expect(copyButton.exists()).toBe(true)
-    expect(copyButton.props('text')).toBe(mockGeneratedCode)
-    expect(copyButton.props('title')).toBe('Copy code')
+    const copyButton = codegenView.findComponent({ name: 'CopyButton' });
+    expect(copyButton.exists()).toBe(true);
+    expect(copyButton.props('text')).toBe(mockGeneratedCode);
+    expect(copyButton.props('title')).toBe('Copy code');
 
-    const downloadButton = codegenView.find('button[aria-label^="Download"]')
-    expect(downloadButton.exists()).toBe(true)
+    const downloadButton = codegenView.find('button[aria-label^="Download"]');
+    expect(downloadButton.exists()).toBe(true);
 
-    const srOnlyText = downloadButton.find('.sr-only')
-    expect(srOnlyText.exists()).toBe(true)
-    expect(downloadButton.attributes('aria-label')).toBe(srOnlyText.text())
-    expect(srOnlyText.text()).toContain('Download')
-  })
+    const srOnlyText = downloadButton.find('.sr-only');
+    expect(srOnlyText.exists()).toBe(true);
+    expect(downloadButton.attributes('aria-label')).toBe(srOnlyText.text());
+    expect(srOnlyText.text()).toContain('Download');
+  });
 
   it('loads generated code for a non-default language from the URL lang param', async () => {
     const wrapper = await mountComponent({
@@ -439,30 +439,30 @@ describe('ExposureDetail', () => {
           template: '<div class="code-block-stub" />',
         },
       },
-    })
+    });
 
     expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
       mockExposureInfo.exposure.id,
       mockExposureInfo.exposure.files?.[0]?.id ?? 598,
       'cellml_codegen',
       'code.Python.py',
-    )
+    );
     expect(exposureStore.getExposureRawContent).not.toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       'cellml_codegen',
       'code.C.c',
-    )
+    );
 
-    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' })
-    expect(codeBlock.exists()).toBe(true)
-    expect(codeBlock.props('code')).toBe(mockGeneratedCode)
-    expect(codeBlock.props('filename')).toBe('code.py')
+    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
+    expect(codeBlock.exists()).toBe(true);
+    expect(codeBlock.props('code')).toBe(mockGeneratedCode);
+    expect(codeBlock.props('filename')).toBe('code.py');
 
     const pythonButton = wrapper
       .findAllComponents({ name: 'ActionButton' })
-      .find((button) => button.text().trim() === 'Python')
-    expect(pythonButton?.props('variant')).toBe('primary')
+      .find((button) => button.text().trim() === 'Python');
+    expect(pythonButton?.props('variant')).toBe('primary');
 
     expect(mockRouterReplace).toHaveBeenCalledWith({
       name: 'exposure-file-detail-view-lang',
@@ -473,8 +473,8 @@ describe('ExposureDetail', () => {
         lang: 'Python',
       },
       query: {},
-    })
-  })
+    });
+  });
 
   it('navigates and fetches code when a language button is clicked', async () => {
     const wrapper = await mountComponent({
@@ -489,21 +489,21 @@ describe('ExposureDetail', () => {
           template: '<div class="code-block-stub" />',
         },
       },
-    })
+    });
 
     expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
       mockExposureInfo.exposure.id,
       mockExposureInfo.exposure.files?.[0]?.id ?? 598,
       'cellml_codegen',
       'code.C.c',
-    )
+    );
 
     const pythonButton = wrapper
       .findAllComponents({ name: 'ActionButton' })
-      .find((button) => button.text().trim() === 'Python')
-    expect(pythonButton).toBeDefined()
+      .find((button) => button.text().trim() === 'Python');
+    expect(pythonButton).toBeDefined();
 
-    await pythonButton?.trigger('click')
+    await pythonButton?.trigger('click');
 
     expect(mockRouterPush).toHaveBeenCalledWith({
       name: 'exposure-file-detail-view-lang',
@@ -514,24 +514,24 @@ describe('ExposureDetail', () => {
         lang: 'Python',
       },
       query: {},
-    })
+    });
 
     // Simulate the route param update that follows a successful navigation.
-    await wrapper.setProps({ lang: 'Python' })
-    await flushPromises()
-    await nextTick()
+    await wrapper.setProps({ lang: 'Python' });
+    await flushPromises();
+    await nextTick();
 
     expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
       mockExposureInfo.exposure.id,
       mockExposureInfo.exposure.files?.[0]?.id ?? 598,
       'cellml_codegen',
       'code.Python.py',
-    )
+    );
 
-    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' })
-    expect(codeBlock.props('filename')).toBe('code.py')
-    expect(pythonButton?.props('variant')).toBe('primary')
-  })
+    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
+    expect(codeBlock.props('filename')).toBe('code.py');
+    expect(pythonButton?.props('variant')).toBe('primary');
+  });
 
   it('toggles wrap active state when clicking the wrap button in codegen view', async () => {
     const wrapper = await mountComponent({
@@ -552,20 +552,20 @@ describe('ExposureDetail', () => {
           template: '<button class="wrap-button-stub" @click="$emit(\'click\')">Wrap</button>',
         },
       },
-    })
+    });
 
-    const wrapButtonComponent = wrapper.findComponent({ name: 'WrapButton' })
-    expect(wrapButtonComponent.exists()).toBe(true)
-    expect(wrapButtonComponent.props('active')).toBe(false)
+    const wrapButtonComponent = wrapper.findComponent({ name: 'WrapButton' });
+    expect(wrapButtonComponent.exists()).toBe(true);
+    expect(wrapButtonComponent.props('active')).toBe(false);
 
     // Click to enable wrap.
-    await wrapButtonComponent.trigger('click')
-    expect(wrapButtonComponent.props('active')).toBe(true)
+    await wrapButtonComponent.trigger('click');
+    expect(wrapButtonComponent.props('active')).toBe(true);
 
     // Click to disable wrap.
-    await wrapButtonComponent.trigger('click')
-    expect(wrapButtonComponent.props('active')).toBe(false)
-  })
+    await wrapButtonComponent.trigger('click');
+    expect(wrapButtonComponent.props('active')).toBe(false);
+  });
 
   it('renders WorkspaceFileBrowser with the exposure workspace and commit', async () => {
     const wrapper = await mountComponent({
@@ -576,153 +576,153 @@ describe('ExposureDetail', () => {
           template: '<div class="workspace-file-browser-stub" />',
         },
       },
-    })
+    });
 
-    const fileBrowser = wrapper.findComponent({ name: 'WorkspaceFileBrowser' })
-    expect(fileBrowser.exists()).toBe(true)
-    expect(fileBrowser.props('alias')).toBe(mockExposureInfo.workspace_alias)
-    expect(fileBrowser.props('commitId')).toBe(mockExposureInfo.exposure.commit_id)
-    expect(fileBrowser.props('path')).toBeUndefined()
-    expect(typeof fileBrowser.props('onFolderClick')).toBe('function')
-    expect(typeof fileBrowser.props('onPathChange')).toBe('function')
-  })
+    const fileBrowser = wrapper.findComponent({ name: 'WorkspaceFileBrowser' });
+    expect(fileBrowser.exists()).toBe(true);
+    expect(fileBrowser.props('alias')).toBe(mockExposureInfo.workspace_alias);
+    expect(fileBrowser.props('commitId')).toBe(mockExposureInfo.exposure.commit_id);
+    expect(fileBrowser.props('path')).toBeUndefined();
+    expect(typeof fileBrowser.props('onFolderClick')).toBe('function');
+    expect(typeof fileBrowser.props('onPathChange')).toBe('function');
+  });
 
   it('renders "Source" section with correct content', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Source')
+      .find((heading) => heading.text().trim() === 'Source');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Source')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Source');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling?.textContent
-    expect(sectionContent).toContain('Baylor, Hollingworth, Chandler, 2002')
-    expect(sectionContent).toContain('29a94f9c5718')
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling?.textContent;
+    expect(sectionContent).toContain('Baylor, Hollingworth, Chandler, 2002');
+    expect(sectionContent).toContain('29a94f9c5718');
+  });
 
   it('renders "About" section with correct content', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'About')
+      .find((heading) => heading.text().trim() === 'About');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('About')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('About');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling?.textContent
-    expect(sectionContent).toContain('Comparison of Simulated and Measured Calcium Sparks')
-    expect(sectionContent).toContain('in Intact Skeletal Muscle Fibers of the Frog')
-    expect(sectionContent).toContain('Catherine Lloyd')
-    expect(sectionContent).toContain('Auckland Bioengineering Institute')
-    expect(sectionContent).toContain('The University of Auckland')
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling?.textContent;
+    expect(sectionContent).toContain('Comparison of Simulated and Measured Calcium Sparks');
+    expect(sectionContent).toContain('in Intact Skeletal Muscle Fibers of the Frog');
+    expect(sectionContent).toContain('Catherine Lloyd');
+    expect(sectionContent).toContain('Auckland Bioengineering Institute');
+    expect(sectionContent).toContain('The University of Auckland');
+  });
 
   it('renders "Citation" section with model citation content', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Citation')
+      .find((heading) => heading.text().trim() === 'Citation');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Citation')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Citation');
 
-    const citationSection = sectionHeading?.element.closest('section')
-    expect(citationSection).toBeDefined()
+    const citationSection = sectionHeading?.element.closest('section');
+    expect(citationSection).toBeDefined();
 
-    const citationBlock = citationSection?.querySelector('.group')
-    expect(citationBlock).toBeDefined()
-    expect(citationBlock?.textContent).toContain('Lloyd, C.')
+    const citationBlock = citationSection?.querySelector('.group');
+    expect(citationBlock).toBeDefined();
+    expect(citationBlock?.textContent).toContain('Lloyd, C.');
     expect(citationBlock?.textContent).toContain(
       'Comparison of Simulated and Measured Calcium Sparks in Intact Skeletal Muscle Fibers of the Frog (Reaction A)',
-    )
-    expect(citationBlock?.textContent).toContain(TITLE)
-  })
+    );
+    expect(citationBlock?.textContent).toContain(TITLE);
+  });
 
   it('renders "Keywords" section with correct content', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Keywords')
+      .find((heading) => heading.text().trim() === 'Keywords');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Keywords')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Keywords');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling
-    const keywordButtons = sectionContent?.querySelectorAll('button')
-    expect(keywordButtons).toHaveLength(2)
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling;
+    const keywordButtons = sectionContent?.querySelectorAll('button');
+    expect(keywordButtons).toHaveLength(2);
+  });
 
   it('renders "Views available" section', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Views available')
+      .find((heading) => heading.text().trim() === 'Views available');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Views available')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Views available');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling
-    const viewItems = sectionContent?.querySelectorAll('li')
-    expect(viewItems).toHaveLength(3)
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling;
+    const viewItems = sectionContent?.querySelectorAll('li');
+    expect(viewItems).toHaveLength(3);
+  });
 
   it('renders "Open with OpenCOR\'s Web app" link that opens in new tab', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const openCorLink = wrapper
       .findAll('a')
-      .find((link) => link.text().trim() === "Open with OpenCOR's Web app")
+      .find((link) => link.text().trim() === "Open with OpenCOR's Web app");
 
-    expect(openCorLink?.exists()).toBe(true)
-    expect(openCorLink?.attributes('target')).toBe('_blank')
-    expect(openCorLink?.attributes('rel')).toBe('noopener noreferrer')
-  })
+    expect(openCorLink?.exists()).toBe(true);
+    expect(openCorLink?.attributes('target')).toBe('_blank');
+    expect(openCorLink?.attributes('rel')).toBe('noopener noreferrer');
+  });
 
   describe('buildOpenCORURL', () => {
     it('builds an openFiles OpenCOR web URL when multiple OpenCOR files are available', async () => {
-      const wrapper = await mountComponent()
+      const wrapper = await mountComponent();
 
       const openCorLink = wrapper
         .findAll('a')
-        .find((link) => link.text().trim() === "Open with OpenCOR's Web app")
+        .find((link) => link.text().trim() === "Open with OpenCOR's Web app");
 
-      expect(openCorLink?.exists()).toBe(true)
+      expect(openCorLink?.exists()).toBe(true);
 
-      const href = openCorLink?.attributes('href')
-      expect(href).toBeTruthy()
-      expect(href).toContain('//opencor.ws/app/?opencor://openFiles/')
-      expect(href).toContain('baylor_hollingworth_chandler_2002_a.cellml')
-      expect(href).toContain('%7C')
-      expect(href).toContain('baylor_hollingworth_chandler_2002_f.cellml')
-    })
+      const href = openCorLink?.attributes('href');
+      expect(href).toBeTruthy();
+      expect(href).toContain('//opencor.ws/app/?opencor://openFiles/');
+      expect(href).toContain('baylor_hollingworth_chandler_2002_a.cellml');
+      expect(href).toContain('%7C');
+      expect(href).toContain('baylor_hollingworth_chandler_2002_f.cellml');
+    });
 
     it('builds an openFile OpenCOR web URL for the selected .cellml route file', async () => {
-      const selectedFile = 'baylor_hollingworth_chandler_2002_c.cellml'
+      const selectedFile = 'baylor_hollingworth_chandler_2002_c.cellml';
       const wrapper = await mountComponent({
         props: {
           file: selectedFile,
         },
-      })
+      });
 
       const openCorLink = wrapper
         .findAll('a')
-        .find((link) => link.text().trim() === "Open with OpenCOR's Web app")
+        .find((link) => link.text().trim() === "Open with OpenCOR's Web app");
 
-      expect(openCorLink?.exists()).toBe(true)
+      expect(openCorLink?.exists()).toBe(true);
 
-      const href = openCorLink?.attributes('href')
-      expect(href).toBeTruthy()
-      expect(href).toContain('//opencor.ws/app/?opencor://openFile/')
-      expect(href).toContain(selectedFile)
-      expect(href).not.toContain('openFiles')
-      expect(href).not.toContain('%7C')
-    })
+      const href = openCorLink?.attributes('href');
+      expect(href).toBeTruthy();
+      expect(href).toContain('//opencor.ws/app/?opencor://openFile/');
+      expect(href).toContain(selectedFile);
+      expect(href).not.toContain('openFiles');
+      expect(href).not.toContain('%7C');
+    });
 
     it('orders OpenCOR files as .cellml, .sedml, then .omex', async () => {
       const exposureInfoWithMixedOpenCORFiles = {
@@ -733,201 +733,201 @@ describe('ExposureDetail', () => {
           ['model.cellml', true],
           ['preview.png', false],
         ] as typeof mockExposureInfo.files,
-      }
+      };
 
       const wrapper = await mountComponent({
         exposureInfo: exposureInfoWithMixedOpenCORFiles,
-      })
+      });
 
       const openCorLink = wrapper
         .findAll('a')
-        .find((link) => link.text().trim() === "Open with OpenCOR's Web app")
+        .find((link) => link.text().trim() === "Open with OpenCOR's Web app");
 
-      expect(openCorLink?.exists()).toBe(true)
+      expect(openCorLink?.exists()).toBe(true);
 
-      const href = openCorLink?.attributes('href') || ''
-      expect(href).toContain('//opencor.ws/app/?opencor://openFiles/')
+      const href = openCorLink?.attributes('href') || '';
+      expect(href).toContain('//opencor.ws/app/?opencor://openFiles/');
 
-      const cellmlIndex = href.indexOf('/model.cellml')
-      const sedmlIndex = href.indexOf('/protocol.sedml')
-      const omexIndex = href.indexOf('/archive.omex')
+      const cellmlIndex = href.indexOf('/model.cellml');
+      const sedmlIndex = href.indexOf('/protocol.sedml');
+      const omexIndex = href.indexOf('/archive.omex');
 
-      expect(cellmlIndex).toBeGreaterThan(-1)
-      expect(sedmlIndex).toBeGreaterThan(-1)
-      expect(omexIndex).toBeGreaterThan(-1)
-      expect(cellmlIndex).toBeLessThan(sedmlIndex)
-      expect(sedmlIndex).toBeLessThan(omexIndex)
-    })
-  })
+      expect(cellmlIndex).toBeGreaterThan(-1);
+      expect(sedmlIndex).toBeGreaterThan(-1);
+      expect(omexIndex).toBeGreaterThan(-1);
+      expect(cellmlIndex).toBeLessThan(sedmlIndex);
+      expect(sedmlIndex).toBeLessThan(omexIndex);
+    });
+  });
 
   it('renders "Navigation" section', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Navigation')
+      .find((heading) => heading.text().trim() === 'Navigation');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Navigation')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Navigation');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling
-    const viewItems = sectionContent?.querySelectorAll('li')
-    expect(viewItems).toHaveLength(6)
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling;
+    const viewItems = sectionContent?.querySelectorAll('li');
+    expect(viewItems).toHaveLength(6);
+  });
 
   it('renders "Downloads" section', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Downloads')
+      .find((heading) => heading.text().trim() === 'Downloads');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Downloads')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Downloads');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling
-    const viewItems = sectionContent?.querySelectorAll('li')
-    expect(viewItems).toHaveLength(3)
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling;
+    const viewItems = sectionContent?.querySelectorAll('li');
+    expect(viewItems).toHaveLength(3);
+  });
 
   it('renders "References" section with citations', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'References')
+      .find((heading) => heading.text().trim() === 'References');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('References')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('References');
 
-    const referencesSection = sectionHeading?.element.closest('section')
-    expect(referencesSection).toBeDefined()
+    const referencesSection = sectionHeading?.element.closest('section');
+    expect(referencesSection).toBeDefined();
 
-    const citationBlock = referencesSection?.querySelector('.group')
-    expect(citationBlock).toBeDefined()
+    const citationBlock = referencesSection?.querySelector('.group');
+    expect(citationBlock).toBeDefined();
     expect(citationBlock?.textContent).toContain(
       'Baylor, S. M., Hollingworth, S., & Chandler, W. K. (2002)',
-    )
+    );
     expect(citationBlock?.textContent).toContain(
       'Comparison of Simulated and Measured Calcium Sparks',
-    )
-    expect(citationBlock?.textContent).toContain('in Intact Skeletal Muscle Fibers of the Frog.')
-    expect(citationBlock?.textContent).toContain('Journal of General Physiology, 120, 349-368.')
+    );
+    expect(citationBlock?.textContent).toContain('in Intact Skeletal Muscle Fibers of the Frog.');
+    expect(citationBlock?.textContent).toContain('Journal of General Physiology, 120, 349-368.');
 
-    const citationReferenceLink = referencesSection?.querySelector('a')
-    expect(citationReferenceLink).toBeDefined()
-    expect(citationReferenceLink?.textContent).toContain('See other models using this reference')
+    const citationReferenceLink = referencesSection?.querySelector('a');
+    expect(citationReferenceLink).toBeDefined();
+    expect(citationReferenceLink?.textContent).toContain('See other models using this reference');
 
     const citationDetailsButton = referencesSection?.querySelector(
       'button[aria-controls="citation-details"]',
-    )
-    expect(citationDetailsButton?.textContent).toBe('Details')
+    );
+    expect(citationDetailsButton?.textContent).toBe('Details');
 
-    citationDetailsButton?.dispatchEvent(new Event('click'))
+    citationDetailsButton?.dispatchEvent(new Event('click'));
     return nextTick().then(() => {
-      const citationModal = wrapper.find('#citation-details')
-      expect(citationModal.exists()).toBe(true)
-      expect(citationModal.text()).toContain('S M. Baylor, S Hollingworth, W K. Chandler')
-      expect(citationModal.text()).toContain('Comparison of Simulated and Measured Calcium Sparks')
-      expect(citationModal.text()).toContain('in Intact Skeletal Muscle Fibers of the Frog')
-      expect(citationModal.text()).toContain('urn:miriam:pubmed:12198091')
-      expect(citationModal.text()).toContain('2002-09-01')
-      expect(citationModal.text()).toContain('Journal of General Physiology')
-    })
-  })
+      const citationModal = wrapper.find('#citation-details');
+      expect(citationModal.exists()).toBe(true);
+      expect(citationModal.text()).toContain('S M. Baylor, S Hollingworth, W K. Chandler');
+      expect(citationModal.text()).toContain('Comparison of Simulated and Measured Calcium Sparks');
+      expect(citationModal.text()).toContain('in Intact Skeletal Muscle Fibers of the Frog');
+      expect(citationModal.text()).toContain('urn:miriam:pubmed:12198091');
+      expect(citationModal.text()).toContain('2002-09-01');
+      expect(citationModal.text()).toContain('Journal of General Physiology');
+    });
+  });
 
   it('renders "Licence" section', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
     const sectionHeading = wrapper
       .findAll('h4')
-      .find((heading) => heading.text().trim() === 'Licence')
+      .find((heading) => heading.text().trim() === 'Licence');
 
-    expect(sectionHeading?.exists()).toBe(true)
-    expect(sectionHeading?.text()).toBe('Licence')
+    expect(sectionHeading?.exists()).toBe(true);
+    expect(sectionHeading?.text()).toBe('Licence');
 
-    const sectionContent = sectionHeading?.element.nextElementSibling?.textContent
-    expect(sectionContent).toContain('CC BY 3.0')
-  })
+    const sectionContent = sectionHeading?.element.nextElementSibling?.textContent;
+    expect(sectionContent).toContain('CC BY 3.0');
+  });
 
   describe('licence loading', () => {
-    const LICENCE_ERROR_MESSAGE = 'Licence information could not be loaded.'
+    const LICENCE_ERROR_MESSAGE = 'Licence information could not be loaded.';
 
     const findLicenceSection = (wrapper: Awaited<ReturnType<typeof mountComponent>>) =>
       wrapper
         .findAll('section')
-        .find((section) => section.find('h4').exists() && section.find('h4').text() === 'Licence')
+        .find((section) => section.find('h4').exists() && section.find('h4').text() === 'Licence');
 
     const licenceCalls = () =>
       vi
         .mocked(exposureStore.getExposureSafeHTML)
-        .mock.calls.filter((call) => call[3] === 'license.txt')
+        .mock.calls.filter((call) => call[3] === 'license.txt');
 
     it('shows the licence declared by the exposure', async () => {
       const wrapper = await mountComponent({
         loadLicence: async () => 'https://creativecommons.org/licenses/by/4.0/',
-      })
+      });
 
-      const section = findLicenceSection(wrapper)
+      const section = findLicenceSection(wrapper);
       expect(section?.find('a').attributes('href')).toBe(
         'https://creativecommons.org/licenses/by/4.0/',
-      )
-      expect(section?.text()).toContain('CC BY 4.0')
-      expect(section?.text()).not.toContain('CC BY 3.0')
-      expect(section?.find('button').exists()).toBe(false)
-    })
+      );
+      expect(section?.text()).toContain('CC BY 4.0');
+      expect(section?.text()).not.toContain('CC BY 3.0');
+      expect(section?.find('button').exists()).toBe(false);
+    });
 
     it('shows a skeleton instead of the default licence while the licence is loading', async () => {
-      const wrapper = await mountComponent({ loadLicence: () => new Promise<string>(() => {}) })
+      const wrapper = await mountComponent({ loadLicence: () => new Promise<string>(() => {}) });
 
-      const section = findLicenceSection(wrapper)
-      expect(section?.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
-      expect(section?.find('a').exists()).toBe(false)
-      expect(section?.text()).not.toContain('CC BY 3.0')
-    })
+      const section = findLicenceSection(wrapper);
+      expect(section?.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true);
+      expect(section?.find('a').exists()).toBe(false);
+      expect(section?.text()).not.toContain('CC BY 3.0');
+    });
 
     it('falls back to the default licence when the declared licence is empty', async () => {
       const wrapper = await mountComponent({
         loadLicence: async () => '  \n',
-      })
+      });
 
-      const section = findLicenceSection(wrapper)
-      expect(section?.text()).toContain('CC BY 3.0')
-      expect(section?.find('button').exists()).toBe(false)
-    })
+      const section = findLicenceSection(wrapper);
+      expect(section?.text()).toContain('CC BY 3.0');
+      expect(section?.find('button').exists()).toBe(false);
+    });
 
     it('shows the default licence without fetching when the file declares no licence', async () => {
-      const exposureInfo = structuredClone(mockExposureInfo)
+      const exposureInfo = structuredClone(mockExposureInfo);
       for (const file of exposureInfo.exposure.files ?? []) {
-        file.views = file.views.filter((v) => v.view_key !== 'license_citation')
+        file.views = file.views.filter((v) => v.view_key !== 'license_citation');
       }
 
-      const wrapper = await mountComponent({ exposureInfo })
+      const wrapper = await mountComponent({ exposureInfo });
 
-      expect(licenceCalls()).toHaveLength(0)
-      const section = findLicenceSection(wrapper)
-      expect(section?.text()).toContain('CC BY 3.0')
-      expect(section?.find('button').exists()).toBe(false)
-    })
+      expect(licenceCalls()).toHaveLength(0);
+      const section = findLicenceSection(wrapper);
+      expect(section?.text()).toContain('CC BY 3.0');
+      expect(section?.find('button').exists()).toBe(false);
+    });
 
     it('shows an error message instead of the default licence when the licence fails to load', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const wrapper = await mountComponent({
         loadLicence: () => Promise.reject(new Error('Licence failed')),
-      })
+      });
 
-      const section = findLicenceSection(wrapper)
-      expect(section?.text()).toContain(LICENCE_ERROR_MESSAGE)
-      expect(section?.find('a').exists()).toBe(false)
-      expect(section?.text()).not.toContain('CC BY 3.0')
+      const section = findLicenceSection(wrapper);
+      expect(section?.text()).toContain(LICENCE_ERROR_MESSAGE);
+      expect(section?.find('a').exists()).toBe(false);
+      expect(section?.text()).not.toContain('CC BY 3.0');
 
       // The rest of the page is unaffected by the licence failure.
-      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
-      expect(wrapper.find('.html-view').exists()).toBe(true)
-      wrapper.unmount()
-      consoleErrorSpy.mockRestore()
-    })
-  })
+      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false);
+      expect(wrapper.find('.html-view').exists()).toBe(true);
+      wrapper.unmount();
+      consoleErrorSpy.mockRestore();
+    });
+  });
 
   describe('cellml_math view', () => {
     it('filters out entries with empty math arrays and renders only non-empty ones', async () => {
@@ -935,46 +935,46 @@ describe('ExposureDetail', () => {
         ['Component A', ['<math>x</math>', '<math>y</math>']],
         ['Component B', []],
         ['Component C', ['<math>z</math>']],
-      ])
+      ]);
 
       const wrapper = await mountComponent({
         props: { view: 'cellml_math' },
         mathsJSON: mathData,
-      })
+      });
 
-      const mathBox = wrapper.find('.box')
-      expect(mathBox.exists()).toBe(true)
+      const mathBox = wrapper.find('.box');
+      expect(mathBox.exists()).toBe(true);
 
       // Only the two non-empty components should have headings.
-      const sectionHeadings = mathBox.findAll('h4')
-      expect(sectionHeadings).toHaveLength(2)
-      expect(sectionHeadings[0].text()).toBe('Component A')
-      expect(sectionHeadings[1].text()).toBe('Component C')
+      const sectionHeadings = mathBox.findAll('h4');
+      expect(sectionHeadings).toHaveLength(2);
+      expect(sectionHeadings[0].text()).toBe('Component A');
+      expect(sectionHeadings[1].text()).toBe('Component C');
 
       // The empty-array entry title must not appear.
-      expect(mathBox.text()).not.toContain('Component B')
-    })
+      expect(mathBox.text()).not.toContain('Component B');
+    });
 
     it('shows empty-state message and not the HTML view when all math sections are filtered out', async () => {
       const mathData = JSON.stringify([
         ['Component A', []],
         ['Component B', []],
-      ])
+      ]);
 
       const wrapper = await mountComponent({
         props: { view: 'cellml_math' },
         mathsJSON: mathData,
-      })
+      });
 
       // Empty-state message must be visible.
-      const emptyMessage = wrapper.find('p.text-sm')
-      expect(emptyMessage.exists()).toBe(true)
-      expect(emptyMessage.text()).toBe('No mathematics content available.')
+      const emptyMessage = wrapper.find('p.text-sm');
+      expect(emptyMessage.exists()).toBe(true);
+      expect(emptyMessage.text()).toBe('No mathematics content available.');
 
       // Must NOT fall through to the detailHTML block.
-      expect(wrapper.find('.html-view').exists()).toBe(false)
-    })
-  })
+      expect(wrapper.find('.html-view').exists()).toBe(false);
+    });
+  });
 
   describe('route and path error handling', () => {
     it('shows WarningBlock and hides citation when codegen language is unavailable', async () => {
@@ -984,7 +984,7 @@ describe('ExposureDetail', () => {
           view: 'cellml_codegen',
           lang: 'CPP',
         },
-      })
+      });
 
       // Must not attempt to fetch code for an unsupported language or fallback.
       expect(exposureStore.getExposureRawContent).not.toHaveBeenCalledWith(
@@ -992,21 +992,21 @@ describe('ExposureDetail', () => {
         expect.anything(),
         'cellml_codegen',
         expect.anything(),
-      )
+      );
 
       // Must not redirect back to default language 'C'.
-      expect(mockRouterReplace).not.toHaveBeenCalled()
+      expect(mockRouterReplace).not.toHaveBeenCalled();
 
       // Warning block must be displayed.
-      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' })
-      expect(warningBlock.exists()).toBe(true)
-      expect(warningBlock.props('title')).toBe('Language not available')
-      expect(warningBlock.text()).toContain('The code generation language CPP is not available.')
+      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' });
+      expect(warningBlock.exists()).toBe(true);
+      expect(warningBlock.props('title')).toBe('Language not available');
+      expect(warningBlock.text()).toContain('The code generation language CPP is not available.');
 
       // Action button to go to default language must be present.
-      const actionButton = warningBlock.findComponent({ name: 'ActionButton' })
-      expect(actionButton.exists()).toBe(true)
-      expect(actionButton.text()).toContain('Generate code for the default C language')
+      const actionButton = warningBlock.findComponent({ name: 'ActionButton' });
+      expect(actionButton.exists()).toBe(true);
+      expect(actionButton.text()).toContain('Generate code for the default C language');
       expect(actionButton.props('to')).toEqual({
         name: 'exposure-file-detail-view-lang',
         params: {
@@ -1015,14 +1015,14 @@ describe('ExposureDetail', () => {
           view: 'cellml_codegen',
           lang: 'C',
         },
-      })
+      });
 
       // Citation section must not be shown.
       const citationHeading = wrapper
         .findAll('h4')
-        .find((heading) => heading.text().trim() === 'Citation')
-      expect(citationHeading).toBeUndefined()
-    })
+        .find((heading) => heading.text().trim() === 'Citation');
+      expect(citationHeading).toBeUndefined();
+    });
 
     it('shows WarningBlock and hides citation when view is unavailable', async () => {
       const wrapper = await mountComponent({
@@ -1030,33 +1030,33 @@ describe('ExposureDetail', () => {
           file: 'baylor_hollingworth_chandler_2002_a.cellml',
           view: 'cellml_codegen_x',
         },
-      })
+      });
 
       // Warning block must be displayed.
-      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' })
-      expect(warningBlock.exists()).toBe(true)
-      expect(warningBlock.props('title')).toBe('View not available')
+      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' });
+      expect(warningBlock.exists()).toBe(true);
+      expect(warningBlock.props('title')).toBe('View not available');
       expect(warningBlock.text()).toContain(
         'The view cellml_codegen_x is not available for this file.',
-      )
+      );
 
       // Must not render base HTML view.
-      expect(wrapper.find('.html-view').exists()).toBe(false)
+      expect(wrapper.find('.html-view').exists()).toBe(false);
 
       // Action button to go to file must be present.
-      const actionButton = warningBlock.findComponent({ name: 'ActionButton' })
-      expect(actionButton.exists()).toBe(true)
-      expect(actionButton.text()).toContain('Go to file')
+      const actionButton = warningBlock.findComponent({ name: 'ActionButton' });
+      expect(actionButton.exists()).toBe(true);
+      expect(actionButton.text()).toContain('Go to file');
       expect(actionButton.props('to')).toBe(
         `/exposure/${mockExposureInfo.exposure_alias}/baylor_hollingworth_chandler_2002_a.cellml`,
-      )
+      );
 
       // Citation section must not be shown.
       const citationHeading = wrapper
         .findAll('h4')
-        .find((heading) => heading.text().trim() === 'Citation')
-      expect(citationHeading).toBeUndefined()
-    })
+        .find((heading) => heading.text().trim() === 'Citation');
+      expect(citationHeading).toBeUndefined();
+    });
 
     it('shows WarningBlock and hides citation when view does not accept language sub-paths', async () => {
       const wrapper = await mountComponent({
@@ -1065,17 +1065,17 @@ describe('ExposureDetail', () => {
           view: 'cellml_math',
           lang: 'Python',
         },
-      })
+      });
 
-      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' })
-      expect(warningBlock.exists()).toBe(true)
-      expect(warningBlock.props('title')).toBe('View not available')
+      const warningBlock = wrapper.findComponent({ name: 'WarningBlock' });
+      expect(warningBlock.exists()).toBe(true);
+      expect(warningBlock.props('title')).toBe('View not available');
 
       const citationHeading = wrapper
         .findAll('h4')
-        .find((heading) => heading.text().trim() === 'Citation')
-      expect(citationHeading).toBeUndefined()
-    })
+        .find((heading) => heading.text().trim() === 'Citation');
+      expect(citationHeading).toBeUndefined();
+    });
 
     it('recovers from invalid language when switching to a valid language', async () => {
       const wrapper = await mountComponent({
@@ -1092,17 +1092,17 @@ describe('ExposureDetail', () => {
             template: '<div class="code-block-stub" />',
           },
         },
-      })
+      });
 
-      expect(wrapper.findComponent({ name: 'WarningBlock' }).exists()).toBe(true)
+      expect(wrapper.findComponent({ name: 'WarningBlock' }).exists()).toBe(true);
 
       // Switch to a valid language.
-      await wrapper.setProps({ lang: 'MATLAB' })
-      await flushPromises()
-      await nextTick()
+      await wrapper.setProps({ lang: 'MATLAB' });
+      await flushPromises();
+      await nextTick();
 
       // Warning block should now be gone.
-      expect(wrapper.findComponent({ name: 'WarningBlock' }).exists()).toBe(false)
+      expect(wrapper.findComponent({ name: 'WarningBlock' }).exists()).toBe(false);
 
       // MATLAB code should be generated.
       expect(exposureStore.getExposureRawContent).toHaveBeenCalledWith(
@@ -1110,93 +1110,93 @@ describe('ExposureDetail', () => {
         mockExposureInfo.exposure.files?.[0]?.id ?? 598,
         'cellml_codegen',
         'code.MATLAB.m',
-      )
+      );
 
       // Citation section should now be visible.
       const citationHeading = wrapper
         .findAll('h4')
-        .find((heading) => heading.text().trim() === 'Citation')
-      expect(citationHeading?.exists()).toBe(true)
-    })
-  })
+        .find((heading) => heading.text().trim() === 'Citation');
+      expect(citationHeading?.exists()).toBe(true);
+    });
+  });
 
   describe('independent area loading', () => {
     const findSectionHeading = (
       wrapper: Awaited<ReturnType<typeof mountComponent>>,
       text: string,
-    ) => wrapper.findAll('h4').find((heading) => heading.text().trim() === text)
+    ) => wrapper.findAll('h4').find((heading) => heading.text().trim() === text);
 
     it('renders the sidebar while the HTML view is still loading', async () => {
-      const wrapper = await mountComponent({ loadHTML: () => new Promise<string>(() => {}) })
+      const wrapper = await mountComponent({ loadHTML: () => new Promise<string>(() => {}) });
 
-      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true)
-      expect(findSectionHeading(wrapper, 'Keywords')?.exists()).toBe(true)
-      expect(wrapper.find('.html-view').exists()).toBe(false)
-      expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
-    })
+      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true);
+      expect(findSectionHeading(wrapper, 'Keywords')?.exists()).toBe(true);
+      expect(wrapper.find('.html-view').exists()).toBe(false);
+      expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true);
+    });
 
     it('shows a skeleton for the metadata sections while metadata is loading', async () => {
-      const wrapper = await mountComponent({ loadMetadata: () => new Promise<string>(() => {}) })
+      const wrapper = await mountComponent({ loadMetadata: () => new Promise<string>(() => {}) });
 
-      expect(wrapper.find('.html-view').exists()).toBe(true)
-      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true)
-      expect(findSectionHeading(wrapper, 'About')).toBeUndefined()
-      expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
-    })
+      expect(wrapper.find('.html-view').exists()).toBe(true);
+      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true);
+      expect(findSectionHeading(wrapper, 'About')).toBeUndefined();
+      expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true);
+    });
 
     it('fetches the HTML view only once for the default view', async () => {
-      await mountComponent()
+      await mountComponent();
 
       const htmlCalls = vi
         .mocked(exposureStore.getExposureSafeHTML)
-        .mock.calls.filter((call) => call[3] === 'index.html')
-      expect(htmlCalls).toHaveLength(1)
-    })
+        .mock.calls.filter((call) => call[3] === 'index.html');
+      expect(htmlCalls).toHaveLength(1);
+    });
 
     it('does not fetch the HTML view when the file has no view entry', async () => {
-      const exposureInfo = structuredClone(mockExposureInfo)
+      const exposureInfo = structuredClone(mockExposureInfo);
       for (const file of exposureInfo.exposure.files ?? []) {
-        file.views = file.views.filter((v) => v.view_key !== 'view')
+        file.views = file.views.filter((v) => v.view_key !== 'view');
       }
 
-      const wrapper = await mountComponent({ exposureInfo })
+      const wrapper = await mountComponent({ exposureInfo });
 
       const htmlCalls = vi
         .mocked(exposureStore.getExposureSafeHTML)
-        .mock.calls.filter((call) => call[3] === 'index.html')
-      expect(htmlCalls).toHaveLength(0)
-      expect(wrapper.find('.html-view').exists()).toBe(false)
-      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
-    })
+        .mock.calls.filter((call) => call[3] === 'index.html');
+      expect(htmlCalls).toHaveLength(0);
+      expect(wrapper.find('.html-view').exists()).toBe(false);
+      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false);
+    });
 
     it('shows an error in the content area only when the HTML view fails to load', async () => {
       const wrapper = await mountComponent({
         loadHTML: () => Promise.reject(new Error('HTML failed')),
-      })
+      });
 
-      const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' })
-      expect(errorBlock.exists()).toBe(true)
-      expect(errorBlock.attributes('title')).toBe('Error loading view')
-      expect(errorBlock.attributes('error')).toBe('HTML failed')
-      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true)
-    })
+      const errorBlock = wrapper.findComponent({ name: 'ErrorBlock' });
+      expect(errorBlock.exists()).toBe(true);
+      expect(errorBlock.attributes('title')).toBe('Error loading view');
+      expect(errorBlock.attributes('error')).toBe('HTML failed');
+      expect(findSectionHeading(wrapper, 'Source')?.exists()).toBe(true);
+    });
 
     it('keeps the page visible when the metadata fails to load', async () => {
-      const wrapper = await mountComponent({ loadMetadata: async () => 'not json' })
+      const wrapper = await mountComponent({ loadMetadata: async () => 'not json' });
 
-      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false)
-      expect(wrapper.find('.html-view').exists()).toBe(true)
-      expect(wrapper.text()).toContain('Model metadata could not be loaded.')
-    })
+      expect(wrapper.findComponent({ name: 'ErrorBlock' }).exists()).toBe(false);
+      expect(wrapper.find('.html-view').exists()).toBe(true);
+      expect(wrapper.text()).toContain('Model metadata could not be loaded.');
+    });
 
     it('prepares images in the HTML view for progressive loading', async () => {
       const wrapper = await mountComponent({
         loadHTML: async () => '<p>Text</p><img src="figure.png">',
-      })
+      });
 
-      const img = wrapper.find('.html-view img')
-      expect(img.attributes('loading')).toBe('lazy')
-      expect(wrapper.find('.html-view .img-frame').attributes('data-img-loading')).toBeDefined()
-    })
-  })
-})
+      const img = wrapper.find('.html-view img');
+      expect(img.attributes('loading')).toBe('lazy');
+      expect(wrapper.find('.html-view .img-frame').attributes('data-img-loading')).toBeDefined();
+    });
+  });
+});

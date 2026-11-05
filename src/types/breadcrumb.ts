@@ -1,9 +1,9 @@
-import type { RouteLocationRaw } from 'vue-router'
+import type { RouteLocationRaw } from 'vue-router';
 
 export interface BreadcrumbItem {
-  label: string
+  label: string;
   // Omit for the current page.
-  to?: RouteLocationRaw
+  to?: RouteLocationRaw;
   // Label comes from an API that hasn't responded yet; render a placeholder.
-  loading?: boolean
+  loading?: boolean;
 }

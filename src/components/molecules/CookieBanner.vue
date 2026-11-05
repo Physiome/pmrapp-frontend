@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import CloseButton from '@/components/atoms/CloseButton.vue'
-import { COOKIE } from '@/constants/global'
-import { Cookie } from '@/utils/cookie'
+import { onMounted, ref } from 'vue';
+import CloseButton from '@/components/atoms/CloseButton.vue';
+import { COOKIE } from '@/constants/global';
+import { Cookie } from '@/utils/cookie';
 
-const isVisible = ref(true)
+const isVisible = ref(true);
 
 const buttonClasses = [
   'px-3 py-1 rounded border border-primary bg-primary text-white',
@@ -12,19 +12,19 @@ const buttonClasses = [
   'rounded-md disabled:opacity-60 disabled:cursor-not-allowed',
   'inline-flex items-center justify-center gap-2 cursor-pointer',
   'focus:outline-none focus:ring-1 focus:ring-primary',
-]
+];
 
 const dismissCookieBanner = async () => {
-  isVisible.value = false
-  await Cookie.set(COOKIE.BANNER_NAME, 'true', COOKIE.BANNER_DAYS)
-}
+  isVisible.value = false;
+  await Cookie.set(COOKIE.BANNER_NAME, 'true', COOKIE.BANNER_DAYS);
+};
 
 onMounted(async () => {
-  const dismissed = await Cookie.get(COOKIE.BANNER_NAME)
+  const dismissed = await Cookie.get(COOKIE.BANNER_NAME);
   if (dismissed === 'true') {
-    isVisible.value = false
+    isVisible.value = false;
   }
-})
+});
 </script>
 
 <template>

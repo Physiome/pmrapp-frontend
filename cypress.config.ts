@@ -1,8 +1,8 @@
-import fs from 'node:fs'
-import { defineConfig } from 'cypress'
-import { loadEnv } from 'vite'
+import fs from 'node:fs';
+import { defineConfig } from 'cypress';
+import { loadEnv } from 'vite';
 
-const basePath = loadEnv('', process.cwd(), 'VITE_').VITE_BASE_PATH || '/'
+const basePath = loadEnv('', process.cwd(), 'VITE_').VITE_BASE_PATH || '/';
 
 export default defineConfig({
   e2e: {
@@ -13,13 +13,13 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       on('task', {
         clearDownloads() {
-          const downloadsPath = config.downloadsFolder
+          const downloadsPath = config.downloadsFolder;
           if (fs.existsSync(downloadsPath)) {
-            fs.rmSync(downloadsPath, { recursive: true, force: true })
+            fs.rmSync(downloadsPath, { recursive: true, force: true });
           }
-          return null
+          return null;
         },
-      })
+      });
     },
   },
-})
+});

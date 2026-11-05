@@ -1,90 +1,90 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import Citation from '@/components/atoms/Citation.vue'
-import CodeBlock from '@/components/atoms/CodeBlock.vue'
-import CopyButton from '@/components/atoms/CopyButton.vue'
-import FilePanel from '@/components/atoms/FilePanel.vue'
-import LoadingBox from '@/components/atoms/LoadingBox.vue'
-import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue'
-import TermButton from '@/components/atoms/TermButton.vue'
-import WrapButton from '@/components/atoms/WrapButton.vue'
-import BugIcon from '@/components/icons/BugIcon.vue'
-import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
-import DownloadIcon from '@/components/icons/DownloadIcon.vue'
-import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue'
-import LoadingIcon from '@/components/icons/LoadingIcon.vue'
-import WarningIcon from '@/components/icons/WarningIcon.vue'
-import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
-import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
-import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue'
-import PageHeader from '@/components/molecules/PageHeader.vue'
-import WarningBlock from '@/components/molecules/WarningBlock.vue'
-import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import Citation from '@/components/atoms/Citation.vue';
+import CodeBlock from '@/components/atoms/CodeBlock.vue';
+import CopyButton from '@/components/atoms/CopyButton.vue';
+import FilePanel from '@/components/atoms/FilePanel.vue';
+import LoadingBox from '@/components/atoms/LoadingBox.vue';
+import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue';
+import TermButton from '@/components/atoms/TermButton.vue';
+import WrapButton from '@/components/atoms/WrapButton.vue';
+import BugIcon from '@/components/icons/BugIcon.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import ExternalLinkIcon from '@/components/icons/ExternalLinkIcon.vue';
+import LoadingIcon from '@/components/icons/LoadingIcon.vue';
+import WarningIcon from '@/components/icons/WarningIcon.vue';
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue';
+import ErrorBlock from '@/components/molecules/ErrorBlock.vue';
+import MathTransformOptions from '@/components/molecules/MathTransformOptions.vue';
+import PageHeader from '@/components/molecules/PageHeader.vue';
+import WarningBlock from '@/components/molecules/WarningBlock.vue';
+import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue';
 import {
   AVAILABLE_VIEWS,
   CODEGEN_LANGUAGES,
   DEFAULT_LICENCE,
   LICENCE_ERROR_MESSAGE,
-} from '@/constants/exposure'
-import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global'
-import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml'
-import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
-import { useExposureStore } from '@/stores/exposure'
-import { useSearchStore } from '@/stores/search'
-import type { BreadcrumbItem } from '@/types/breadcrumb'
-import type { ErrorInfo } from '@/types/error'
-import type { ExposureInfo, Metadata, ViewEntry } from '@/types/exposure'
-import type { MathMLFormatOptions } from '@/types/mathml'
-import { formatCitation, formatCitationAuthor, parseFullNameToAuthor } from '@/utils/citation'
-import { downloadFileFromContent } from '@/utils/download'
+} from '@/constants/exposure';
+import { GITHUB_ISSUES_URL, TITLE } from '@/constants/global';
+import { DEFAULT_MATH_FORMAT_OPTIONS } from '@/constants/mathml';
+import { downloadCOMBINEArchive, getWorkspaceArchiveUrl } from '@/services/downloadUrlService';
+import { useExposureStore } from '@/stores/exposure';
+import { useSearchStore } from '@/stores/search';
+import type { BreadcrumbItem } from '@/types/breadcrumb';
+import type { ErrorInfo } from '@/types/error';
+import type { ExposureInfo, Metadata, ViewEntry } from '@/types/exposure';
+import type { MathMLFormatOptions } from '@/types/mathml';
+import { formatCitation, formatCitationAuthor, parseFullNameToAuthor } from '@/utils/citation';
+import { downloadFileFromContent } from '@/utils/download';
 import {
   generateExposureTitle,
   getExposureIdFromResourcePath,
   resolveExposureFileTitle,
-} from '@/utils/exposure'
-import { getFileExtension, isOpenCORFile } from '@/utils/file'
-import { formatYear } from '@/utils/format'
-import { markHtmlImagesLoaded, prepareHtmlImages } from '@/utils/html'
-import { formatLicenceUrl } from '@/utils/licence'
-import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer'
-import { encodePathSegments } from '@/utils/path'
-import { buildSearchQuery, isValidTerm } from '@/utils/search'
+} from '@/utils/exposure';
+import { getFileExtension, isOpenCORFile } from '@/utils/file';
+import { formatYear } from '@/utils/format';
+import { markHtmlImagesLoaded, prepareHtmlImages } from '@/utils/html';
+import { formatLicenceUrl } from '@/utils/licence';
+import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer';
+import { encodePathSegments } from '@/utils/path';
+import { buildSearchQuery, isValidTerm } from '@/utils/search';
 
-type ExposureFileEntry = ExposureInfo['files'][number]
+type ExposureFileEntry = ExposureInfo['files'][number];
 
 const props = withDefaults(
   defineProps<{
-    alias: string
-    file: string
-    view: string
-    lang?: string
+    alias: string;
+    file: string;
+    view: string;
+    lang?: string;
   }>(),
   {
     lang: '',
   },
-)
+);
 
-const exposureStore = useExposureStore()
-const exposureInfo = ref<ExposureInfo | null>(null)
-const error = ref<ErrorInfo | null>(null)
-const isLoading = ref(true)
-const exposureId = ref<number>(NaN)
-const exposureFilePath = ref<string>(props.file)
-const exposureFileId = ref<number>(NaN)
+const exposureStore = useExposureStore();
+const exposureInfo = ref<ExposureInfo | null>(null);
+const error = ref<ErrorInfo | null>(null);
+const isLoading = ref(true);
+const exposureId = ref<number>(NaN);
+const exposureFilePath = ref<string>(props.file);
+const exposureFileId = ref<number>(NaN);
 // The HTML view is only available when the file has a 'view' entry.
-const htmlViewFileId = ref<number>(NaN)
-const detailHTML = ref<string>('')
-const generatedCode = ref<string>('')
-const generatedCodeFilename = ref<string>('')
-const codeWrapActive = ref(false)
-const rawMathsData = ref<[string, string[]][]>([])
-const mathFormatOptions = ref<MathMLFormatOptions>({ ...DEFAULT_MATH_FORMAT_OPTIONS })
+const htmlViewFileId = ref<number>(NaN);
+const detailHTML = ref<string>('');
+const generatedCode = ref<string>('');
+const generatedCodeFilename = ref<string>('');
+const codeWrapActive = ref(false);
+const rawMathsData = ref<[string, string[]][]>([]);
+const mathFormatOptions = ref<MathMLFormatOptions>({ ...DEFAULT_MATH_FORMAT_OPTIONS });
 const mathsJSON = computed<[string, string[]][]>(() => {
   const appliedOptions = Object.values(mathFormatOptions.value).some(Boolean)
     ? mathFormatOptions.value
-    : DEFAULT_MATH_FORMAT_OPTIONS
+    : DEFAULT_MATH_FORMAT_OPTIONS;
 
   return rawMathsData.value.map((entry): [string, string[]] => {
     const mathMLArray = entry[1].map((mathML) =>
@@ -93,38 +93,38 @@ const mathsJSON = computed<[string, string[]][]>(() => {
         greekSymbols: appliedOptions.greekSymbols,
         subscripts: appliedOptions.subscripts,
       }),
-    )
-    return [entry[0], mathMLArray]
-  })
-})
-const metadataJSON = ref<Metadata>({})
-const htmlViewRef = ref<HTMLElement | null>(null)
-const licenceInfo = ref<string>(DEFAULT_LICENCE)
-const availableViews = ref<ViewEntry[]>([])
-const isCitationDetailsOpen = ref(false)
-const hasOtherRelatedModels = ref(false)
-const isDownloadingCOMBINE = ref(false)
-const isFileNotFound = ref(false)
-const isViewNotFound = ref(false)
-const isLangNotFound = ref(false)
-const isViewLoading = ref(false)
-const viewError = ref<ErrorInfo | null>(null)
-const isMetadataLoading = ref(false)
-const metadataError = ref<ErrorInfo | null>(null)
-const isLicenceLoading = ref(false)
-const licenceError = ref(false)
+    );
+    return [entry[0], mathMLArray];
+  });
+});
+const metadataJSON = ref<Metadata>({});
+const htmlViewRef = ref<HTMLElement | null>(null);
+const licenceInfo = ref<string>(DEFAULT_LICENCE);
+const availableViews = ref<ViewEntry[]>([]);
+const isCitationDetailsOpen = ref(false);
+const hasOtherRelatedModels = ref(false);
+const isDownloadingCOMBINE = ref(false);
+const isFileNotFound = ref(false);
+const isViewNotFound = ref(false);
+const isLangNotFound = ref(false);
+const isViewLoading = ref(false);
+const viewError = ref<ErrorInfo | null>(null);
+const isMetadataLoading = ref(false);
+const metadataError = ref<ErrorInfo | null>(null);
+const isLicenceLoading = ref(false);
+const licenceError = ref(false);
 // Incremented whenever a new file or view load starts, so that stale responses can be ignored.
-let fileLoadToken = 0
-let viewLoadToken = 0
+let fileLoadToken = 0;
+let viewLoadToken = 0;
 
 const hasPathError = computed(
   () => isFileNotFound.value || isViewNotFound.value || isLangNotFound.value,
-)
-const loadedFileTitle = ref('')
+);
+const loadedFileTitle = ref('');
 
-const router = useRouter()
-const route = useRoute()
-const searchStore = useSearchStore()
+const router = useRouter();
+const route = useRoute();
+const searchStore = useSearchStore();
 
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   const exposureLabel = exposureInfo.value
@@ -133,10 +133,10 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
         exposureInfo.value.exposure.id,
         false,
       )
-    : props.alias
+    : props.alias;
 
   // The 'view' key is the file's default view, so it gets no crumb of its own.
-  const hasViewCrumb = !!props.file && !!props.view && props.view !== 'view'
+  const hasViewCrumb = !!props.file && !!props.view && props.view !== 'view';
 
   const items: BreadcrumbItem[] = [
     {
@@ -144,28 +144,28 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
       to: props.file ? { name: 'exposure-detail', params: { alias: props.alias } } : undefined,
       loading: !exposureInfo.value && isLoading.value,
     },
-  ]
+  ];
 
   if (props.file) {
     items.push({
       label: props.file,
       // Trailing slash matches the file links in the navigation sidebar.
       to: hasViewCrumb ? `/exposure/${props.alias}/${encodePathSegments(props.file)}/` : undefined,
-    })
+    });
   }
 
   if (hasViewCrumb) {
-    const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view)
-    items.push({ label: viewEntry?.name ?? props.view })
+    const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view);
+    items.push({ label: viewEntry?.name ?? props.view });
   }
 
-  return items
-})
+  return items;
+});
 
 const fileBrowserPath = computed(() => {
-  const p = route.query.path
-  return typeof p === 'string' ? p : undefined
-})
+  const p = route.query.path;
+  return typeof p === 'string' ? p : undefined;
+});
 
 // Generates a citation URL from the current route, excluding query parameters and the hash.
 // It resolves the application's base path from vite.config to construct the complete URL.
@@ -173,94 +173,94 @@ const fileBrowserPath = computed(() => {
 // Params are built from props rather than route.params because the :file(.+) route param
 // captures a trailing slash inconsistently depending on which route alias was matched.
 const citationUrl = computed(() => {
-  const params: Record<string, string> = { alias: props.alias }
-  if (props.file) params.file = props.file
-  if (props.view && !isViewNotFound.value) params.view = props.view
-  if (props.lang && !isLangNotFound.value) params.lang = props.lang
+  const params: Record<string, string> = { alias: props.alias };
+  if (props.file) params.file = props.file;
+  if (props.view && !isViewNotFound.value) params.view = props.view;
+  if (props.lang && !isLangNotFound.value) params.lang = props.lang;
 
-  const resolved = router.resolve({ name: route.name, params })
+  const resolved = router.resolve({ name: route.name, params });
   // File-only routes need a trailing slash so production's raw-file server serves the page instead of downloading the file.
-  const href = props.file && !props.view ? `${resolved.href}/` : resolved.href
-  const resolvedURL = new URL(href, window.location.origin)
-  const decodedHref = decodeURIComponent(href)
+  const href = props.file && !props.view ? `${resolved.href}/` : resolved.href;
+  const resolvedURL = new URL(href, window.location.origin);
+  const decodedHref = decodeURIComponent(href);
 
-  return resolvedURL.origin + decodedHref
-})
+  return resolvedURL.origin + decodedHref;
+});
 
 const handleFileBrowserFolderClick = (name: string) => {
-  const currentPath = fileBrowserPath.value
-  const newPath = currentPath ? `${currentPath}/${name}` : name
-  router.push({ query: { ...route.query, path: newPath } })
-}
+  const currentPath = fileBrowserPath.value;
+  const newPath = currentPath ? `${currentPath}/${name}` : name;
+  router.push({ query: { ...route.query, path: newPath } });
+};
 
 const handleFileBrowserPathChange = (newPath: string | undefined) => {
-  const { path: _removed, ...restQuery } = route.query
-  router.push({ query: newPath ? { ...restQuery, path: newPath } : restQuery })
-}
+  const { path: _removed, ...restQuery } = route.query;
+  router.push({ query: newPath ? { ...restQuery, path: newPath } : restQuery });
+};
 
 // This route path is used to fix relative paths in the HTML content.
 // It is not a part of the API request parameters.
 // Note: Keep as "exposure" (singular) to match server file paths, even if the route was matched via an alias.
-const routePath = `/exposure/${props.alias}`
+const routePath = `/exposure/${props.alias}`;
 
 const loadTitle = async (file: string) =>
-  resolveExposureFileTitle(props.alias, file, (request) => searchStore.searchQuery(request))
+  resolveExposureFileTitle(props.alias, file, (request) => searchStore.searchQuery(request));
 
 const refreshLoadedFileTitle = async () => {
-  loadedFileTitle.value = ''
+  loadedFileTitle.value = '';
 
   if (!props.file) {
-    return
+    return;
   }
 
   try {
-    loadedFileTitle.value = await loadTitle(props.file)
+    loadedFileTitle.value = await loadTitle(props.file);
   } catch (err) {
-    console.error('Error loading exposure title:', err)
+    console.error('Error loading exposure title:', err);
   }
-}
+};
 
 const actionToolbarWidth = computed(() => {
   if (error.value || isLoading.value) {
-    return 'w-full'
+    return 'w-full';
   }
 
   return [
     'w-full ',
     'lg:w-[calc(100%-theme(spacing.72)-theme(spacing.8))]',
     'xl:w-[calc(100%-theme(spacing.80)-theme(spacing.8))]',
-  ]
-})
+  ];
+});
 
 const exposureTitle = computed(() => {
   if (loadedFileTitle.value) {
-    return loadedFileTitle.value
+    return loadedFileTitle.value;
   }
 
   return generateExposureTitle(
     exposureInfo.value?.exposure.description,
     exposureInfo.value?.exposure.id,
     false,
-  )
-})
+  );
+});
 
 const pageTitle = computed(() => {
   if (props.view) {
-    const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view)
+    const viewEntry = AVAILABLE_VIEWS.find((v) => v.view_key === props.view);
     if (viewEntry) {
       if (viewEntry.view_key === 'view') {
-        return `${exposureFilePath.value}`
+        return `${exposureFilePath.value}`;
       }
-      return `${viewEntry.name}`
+      return `${viewEntry.name}`;
     }
   }
 
-  return exposureTitle.value
-})
+  return exposureTitle.value;
+});
 
 const exposureIssueUrl = computed(() => {
   if (!props.alias) {
-    return `${GITHUB_ISSUES_URL}/new`
+    return `${GITHUB_ISSUES_URL}/new`;
   }
 
   const params = new URLSearchParams({
@@ -268,149 +268,149 @@ const exposureIssueUrl = computed(() => {
     template: 'exposure.yml',
     title: `[Exposure]: ${error.value ? error.value.title : exposureTitle.value}`,
     'exposure-url': citationUrl.value,
-  })
+  });
 
-  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
-})
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`;
+});
 
 const openCORFiles = computed(() => {
-  if (!exposureInfo.value) return []
+  if (!exposureInfo.value) return [];
 
   return exposureInfo.value.files.filter((entry) => {
     if (props.file) {
-      return entry[0] === props.file && isOpenCORFile(entry[0])
+      return entry[0] === props.file && isOpenCORFile(entry[0]);
     }
-    return isOpenCORFile(entry[0])
-  })
-})
+    return isOpenCORFile(entry[0]);
+  });
+});
 
 const navigationFiles = computed(() => {
-  if (!exposureInfo.value) return []
+  if (!exposureInfo.value) return [];
 
-  return exposureInfo.value.files.filter((entry) => entry[1] === true)
-})
+  return exposureInfo.value.files.filter((entry) => entry[1] === true);
+});
 
 const createdYear = computed(() => {
-  if (!exposureInfo.value) return ''
+  if (!exposureInfo.value) return '';
 
-  return formatYear(exposureInfo.value.exposure.created_ts)
-})
+  return formatYear(exposureInfo.value.exposure.created_ts);
+});
 
 const workspaceArchiveFilename = computed(() => {
-  if (!exposureInfo.value) return ''
+  if (!exposureInfo.value) return '';
 
-  return exposureInfo.value.exposure.description || exposureInfo.value.workspace_alias
-})
+  return exposureInfo.value.exposure.description || exposureInfo.value.workspace_alias;
+});
 
 const workspaceArchiveUrlBase = computed(() => {
-  if (!exposureInfo.value) return ''
+  if (!exposureInfo.value) return '';
 
   return getWorkspaceArchiveUrl(
     exposureInfo.value.workspace_alias,
     exposureInfo.value.exposure.commit_id,
-  )
-})
+  );
+});
 
 // Extracts the language segment from a codegen path for use in the URL route.
 // The paths come from the CODEGEN_LANGUAGES constant in '@/constants/exposure'.
 const extractLangPath = (path: string) => {
-  return path.split('.')[1]
-}
+  return path.split('.')[1];
+};
 
-const defaultLangKey = extractLangPath(CODEGEN_LANGUAGES[0]?.path ?? 'code.C.c')
+const defaultLangKey = extractLangPath(CODEGEN_LANGUAGES[0]?.path ?? 'code.C.c');
 
 const isKnownLang = (lang: string) =>
-  CODEGEN_LANGUAGES.some((l) => extractLangPath(l.path) === lang)
+  CODEGEN_LANGUAGES.some((l) => extractLangPath(l.path) === lang);
 
 const defaultFileViewTarget = computed(() => {
   if (exposureFilePath.value) {
-    return `/exposure/${props.alias}/${exposureFilePath.value}`
+    return `/exposure/${props.alias}/${exposureFilePath.value}`;
   }
-  return `/exposure/${props.alias}`
-})
+  return `/exposure/${props.alias}`;
+});
 
 const handleDownloadCOMBINEArchive = async () => {
-  const exposureAlias = props.alias
+  const exposureAlias = props.alias;
   const fileName = exposureInfo.value
     ? `${exposureInfo.value.exposure.description}`
-    : `${exposureAlias}`
+    : `${exposureAlias}`;
 
-  isDownloadingCOMBINE.value = true
+  isDownloadingCOMBINE.value = true;
 
   try {
-    await downloadCOMBINEArchive(exposureAlias, fileName)
+    await downloadCOMBINEArchive(exposureAlias, fileName);
   } catch (err) {
-    console.error('Error downloading COMBINE archive:', err)
+    console.error('Error downloading COMBINE archive:', err);
   } finally {
-    isDownloadingCOMBINE.value = false
+    isDownloadingCOMBINE.value = false;
   }
-}
+};
 
 const getOpenCORFilesToOpen = (files: ExposureFileEntry[], targetFile?: string) => {
-  let openCORFilesToOpen = files
+  let openCORFilesToOpen = files;
   const selectedCellmlFile = props.file?.endsWith('.cellml')
     ? files.find((entry) => entry[0] === props.file)
-    : undefined
+    : undefined;
 
   if (targetFile) {
-    openCORFilesToOpen = files.filter((entry) => entry[0] === targetFile)
+    openCORFilesToOpen = files.filter((entry) => entry[0] === targetFile);
   } else if (selectedCellmlFile) {
-    openCORFilesToOpen = [selectedCellmlFile]
+    openCORFilesToOpen = [selectedCellmlFile];
   }
 
-  return openCORFilesToOpen
-}
+  return openCORFilesToOpen;
+};
 
 const getOrder = (filename: string) => {
-  const extension = getFileExtension(filename)
+  const extension = getFileExtension(filename);
 
-  if (extension === 'cellml') return 1
-  if (extension === 'sedml') return 2
-  if (extension === 'omex') return 3
-  return 4
-}
+  if (extension === 'cellml') return 1;
+  if (extension === 'sedml') return 2;
+  if (extension === 'omex') return 3;
+  return 4;
+};
 
 const sortOpenCORFiles = (files: ExposureFileEntry[]) => {
-  return [...files].sort((a, b) => getOrder(a[0]) - getOrder(b[0]))
-}
+  return [...files].sort((a, b) => getOrder(a[0]) - getOrder(b[0]));
+};
 
 const generateOpenCORLink = (files: ExposureFileEntry[], baseURL: string, option?: string) => {
-  const fileURLs = files.map((entry) => `${baseURL}/${entry[0]}`).join('%7C')
-  const command = files.length > 1 ? 'openFiles' : 'openFile'
-  const opencorLink = `opencor://${command}/${fileURLs}`
+  const fileURLs = files.map((entry) => `${baseURL}/${entry[0]}`).join('%7C');
+  const command = files.length > 1 ? 'openFiles' : 'openFile';
+  const opencorLink = `opencor://${command}/${fileURLs}`;
 
   if (option !== 'desktop') {
-    return `//opencor.ws/app/?${opencorLink}`
+    return `//opencor.ws/app/?${opencorLink}`;
   }
-  return opencorLink
-}
+  return opencorLink;
+};
 
 const buildOpenCORURL = (option?: string, targetFile?: string) => {
-  if (!exposureInfo.value || openCORFiles.value.length === 0) return ''
+  if (!exposureInfo.value || openCORFiles.value.length === 0) return '';
 
-  const baseURL = `${exposureInfo.value.workspace.url}rawfile/${exposureInfo.value.exposure.commit_id}`
-  const filesToOpen = getOpenCORFilesToOpen(openCORFiles.value, targetFile)
-  const sortedFiles = sortOpenCORFiles(filesToOpen)
+  const baseURL = `${exposureInfo.value.workspace.url}rawfile/${exposureInfo.value.exposure.commit_id}`;
+  const filesToOpen = getOpenCORFilesToOpen(openCORFiles.value, targetFile);
+  const sortedFiles = sortOpenCORFiles(filesToOpen);
 
-  return generateOpenCORLink(sortedFiles, baseURL, option)
-}
+  return generateOpenCORLink(sortedFiles, baseURL, option);
+};
 
 const convertFirstTextNodeToTitle = () => {
-  if (!htmlViewRef.value) return
+  if (!htmlViewRef.value) return;
 
-  const firstChild = htmlViewRef.value.firstChild
+  const firstChild = htmlViewRef.value.firstChild;
   if (firstChild && firstChild.nodeType === 3) {
-    const textContent = firstChild.textContent?.trim()
+    const textContent = firstChild.textContent?.trim();
     if (textContent) {
-      const h2 = document.createElement('h2')
-      h2.textContent = textContent
-      htmlViewRef.value.replaceChild(h2, firstChild)
+      const h2 = document.createElement('h2');
+      h2.textContent = textContent;
+      htmlViewRef.value.replaceChild(h2, firstChild);
     }
   }
-}
+};
 
-const isCurrentViewLoad = (token: number) => token === viewLoadToken
-const isCurrentFileLoad = (token: number) => token === fileLoadToken
+const isCurrentViewLoad = (token: number) => token === viewLoadToken;
+const isCurrentFileLoad = (token: number) => token === fileLoadToken;
 
 const generateCode = async (langPath: string, fileName: string, token: number) => {
   const code = await exposureStore.getExposureRawContent(
@@ -418,22 +418,22 @@ const generateCode = async (langPath: string, fileName: string, token: number) =
     exposureFileId.value,
     'cellml_codegen',
     langPath,
-  )
-  if (!isCurrentViewLoad(token)) return
-  generatedCode.value = code
-  generatedCodeFilename.value = fileName
-}
+  );
+  if (!isCurrentViewLoad(token)) return;
+  generatedCode.value = code;
+  generatedCodeFilename.value = fileName;
+};
 
 const downloadCode = () => {
-  downloadFileFromContent(generatedCode.value, generatedCodeFilename.value)
-}
+  downloadFileFromContent(generatedCode.value, generatedCodeFilename.value);
+};
 
 const toggleCodeWrap = () => {
-  codeWrapActive.value = !codeWrapActive.value
-}
+  codeWrapActive.value = !codeWrapActive.value;
+};
 
 const generateMath = async (token: number) => {
-  await initMathPolyfills()
+  await initMathPolyfills();
 
   try {
     const response = await exposureStore.getExposureRawContent(
@@ -441,31 +441,31 @@ const generateMath = async (token: number) => {
       exposureFileId.value,
       'cellml_math',
       'math.json',
-    )
-    if (!isCurrentViewLoad(token)) return
-    const mathResponseJSON = JSON.parse(response)
+    );
+    if (!isCurrentViewLoad(token)) return;
+    const mathResponseJSON = JSON.parse(response);
     const filteredMathsJSON = Array.isArray(mathResponseJSON)
       ? mathResponseJSON.filter(
           (value): value is [string, string[]] => Array.isArray(value[1]) && value[1].length > 0,
         )
-      : []
+      : [];
     rawMathsData.value = filteredMathsJSON.map((entry): [string, string[]] => {
-      const mathMLArray = entry[1].map((mathML) => transformMathString(mathML))
-      return [entry[0], mathMLArray]
-    })
+      const mathMLArray = entry[1].map((mathML) => transformMathString(mathML));
+      return [entry[0], mathMLArray];
+    });
   } catch (err) {
-    if (!isCurrentViewLoad(token)) return
-    const errorMessage = err instanceof Error ? err.message : 'Failed to parse mathematics data.'
+    if (!isCurrentViewLoad(token)) return;
+    const errorMessage = err instanceof Error ? err.message : 'Failed to parse mathematics data.';
     viewError.value = {
       title: 'Error parsing mathematics',
       message: errorMessage,
-    }
-    console.error('Error parsing mathematics JSON:', err)
+    };
+    console.error('Error parsing mathematics JSON:', err);
   }
-}
+};
 
 const generateMetadata = async (token: number) => {
-  metadataError.value = null
+  metadataError.value = null;
 
   try {
     const metadata = await exposureStore.getExposureRawContent(
@@ -473,19 +473,19 @@ const generateMetadata = async (token: number) => {
       exposureFileId.value,
       'cellml_metadata',
       'cmeta.json',
-    )
-    if (!isCurrentFileLoad(token)) return
-    metadataJSON.value = JSON.parse(metadata)
+    );
+    if (!isCurrentFileLoad(token)) return;
+    metadataJSON.value = JSON.parse(metadata);
   } catch (err) {
-    if (!isCurrentFileLoad(token)) return
-    const errorMessage = err instanceof Error ? err.message : 'Failed to parse metadata JSON.'
+    if (!isCurrentFileLoad(token)) return;
+    const errorMessage = err instanceof Error ? err.message : 'Failed to parse metadata JSON.';
     metadataError.value = {
       title: 'Error parsing metadata',
       message: errorMessage,
-    }
-    console.error('Error parsing metadata JSON:', err)
+    };
+    console.error('Error parsing metadata JSON:', err);
   }
-}
+};
 
 const loadDefaultView = async (token: number) => {
   // Only load the HTML view if the file has a 'view' entry.
@@ -496,23 +496,23 @@ const loadDefaultView = async (token: number) => {
       'view',
       'index.html',
       routePath,
-    )
-    if (!isCurrentViewLoad(token)) return
-    detailHTML.value = prepareHtmlImages(html)
+    );
+    if (!isCurrentViewLoad(token)) return;
+    detailHTML.value = prepareHtmlImages(html);
   }
-}
+};
 
 const loadCodegenView = async (token: number) => {
-  if (!exposureInfo.value) return
+  if (!exposureInfo.value) return;
 
   // When no language is specified in the URL, redirect to the default language (C).
   if (!props.lang) {
-    const defaultLang = CODEGEN_LANGUAGES[0]
-    if (!defaultLang) return
+    const defaultLang = CODEGEN_LANGUAGES[0];
+    if (!defaultLang) return;
 
-    isLangNotFound.value = false
-    await generateCode(defaultLang.path, defaultLang.fileName, token)
-    if (!isCurrentViewLoad(token)) return
+    isLangNotFound.value = false;
+    await generateCode(defaultLang.path, defaultLang.fileName, token);
+    if (!isCurrentViewLoad(token)) return;
 
     // Reflect the default language in the URL (replace so it does not pollute browser history).
     if (props.view === 'cellml_codegen') {
@@ -525,21 +525,21 @@ const loadCodegenView = async (token: number) => {
           lang: extractLangPath(defaultLang.path),
         },
         query: route.query,
-      })
+      });
     }
-    return
+    return;
   }
 
   // When a language is specified in the URL, verify that it is supported.
-  const activeLang = CODEGEN_LANGUAGES.find((l) => extractLangPath(l.path) === props.lang)
+  const activeLang = CODEGEN_LANGUAGES.find((l) => extractLangPath(l.path) === props.lang);
   if (!activeLang) {
-    isLangNotFound.value = true
-    return
+    isLangNotFound.value = true;
+    return;
   }
 
-  isLangNotFound.value = false
-  await generateCode(activeLang.path, activeLang.fileName, token)
-  if (!isCurrentViewLoad(token)) return
+  isLangNotFound.value = false;
+  await generateCode(activeLang.path, activeLang.fileName, token);
+  if (!isCurrentViewLoad(token)) return;
 
   // Reflect the active language in the URL (replace so it does not pollute browser history).
   if (props.view === 'cellml_codegen') {
@@ -552,9 +552,9 @@ const loadCodegenView = async (token: number) => {
         lang: extractLangPath(activeLang.path),
       },
       query: route.query,
-    })
+    });
   }
-}
+};
 
 const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
   router.push({
@@ -566,8 +566,8 @@ const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
       lang: extractLangPath(lang.path),
     },
     query: route.query,
-  })
-}
+  });
+};
 
 // Returns the route target for a view button in the sidebar.
 // For the codegen view, always include the active lang segment so that clicking
@@ -575,7 +575,7 @@ const navigateToLang = (lang: (typeof CODEGEN_LANGUAGES)[number]) => {
 // (and triggers loadCodegenView via the props.view or props.lang watch).
 const viewButtonTarget = (viewKey: string) => {
   if (viewKey === 'cellml_codegen') {
-    const activeLangPath = isKnownLang(props.lang) ? props.lang : defaultLangKey
+    const activeLangPath = isKnownLang(props.lang) ? props.lang : defaultLangKey;
     return {
       name: 'exposure-file-detail-view-lang' as const,
       params: {
@@ -584,36 +584,36 @@ const viewButtonTarget = (viewKey: string) => {
         view: 'cellml_codegen',
         lang: activeLangPath,
       },
-    }
+    };
   }
-  return `/exposure/${props.alias}/${exposureFilePath.value}/${viewKey}`
-}
+  return `/exposure/${props.alias}/${exposureFilePath.value}/${viewKey}`;
+};
 
 // Keep the current content visible while switching between codegen languages,
 // and only show the skeleton when there is nothing to show yet.
 const hasViewContent = computed(() => {
-  if (props.view === 'cellml_codegen') return Boolean(generatedCode.value)
-  if (props.view === 'cellml_math') return rawMathsData.value.length > 0
-  return Boolean(detailHTML.value)
-})
+  if (props.view === 'cellml_codegen') return Boolean(generatedCode.value);
+  if (props.view === 'cellml_math') return rawMathsData.value.length > 0;
+  return Boolean(detailHTML.value);
+});
 
 const isAboutSectionAvailable = computed(() => {
   return (
     metadataJSON.value.model_title ||
     metadataJSON.value.model_author_org ||
     (metadataJSON.value.model_author && isValidTerm(metadataJSON.value.model_author))
-  )
-})
+  );
+});
 
 const citationTitle = computed(() => {
-  return metadataJSON.value.model_title || exposureTitle.value
-})
+  return metadataJSON.value.model_title || exposureTitle.value;
+});
 
 const citationAuthors = computed(() => {
-  if (!metadataJSON.value.model_author) return []
-  const author = parseFullNameToAuthor(metadataJSON.value.model_author)
-  return author ? [author] : []
-})
+  if (!metadataJSON.value.model_author) return [];
+  const author = parseFullNameToAuthor(metadataJSON.value.model_author);
+  return author ? [author] : [];
+});
 
 const modelCitation = computed(() => {
   return {
@@ -622,173 +622,173 @@ const modelCitation = computed(() => {
     issued: createdYear.value,
     url: citationUrl.value,
     publisher: TITLE,
-  }
-})
+  };
+});
 
 // Although metadataJSON.value.citations is an array,
 // it contains only one citation because metadataJSON.value.citation_id and citation_title are single values.
 const publicationCitation = computed(() => {
-  return metadataJSON.value.citations?.length ? metadataJSON.value.citations[0] : null
-})
+  return metadataJSON.value.citations?.length ? metadataJSON.value.citations[0] : null;
+});
 
 const handleKeywordClick = (kind: string, keyword: string) => {
-  const currentQuery = router.currentRoute.value.query
-  router.push({ path: '/search', query: buildSearchQuery(kind, keyword, currentQuery) })
-}
+  const currentQuery = router.currentRoute.value.query;
+  router.push({ path: '/search', query: buildSearchQuery(kind, keyword, currentQuery) });
+};
 
 const handleCitationAuthorClick = (authorParts: string[]) => {
-  const familyName = authorParts[0]
+  const familyName = authorParts[0];
   if (familyName) {
-    handleKeywordClick('citation_author_family_name', familyName)
+    handleKeywordClick('citation_author_family_name', familyName);
   }
-}
+};
 
 const filteredKeywords = computed(() => {
-  const originalKeywords = metadataJSON.value.keywords || []
+  const originalKeywords = metadataJSON.value.keywords || [];
   return originalKeywords
     .filter(
       (keywordTuple) => Array.isArray(keywordTuple) && keywordTuple.length >= 2 && keywordTuple[1],
     )
-    .map((keywordTuple) => keywordTuple[1] || '')
-})
+    .map((keywordTuple) => keywordTuple[1] || '');
+});
 
 const checkOtherRelatedModels = async (token: number) => {
-  const term = metadataJSON.value.citation_id
-  const kind = 'citation_id'
+  const term = metadataJSON.value.citation_id;
+  const kind = 'citation_id';
 
   if (!term || !isValidTerm(term)) {
-    hasOtherRelatedModels.value = false
-    return
+    hasOtherRelatedModels.value = false;
+    return;
   }
 
   try {
-    const searchResults = await searchStore.searchIndexTerm(kind, term)
-    if (!isCurrentFileLoad(token)) return
+    const searchResults = await searchStore.searchIndexTerm(kind, term);
+    if (!isCurrentFileLoad(token)) return;
 
     if (!Array.isArray(searchResults)) {
-      hasOtherRelatedModels.value = false
-      return
+      hasOtherRelatedModels.value = false;
+      return;
     }
 
     const otherRelatedModels = searchResults.filter((result) => {
-      const _exposureId = getExposureIdFromResourcePath(result.resource_path)
-      return Number(_exposureId) !== exposureId.value
-    })
+      const _exposureId = getExposureIdFromResourcePath(result.resource_path);
+      return Number(_exposureId) !== exposureId.value;
+    });
 
-    hasOtherRelatedModels.value = otherRelatedModels.length > 0
+    hasOtherRelatedModels.value = otherRelatedModels.length > 0;
   } catch (err) {
-    console.error('Error checking related models:', err)
-    if (!isCurrentFileLoad(token)) return
-    hasOtherRelatedModels.value = false
+    console.error('Error checking related models:', err);
+    if (!isCurrentFileLoad(token)) return;
+    hasOtherRelatedModels.value = false;
   }
-}
+};
 
 // Reset all state variables that are specific to a file or view.
 const resetState = () => {
-  availableViews.value = []
-  detailHTML.value = ''
-  exposureFileId.value = Number.NaN
-  htmlViewFileId.value = Number.NaN
-  exposureFilePath.value = ''
-  generatedCode.value = ''
-  generatedCodeFilename.value = ''
-  hasOtherRelatedModels.value = false
-  isFileNotFound.value = false
-  isViewNotFound.value = false
-  isLangNotFound.value = false
-  licenceInfo.value = DEFAULT_LICENCE
-  isLicenceLoading.value = false
-  licenceError.value = false
-  metadataError.value = null
-  metadataJSON.value = {}
-  rawMathsData.value = []
-  viewError.value = null
-  isMetadataLoading.value = false
-  isViewLoading.value = false
+  availableViews.value = [];
+  detailHTML.value = '';
+  exposureFileId.value = Number.NaN;
+  htmlViewFileId.value = Number.NaN;
+  exposureFilePath.value = '';
+  generatedCode.value = '';
+  generatedCodeFilename.value = '';
+  hasOtherRelatedModels.value = false;
+  isFileNotFound.value = false;
+  isViewNotFound.value = false;
+  isLangNotFound.value = false;
+  licenceInfo.value = DEFAULT_LICENCE;
+  isLicenceLoading.value = false;
+  licenceError.value = false;
+  metadataError.value = null;
+  metadataJSON.value = {};
+  rawMathsData.value = [];
+  viewError.value = null;
+  isMetadataLoading.value = false;
+  isViewLoading.value = false;
   // Invalidate any in-flight view load for the previous file.
-  viewLoadToken++
-}
+  viewLoadToken++;
+};
 
 const loadViewContent = async (token: number) => {
   if (isFileNotFound.value) {
-    return
+    return;
   }
 
   // If no view or default 'view' is requested.
   if (!props.view || props.view === 'view') {
     if (props.lang) {
-      isViewNotFound.value = true
-      return
+      isViewNotFound.value = true;
+      return;
     }
-    await loadDefaultView(token)
-    return
+    await loadDefaultView(token);
+    return;
   }
 
   // Check if the requested view is available for this file.
-  const isViewAvailable = availableViews.value.some((v) => v.view_key === props.view)
+  const isViewAvailable = availableViews.value.some((v) => v.view_key === props.view);
   if (!isViewAvailable) {
-    isViewNotFound.value = true
-    return
+    isViewNotFound.value = true;
+    return;
   }
 
   if (props.view === 'cellml_codegen') {
-    await loadCodegenView(token)
-    return
+    await loadCodegenView(token);
+    return;
   }
 
   if (props.view === 'cellml_math') {
     if (props.lang) {
-      isViewNotFound.value = true
-      return
+      isViewNotFound.value = true;
+      return;
     }
-    await generateMath(token)
-    return
+    await generateMath(token);
+    return;
   }
-}
+};
 
 const loadCurrentView = async () => {
-  const token = ++viewLoadToken
-  isViewNotFound.value = false
-  isLangNotFound.value = false
-  viewError.value = null
-  isViewLoading.value = true
+  const token = ++viewLoadToken;
+  isViewNotFound.value = false;
+  isLangNotFound.value = false;
+  viewError.value = null;
+  isViewLoading.value = true;
 
   try {
-    await loadViewContent(token)
+    await loadViewContent(token);
   } catch (err) {
-    if (!isCurrentViewLoad(token)) return
-    const errorMessage = err instanceof Error ? err.message : 'Failed to load view.'
+    if (!isCurrentViewLoad(token)) return;
+    const errorMessage = err instanceof Error ? err.message : 'Failed to load view.';
     viewError.value = {
       title: 'Error loading view',
       message: errorMessage,
-    }
-    console.error('Error loading exposure view:', err)
+    };
+    console.error('Error loading exposure view:', err);
   } finally {
     if (isCurrentViewLoad(token)) {
-      isViewLoading.value = false
+      isViewLoading.value = false;
     }
   }
-}
+};
 
 const loadMetadata = async (token: number) => {
-  isMetadataLoading.value = true
+  isMetadataLoading.value = true;
 
   try {
-    await generateMetadata(token)
-    await checkOtherRelatedModels(token)
+    await generateMetadata(token);
+    await checkOtherRelatedModels(token);
   } finally {
     if (isCurrentFileLoad(token)) {
-      isMetadataLoading.value = false
+      isMetadataLoading.value = false;
     }
   }
-}
+};
 
 const loadLicence = async (exposureFileIdForLicence: number, token: number) => {
   // The file declares its own licence, so don't show the default while it loads.
   // If loading fails, show an error message instead of the default.
-  licenceInfo.value = ''
-  licenceError.value = false
-  isLicenceLoading.value = true
+  licenceInfo.value = '';
+  licenceError.value = false;
+  isLicenceLoading.value = true;
 
   try {
     const licence = await exposureStore.getExposureSafeHTML(
@@ -797,39 +797,40 @@ const loadLicence = async (exposureFileIdForLicence: number, token: number) => {
       'license_citation',
       'license.txt',
       routePath,
-    )
-    if (!isCurrentFileLoad(token)) return
-    licenceInfo.value = licence.trim() || DEFAULT_LICENCE
+    );
+    if (!isCurrentFileLoad(token)) return;
+    licenceInfo.value = licence.trim() || DEFAULT_LICENCE;
   } catch (err) {
-    if (!isCurrentFileLoad(token)) return
-    licenceError.value = true
-    console.error('Error loading exposure licence:', err)
+    if (!isCurrentFileLoad(token)) return;
+    licenceError.value = true;
+    console.error('Error loading exposure licence:', err);
   } finally {
     if (isCurrentFileLoad(token)) {
-      isLicenceLoading.value = false
+      isLicenceLoading.value = false;
     }
   }
-}
+};
 
 const loadInitialView = async () => {
-  if (!exposureInfo.value) return
+  if (!exposureInfo.value) return;
 
-  const token = ++fileLoadToken
+  const token = ++fileLoadToken;
 
   // Reset per-file state before selecting a new file to avoid stale view content.
-  resetState()
-  exposureId.value = exposureInfo.value.exposure?.id
-  const exposureFiles = exposureInfo.value.exposure?.files || []
-  const filesWithViews = exposureFiles.filter((file) => file.views?.length > 0)
+  resetState();
+  exposureId.value = exposureInfo.value.exposure?.id;
+  const exposureFiles = exposureInfo.value.exposure?.files || [];
+  const filesWithViews = exposureFiles.filter((file) => file.views?.length > 0);
   const defaultFileWithViews =
-    filesWithViews.find((file) => file.workspace_file_path.endsWith('.cellml')) || filesWithViews[0]
-  let fileWithViews: (typeof filesWithViews)[number] | undefined = defaultFileWithViews
+    filesWithViews.find((file) => file.workspace_file_path.endsWith('.cellml')) ||
+    filesWithViews[0];
+  let fileWithViews: (typeof filesWithViews)[number] | undefined = defaultFileWithViews;
 
   if (props.file) {
-    exposureFilePath.value = props.file
-    fileWithViews = filesWithViews.find((file) => file.workspace_file_path === props.file)
+    exposureFilePath.value = props.file;
+    fileWithViews = filesWithViews.find((file) => file.workspace_file_path === props.file);
   } else {
-    exposureFilePath.value = defaultFileWithViews?.workspace_file_path || ''
+    exposureFilePath.value = defaultFileWithViews?.workspace_file_path || '';
   }
 
   if (!fileWithViews) {
@@ -837,27 +838,27 @@ const loadInitialView = async () => {
     // so that valid files without views keep the current silent behaviour.
     const fileExists =
       exposureInfo.value.files.some((entry) => entry[0] === props.file) ||
-      exposureFiles.some((file) => file.workspace_file_path === props.file)
-    isFileNotFound.value = Boolean(props.file) && !fileExists
+      exposureFiles.some((file) => file.workspace_file_path === props.file);
+    isFileNotFound.value = Boolean(props.file) && !fileExists;
     if (fileExists && props.view) {
-      isViewNotFound.value = true
+      isViewNotFound.value = true;
     }
-    return
+    return;
   }
 
   availableViews.value = AVAILABLE_VIEWS.filter((view) =>
     fileWithViews.views.some((v) => v.view_key === view.view_key),
-  )
-  exposureFileId.value = fileWithViews.id
-  exposureFilePath.value = fileWithViews.workspace_file_path
-  exposureId.value = fileWithViews.exposure_id
+  );
+  exposureFileId.value = fileWithViews.id;
+  exposureFilePath.value = fileWithViews.workspace_file_path;
+  exposureId.value = fileWithViews.exposure_id;
 
-  const viewEntry = fileWithViews.views.find((v) => v.view_key === 'view')
-  const licenceEntry = fileWithViews.views.find((v) => v.view_key === 'license_citation')
-  const metaEntry = fileWithViews.views.find((v) => v.view_key === 'cellml_metadata')
+  const viewEntry = fileWithViews.views.find((v) => v.view_key === 'view');
+  const licenceEntry = fileWithViews.views.find((v) => v.view_key === 'license_citation');
+  const metaEntry = fileWithViews.views.find((v) => v.view_key === 'cellml_metadata');
 
   if (viewEntry) {
-    htmlViewFileId.value = viewEntry.exposure_file_id
+    htmlViewFileId.value = viewEntry.exposure_file_id;
   }
 
   // Load each area independently so that one slow request does not block the others.
@@ -865,80 +866,80 @@ const loadInitialView = async () => {
     metaEntry ? loadMetadata(token) : checkOtherRelatedModels(token),
     licenceEntry ? loadLicence(licenceEntry.exposure_file_id, token) : Promise.resolve(),
     loadCurrentView(),
-  ])
-}
+  ]);
+};
 
 watch(detailHTML, async () => {
   if (detailHTML.value) {
-    await nextTick()
-    convertFirstTextNodeToTitle()
+    await nextTick();
+    convertFirstTextNodeToTitle();
     if (htmlViewRef.value) {
-      markHtmlImagesLoaded(htmlViewRef.value)
+      markHtmlImagesLoaded(htmlViewRef.value);
     }
   }
-})
+});
 
 watch(
   () => props.file,
   async (newFile, oldFile) => {
-    if (newFile === oldFile) return
-    void refreshLoadedFileTitle()
-    await loadInitialView()
+    if (newFile === oldFile) return;
+    void refreshLoadedFileTitle();
+    await loadInitialView();
   },
-)
+);
 
 watch(
   () => props.alias,
   async (newAlias, oldAlias) => {
-    if (newAlias === oldAlias) return
-    await refreshLoadedFileTitle()
+    if (newAlias === oldAlias) return;
+    await refreshLoadedFileTitle();
   },
-)
+);
 
 watch(
   () => props.view,
   async (newView, oldView) => {
-    if (newView === oldView) return
-    await loadCurrentView()
+    if (newView === oldView) return;
+    await loadCurrentView();
   },
-)
+);
 
 watch(
   () => props.lang,
   async (newLang, oldLang) => {
     // Only react when the lang segment actually changed.
-    if (newLang === oldLang) return
-    await loadCurrentView()
+    if (newLang === oldLang) return;
+    await loadCurrentView();
   },
-)
+);
 
 onMounted(async () => {
-  error.value = null
+  error.value = null;
 
   try {
-    void refreshLoadedFileTitle()
-    exposureInfo.value = await exposureStore.getExposureInfo(props.alias)
+    void refreshLoadedFileTitle();
+    exposureInfo.value = await exposureStore.getExposureInfo(props.alias);
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Failed to load exposure.'
+    const errorMessage = err instanceof Error ? err.message : 'Failed to load exposure.';
     if (errorMessage.toLowerCase().includes('not found')) {
       error.value = {
         title: 'Exposure not found',
         message: 'The exposure you are looking for does not exist or has been removed.',
-      }
+      };
     } else {
       error.value = {
         title: 'Error loading exposure',
         message: errorMessage,
-      }
+      };
     }
-    console.error('Error loading exposure:', err)
+    console.error('Error loading exposure:', err);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 
   // Render the page shell first, then load each area independently.
-  void loadInitialView()
-})
+  void loadInitialView();
+});
 </script>
 
 <template>

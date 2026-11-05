@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(defineProps<{ class?: string }>(), {
   class: 'w-6 h-6',
-})
+});
 </script>
 
 <template>

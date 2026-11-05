@@ -1,11 +1,11 @@
 <script setup lang="ts">
 interface Props {
-  message?: string
+  message?: string;
 }
 
 withDefaults(defineProps<Props>(), {
   message: 'Loading...',
-})
+});
 </script>
 
 <template>

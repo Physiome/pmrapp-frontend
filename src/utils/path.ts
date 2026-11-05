@@ -8,35 +8,35 @@
  * @returns The processed HTML with resolved paths.
  */
 export function resolveHtmlPaths(html: string, baseUrl: string, routePath: string): string {
-  let result = html
+  let result = html;
 
   // Replace src="../" and src="../../" etc. with full paths.
   result = result.replace(/src="(\.\.\/)+/g, () => {
-    return `src="${baseUrl}${routePath}/`
-  })
+    return `src="${baseUrl}${routePath}/`;
+  });
 
   // Replace src="./" with full paths.
-  result = result.replace(/src="\.\//g, `src="${baseUrl}${routePath}/`)
+  result = result.replace(/src="\.\//g, `src="${baseUrl}${routePath}/`);
 
   // Replace href="../" and href="../../" etc. with full paths.
   result = result.replace(/href="(\.\.\/)+/g, () => {
-    return `href="${baseUrl}${routePath}/`
-  })
+    return `href="${baseUrl}${routePath}/`;
+  });
 
   // Replace href="./" with full paths.
-  result = result.replace(/href="\.\//g, `href="${baseUrl}${routePath}/`)
+  result = result.replace(/href="\.\//g, `href="${baseUrl}${routePath}/`);
 
   // Replace src="/" (root-relative paths) with full URL.
   // But avoid replacing src="//" (protocol-relative URLs).
-  result = result.replace(/src="\/(?!\/)/g, `src="${baseUrl}/`)
+  result = result.replace(/src="\/(?!\/)/g, `src="${baseUrl}/`);
 
   // Replace href="/" (root-relative paths) with full URL.
   // But avoid replacing href="//" (protocol-relative URLs).
-  result = result.replace(/href="\/(?!\/)/g, `href="${baseUrl}/`)
+  result = result.replace(/href="\/(?!\/)/g, `href="${baseUrl}/`);
 
   // Note: Absolute URLs (http://, https://, //, data:, blob:) are left unchanged.
 
-  return result
+  return result;
 }
 
 /**
@@ -45,18 +45,18 @@ export function resolveHtmlPaths(html: string, baseUrl: string, routePath: strin
  * Multiple consecutive trailing slashes are collapsed into a single slash.
  */
 export const ensureTrailingSlash = (path: string): string => {
-  const trimmed = path.trim()
-  if (!trimmed) return ''
-  return `${trimmed.replace(/\/+$/, '')}/`
-}
+  const trimmed = path.trim();
+  if (!trimmed) return '';
+  return `${trimmed.replace(/\/+$/, '')}/`;
+};
 
 /**
  * Encodes each segment of a path for use in a URL, keeping the '/' separators.
  * Characters like '#', '?' or '%' in a file or folder name then stay part of the path.
  */
 export const encodePathSegments = (path: string): string => {
-  return path.split('/').map(encodeURIComponent).join('/')
-}
+  return path.split('/').map(encodeURIComponent).join('/');
+};
 
 /**
  * Splits a path into its segments, each with the path up to and including it.
@@ -65,7 +65,7 @@ export const encodePathSegments = (path: string): string => {
  * @example getPathSegments('src/models') // [{ name: 'src', path: 'src' }, { name: 'models', path: 'src/models' }]
  */
 export const getPathSegments = (path: string): { name: string; path: string }[] => {
-  const names = path.split('/').filter(Boolean)
+  const names = path.split('/').filter(Boolean);
 
-  return names.map((name, index) => ({ name, path: names.slice(0, index + 1).join('/') }))
-}
+  return names.map((name, index) => ({ name, path: names.slice(0, index + 1).join('/') }));
+};

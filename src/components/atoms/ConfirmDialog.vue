@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onUnmounted, watch } from 'vue'
-import ActionButton from '@/components/atoms/ActionButton.vue'
+import { onUnmounted, watch } from 'vue';
+import ActionButton from '@/components/atoms/ActionButton.vue';
 
 interface Props {
-  show: boolean
-  title?: string
-  message?: string
-  confirmLabel?: string
-  cancelLabel?: string
+  show: boolean;
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,34 +15,34 @@ const props = withDefaults(defineProps<Props>(), {
   message: 'Are you sure?',
   confirmLabel: 'Confirm',
   cancelLabel: 'Cancel',
-})
+});
 
 const emit = defineEmits<{
-  (e: 'confirm'): void
-  (e: 'cancel'): void
-}>()
+  (e: 'confirm'): void;
+  (e: 'cancel'): void;
+}>();
 
 const handleKeyDown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
-    emit('cancel')
+    emit('cancel');
   }
-}
+};
 
 watch(
   () => props.show,
   (newVal) => {
     if (newVal) {
-      document.addEventListener('keydown', handleKeyDown)
+      document.addEventListener('keydown', handleKeyDown);
     } else {
-      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keydown', handleKeyDown);
     }
   },
   { immediate: true },
-)
+);
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeyDown)
-})
+  document.removeEventListener('keydown', handleKeyDown);
+});
 </script>
 
 <template>

@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
-import SearchResultsMessage from '@/components/atoms/SearchResultsMessage.vue'
-import TermButton from '@/components/atoms/TermButton.vue'
-import FileIcon from '@/components/icons/FileIcon.vue'
-import ListContent from '@/components/molecules/ListContent.vue'
-import ListItem from '@/components/molecules/ListItem.vue'
-import type { SearchFilter, SearchResult } from '@/types/search'
-import { getExposureIdFromResourcePath } from '@/utils/exposure'
-import { formatDate } from '@/utils/format'
-import { buildSearchQuery, getSearchResultLink, isValidTerm } from '@/utils/search'
+import { useRoute, useRouter } from 'vue-router';
+import SearchResultsMessage from '@/components/atoms/SearchResultsMessage.vue';
+import TermButton from '@/components/atoms/TermButton.vue';
+import FileIcon from '@/components/icons/FileIcon.vue';
+import ListContent from '@/components/molecules/ListContent.vue';
+import ListItem from '@/components/molecules/ListItem.vue';
+import type { SearchFilter, SearchResult } from '@/types/search';
+import { getExposureIdFromResourcePath } from '@/utils/exposure';
+import { formatDate } from '@/utils/format';
+import { buildSearchQuery, getSearchResultLink, isValidTerm } from '@/utils/search';
 
 interface Props {
-  results: SearchResult[]
-  isLoading: boolean
-  error: string | null
-  term: string
-  kind: string
-  query?: string
-  filters?: SearchFilter[]
+  results: SearchResult[];
+  isLoading: boolean;
+  error: string | null;
+  term: string;
+  kind: string;
+  query?: string;
+  filters?: SearchFilter[];
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
-const textHighlightClass = 'text-highlight font-semibold'
+const textHighlightClass = 'text-highlight font-semibold';
 
 const handleKeywordClick = (kind: string, keyword: string) => {
-  router.push({ path: '/search', query: buildSearchQuery(kind, keyword, route.query) })
-}
+  router.push({ path: '/search', query: buildSearchQuery(kind, keyword, route.query) });
+};
 
 const handleAuthorClick = (kind: string, author: string) => {
-  router.push({ path: '/search', query: buildSearchQuery(kind, author, route.query) })
-}
+  router.push({ path: '/search', query: buildSearchQuery(kind, author, route.query) });
+};
 
 const isIdActive = (ids: string[] | undefined) => {
-  if (!ids || props.kind !== 'citation_id') return false
-  return ids.some((id) => id.toLowerCase() === props.term.toLowerCase())
-}
+  if (!ids || props.kind !== 'citation_id') return false;
+  return ids.some((id) => id.toLowerCase() === props.term.toLowerCase());
+};
 </script>
 
 <template>

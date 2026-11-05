@@ -4,9 +4,9 @@ import type {
   IndexSearchResult,
   SearchQueryRequest,
   SearchQueryResponse,
-} from '@/types/search'
+} from '@/types/search';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const searchService = {
   async getIndexes(): Promise<IndexesResponse> {
@@ -15,13 +15,13 @@ export const searchService = {
       headers: {
         'Content-Type': 'application/json',
       },
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`)
+      throw new Error(`Request failed: ${response.status}`);
     }
 
-    return await response.json()
+    return await response.json();
   },
 
   async getIndexKind(kind: string): Promise<IndexKindResponse> {
@@ -30,13 +30,13 @@ export const searchService = {
       headers: {
         'Content-Type': 'application/json',
       },
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`)
+      throw new Error(`Request failed: ${response.status}`);
     }
 
-    return await response.json()
+    return await response.json();
   },
 
   async searchIndexTerm(kind: string, term: string): Promise<IndexSearchResult> {
@@ -48,13 +48,13 @@ export const searchService = {
           'Content-Type': 'application/json',
         },
       },
-    )
+    );
 
     if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`)
+      throw new Error(`Request failed: ${response.status}`);
     }
 
-    return await response.json()
+    return await response.json();
   },
 
   async searchQuery(payload: SearchQueryRequest): Promise<SearchQueryResponse> {
@@ -64,12 +64,12 @@ export const searchService = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`)
+      throw new Error(`Request failed: ${response.status}`);
     }
 
-    return await response.json()
+    return await response.json();
   },
-}
+};

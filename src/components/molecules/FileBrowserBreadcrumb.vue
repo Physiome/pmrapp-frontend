@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { getPathSegments } from '@/utils/path'
-import { getWorkspacePathLink } from '@/utils/workspace'
+import { computed } from 'vue';
+import { getPathSegments } from '@/utils/path';
+import { getWorkspacePathLink } from '@/utils/workspace';
 
 // Pass onPathChange to browse folders in place (e.g. inside an exposure),
 // or alias and commitId to link to the workspace folder pages.
 const props = defineProps<{
-  path: string
-  alias?: string
-  commitId?: string
-  onPathChange?: (path: string | undefined) => void
-}>()
+  path: string;
+  alias?: string;
+  commitId?: string;
+  onPathChange?: (path: string | undefined) => void;
+}>();
 
-const pathSegments = computed(() => getPathSegments(props.path))
+const pathSegments = computed(() => getPathSegments(props.path));
 
-const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.commitId ?? '', path)
+const linkTo = (path: string) =>
+  getWorkspacePathLink(props.alias ?? '', props.commitId ?? '', path);
 </script>
 
 <template>

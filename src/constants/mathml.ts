@@ -1,6 +1,6 @@
-import type { MathMLFormatOptions } from '@/types/mathml'
+import type { MathMLFormatOptions } from '@/types/mathml';
 
-export const MATH_FORMAT_OPTIONS_STORAGE_KEY = 'math_format_options_v1'
+export const MATH_FORMAT_OPTIONS_STORAGE_KEY = 'math_format_options_v1';
 
 /**
  * Default formatting options applied to MathML output.
@@ -9,7 +9,7 @@ export const DEFAULT_MATH_FORMAT_OPTIONS: Required<MathMLFormatOptions> = {
   digitGrouping: false,
   greekSymbols: false,
   subscripts: false,
-}
+};
 
 export const MATHML_FORMAT_OPTIONS = [
   {
@@ -35,4 +35,4 @@ export const MATHML_FORMAT_OPTIONS = [
     example:
       '<math><mi>q_Ca_o</mi></math> → <math><msub><msub><mi>q</mi><mi>Ca</mi></msub><mi>o</mi></msub></math>',
   },
-] as const
+] as const;
