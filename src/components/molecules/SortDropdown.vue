@@ -1,82 +1,82 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import ArrowUpIcon from '@/components/icons/ArrowUpIcon.vue'
-import CheckmarkIcon from '@/components/icons/CheckmarkIcon.vue'
-import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
-import type { SortOption } from '@/types/common'
-import type { SortOptionGroup } from '@/utils/sort'
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import ArrowUpIcon from '@/components/icons/ArrowUpIcon.vue';
+import CheckmarkIcon from '@/components/icons/CheckmarkIcon.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import type { SortOption } from '@/types/common';
+import type { SortOptionGroup } from '@/utils/sort';
 
 interface Props {
-  modelValue: SortOption
-  options: SortOptionGroup[]
-  disabled?: boolean
+  modelValue: SortOption;
+  options: SortOptionGroup[];
+  disabled?: boolean;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: SortOption]
-}>()
+  'update:modelValue': [value: SortOption];
+}>();
 
-const isOpen = ref(false)
-const dropdownRef = ref<HTMLDivElement | null>(null)
+const isOpen = ref(false);
+const dropdownRef = ref<HTMLDivElement | null>(null);
 
 // Parse current sort option into field and direction.
 const currentSort = computed(() => {
-  const [field, direction] = props.modelValue.split('-') as [string, string]
-  return { field, direction }
-})
+  const [field, direction] = props.modelValue.split('-') as [string, string];
+  return { field, direction };
+});
 
 const currentFieldLabel = computed(() => {
-  const fieldsGroup = props.options.find((g) => g.group === 'Fields')
+  const fieldsGroup = props.options.find((g) => g.group === 'Fields');
   return (
     fieldsGroup?.options.find((o) => o.value === currentSort.value.field)?.label ||
     currentSort.value.field
-  )
-})
+  );
+});
 
 const getDirectionArrowClass = (direction: string) => {
-  const classes = ['w-4 h-4 transition-transform']
+  const classes = ['w-4 h-4 transition-transform'];
   if (direction === 'desc') {
-    classes.push('rotate-180')
+    classes.push('rotate-180');
   }
-  return classes.join(' ')
-}
+  return classes.join(' ');
+};
 
 const isOptionSelected = (option: { value: string; type: 'field' | 'direction' }) => {
   return option.type === 'field'
     ? props.modelValue.startsWith(option.value)
-    : props.modelValue.endsWith(option.value)
-}
+    : props.modelValue.endsWith(option.value);
+};
 
 const handleSelectOption = (value: string, type: 'field' | 'direction') => {
-  let newSortOption: SortOption
+  let newSortOption: SortOption;
 
   if (type === 'field') {
     // Update field, keep direction.
-    newSortOption = `${value}-${currentSort.value.direction}` as SortOption
+    newSortOption = `${value}-${currentSort.value.direction}` as SortOption;
   } else {
     // Update direction, keep field.
-    newSortOption = `${currentSort.value.field}-${value}` as SortOption
+    newSortOption = `${currentSort.value.field}-${value}` as SortOption;
   }
 
-  emit('update:modelValue', newSortOption)
-}
+  emit('update:modelValue', newSortOption);
+};
 
 const handleClickOutside = (event: MouseEvent) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-    isOpen.value = false
+    isOpen.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener('click', handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
@@ -117,12 +117,13 @@ onUnmounted(() => {
             :class="{ 'border-b border-gray-200 dark:border-gray-700': index < options.length - 1 }"
           >
             <button
+              type="button"
               v-for="option in group.options"
               :key="option.value"
               role="menuitem"
               class="w-full text-left px-3 py-2 text-sm cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
               :class="{
-                'bg-gray-100 dark:bg-gray-700': isOptionSelected(option)
+                'bg-gray-100 dark:bg-gray-700': isOptionSelected(option),
               }"
               @click="handleSelectOption(option.value, option.type)"
             >
@@ -143,4 +144,3 @@ onUnmounted(() => {
     </transition>
   </div>
 </template>
-

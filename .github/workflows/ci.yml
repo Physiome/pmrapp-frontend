@@ -35,11 +35,13 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      # `biome ci` does not check formatting of .vue files yet (Biome 2.6),
+      # so formatting is checked separately with a read-only `biome format`.
       - name: Check formatting
-        run: bun run format
+        run: bun run format:ci --reporter=github
 
-      - name: Run linter
-        run: bun run lint
+      - name: Check linting and import order
+        run: bun run check:ci --reporter=github
 
       - name: Run unit tests
         run: bun run test:unit

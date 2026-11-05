@@ -1,65 +1,65 @@
-import { GITHUB_AUTH_ERROR_MESSAGES, LOGIN_ERROR_MESSAGES } from '@/constants/auth'
-import type { GitHubAuthData, LoginCredentials } from '@/types/auth'
+import { GITHUB_AUTH_ERROR_MESSAGES, LOGIN_ERROR_MESSAGES } from '@/constants/auth';
+import type { GitHubAuthData, LoginCredentials } from '@/types/auth';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-const GITHUB_AUTH_API = import.meta.env.VITE_GITHUB_AUTH_API
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GITHUB_AUTH_API = import.meta.env.VITE_GITHUB_AUTH_API;
 
 const normaliseErrorText = (errorText: string): string => {
-  const trimmed = errorText.trim()
-  return trimmed.replace(/^['"]|['"]$/g, '')
-}
+  const trimmed = errorText.trim();
+  return trimmed.replace(/^['"]|['"]$/g, '');
+};
 
 const getKnownLoginErrorMessage = (key: string): string | undefined => {
   if (key === 'invalidcredentials' || key === 'invalid_credentials') {
-    return LOGIN_ERROR_MESSAGES.invalidCredentials
+    return LOGIN_ERROR_MESSAGES.invalidCredentials;
   }
 
-  return undefined
-}
+  return undefined;
+};
 
 const getLoginErrorMessageByStatus = (status: number): string => {
   if (status === 401) {
-    return LOGIN_ERROR_MESSAGES.invalidCredentials
+    return LOGIN_ERROR_MESSAGES.invalidCredentials;
   }
 
   if (status === 403) {
-    return LOGIN_ERROR_MESSAGES.forbidden
+    return LOGIN_ERROR_MESSAGES.forbidden;
   }
 
   if (status === 429) {
-    return LOGIN_ERROR_MESSAGES.tooManyRequests
+    return LOGIN_ERROR_MESSAGES.tooManyRequests;
   }
 
   if (status >= 500) {
-    return LOGIN_ERROR_MESSAGES.serviceUnavailable
+    return LOGIN_ERROR_MESSAGES.serviceUnavailable;
   }
 
-  return LOGIN_ERROR_MESSAGES.generic
-}
+  return LOGIN_ERROR_MESSAGES.generic;
+};
 
 const mapLoginErrorMessage = (errorText: string, status: number): string => {
   if (!errorText) {
-    return getLoginErrorMessageByStatus(status)
+    return getLoginErrorMessageByStatus(status);
   }
 
-  const normalisedText = normaliseErrorText(errorText)
-  const normalisedKey = normalisedText.toLowerCase()
-  const mappedMessage = getKnownLoginErrorMessage(normalisedKey)
+  const normalisedText = normaliseErrorText(errorText);
+  const normalisedKey = normalisedText.toLowerCase();
+  const mappedMessage = getKnownLoginErrorMessage(normalisedKey);
 
   if (mappedMessage) {
-    return mappedMessage
+    return mappedMessage;
   }
 
   // If backend returns machine-style codes, avoid exposing raw text.
   const looksLikeMachineCode =
-    /^[a-z0-9_-]+$/i.test(normalisedText) || /^[A-Z][a-zA-Z0-9]+$/.test(normalisedText)
+    /^[a-z0-9_-]+$/i.test(normalisedText) || /^[A-Z][a-zA-Z0-9]+$/.test(normalisedText);
   if (looksLikeMachineCode) {
-    return getLoginErrorMessageByStatus(status)
+    return getLoginErrorMessageByStatus(status);
   }
 
   // Preserve human-readable backend detail for unknown cases.
-  return normalisedText || getLoginErrorMessageByStatus(status)
-}
+  return normalisedText || getLoginErrorMessageByStatus(status);
+};
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<string> {
@@ -69,16 +69,16 @@ export const authService = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(credentials),
-    })
+    });
 
     if (!response.ok) {
-      const errorText = await response.text()
-      const errorMessage = mapLoginErrorMessage(errorText, response.status)
-      throw new Error(errorMessage)
+      const errorText = await response.text();
+      const errorMessage = mapLoginErrorMessage(errorText, response.status);
+      throw new Error(errorMessage);
     }
 
-    const token = await response.text()
-    return token
+    const token = await response.text();
+    return token;
   },
 
   async loginWithGitHub(code: string): Promise<GitHubAuthData> {
@@ -86,17 +86,17 @@ export const authService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(GITHUB_AUTH_ERROR_MESSAGES.generic)
+      throw new Error(GITHUB_AUTH_ERROR_MESSAGES.generic);
     }
 
-    return response.json() as Promise<GitHubAuthData>
+    return response.json() as Promise<GitHubAuthData>;
   },
 
   async logout(): Promise<void> {
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('auth_token');
 
     const response = await fetch(`${API_BASE_URL}/api/sign_out`, {
       method: 'POST',
@@ -104,15 +104,15 @@ export const authService = {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Logout failed: ${response.status}`)
+      throw new Error(`Logout failed: ${response.status}`);
     }
   },
 
   async revokeGitHub(): Promise<void> {
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('auth_token');
 
     const response = await fetch(`${GITHUB_AUTH_API}/api/auth/revoke`, {
       method: 'POST',
@@ -120,10 +120,10 @@ export const authService = {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(GITHUB_AUTH_ERROR_MESSAGES.revoke)
+      throw new Error(GITHUB_AUTH_ERROR_MESSAGES.revoke);
     }
   },
-}
+};

@@ -4,8 +4,8 @@
 
 export interface ComparisonRow extends Record<string, unknown> {
   /** Row identifier. May be null for separator rows that are stripped out during grouping. */
-  id: string | number | null
-  [key: string]: unknown
+  id: string | number | null;
+  [key: string]: unknown;
 }
 
 /**
@@ -14,11 +14,11 @@ export interface ComparisonRow extends Record<string, unknown> {
  */
 export interface ParseCompleteResults {
   /** Array of parsed rows—each row is an array or object depending on header setting. */
-  data: ComparisonRow[]
+  data: ComparisonRow[];
   /** Array of errors encountered during parsing. */
-  errors: ParseError[]
+  errors: ParseError[];
   /** Metadata about the parse operation. */
-  meta: ParseMeta
+  meta: ParseMeta;
 }
 
 /**
@@ -27,13 +27,13 @@ export interface ParseCompleteResults {
  */
 export interface ParseError {
   /** Type of error: 'Quotes', 'Delimiter', or 'FieldMismatch'. */
-  type: 'Quotes' | 'Delimiter' | 'FieldMismatch'
+  type: 'Quotes' | 'Delimiter' | 'FieldMismatch';
   /** Standardised error code. */
-  code: 'MissingQuotes' | 'UndetectableDelimiter' | 'TooFewFields' | 'TooManyFields'
+  code: 'MissingQuotes' | 'UndetectableDelimiter' | 'TooFewFields' | 'TooManyFields';
   /** Human-readable error message. */
-  message: string
+  message: string;
   /** Row index where the error occurred. */
-  row?: number
+  row?: number;
 }
 
 /**
@@ -42,19 +42,19 @@ export interface ParseError {
  */
 export interface ParseMeta {
   /** Delimiter used in the parse. */
-  delimiter: string
+  delimiter: string;
   /** Line break sequence used in the parse. */
-  linebreak: string
+  linebreak: string;
   /** Whether the parse was aborted. */
-  aborted: boolean
+  aborted: boolean;
   /** Whether preview consumed all input. */
-  truncated: boolean
+  truncated: boolean;
   /** Current cursor position in the input. */
-  cursor: number
+  cursor: number;
   /** Array of field names (only when header: true). */
-  fields?: string[]
+  fields?: string[];
   /** Headers that were automatically renamed to avoid duplication. */
-  renamedHeaders?: Record<string, string>
+  renamedHeaders?: Record<string, string>;
 }
 
 /**
@@ -62,6 +62,6 @@ export interface ParseMeta {
  * Note: This may differ from ParseError depending on the error context.
  */
 export interface ParseErrorEvent {
-  name: string
-  message: string
+  name: string;
+  message: string;
 }

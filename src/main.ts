@@ -1,21 +1,21 @@
-import { createPinia } from 'pinia'
-import { createApp } from 'vue'
-import { createGtag } from 'vue-gtag'
-import './assets/main.css'
+import { createPinia } from 'pinia';
+import { createApp } from 'vue';
+import { createGtag } from 'vue-gtag';
+import './assets/main.css';
 
-import App from './App.vue'
-import { LOGIN_DISABLED } from './constants/auth'
-import router from './router'
-import { useAuthStore } from './stores/auth'
+import App from './App.vue';
+import { LOGIN_DISABLED } from './constants/auth';
+import router from './router';
+import { useAuthStore } from './stores/auth';
 
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID
-const isCypress = typeof window !== 'undefined' && 'Cypress' in window
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+const isCypress = typeof window !== 'undefined' && 'Cypress' in window;
 
-const app = createApp(App)
-const pinia = createPinia()
+const app = createApp(App);
+const pinia = createPinia();
 
-app.use(pinia)
-app.use(router)
+app.use(pinia);
+app.use(router);
 
 if (GA_MEASUREMENT_ID && !isCypress) {
   const gtag = createGtag({
@@ -23,19 +23,19 @@ if (GA_MEASUREMENT_ID && !isCypress) {
     pageTracker: {
       router,
     },
-  })
-  app.use(gtag)
+  });
+  app.use(gtag);
 }
 
 // Initialise authentication state from local storage.
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
 // When login is disabled, any previously stored authentication data is stale
 // and should be removed so that it is not left behind in storage.
 if (LOGIN_DISABLED) {
-  authStore.clearAuth()
+  authStore.clearAuth();
 } else {
-  authStore.initAuth()
+  authStore.initAuth();
 }
 
 // Synchronises authentication state across browser tabs.
@@ -43,17 +43,17 @@ if (LOGIN_DISABLED) {
 // Listens for changes to both 'auth_token' and 'username', and debounces reinitialisation
 // so that initAuth() executes only once after both keys are set during login.
 // This listener persists for the application's lifetime and requires no explicit cleanup.
-let authStorageSyncTimeout: number | undefined
+let authStorageSyncTimeout: number | undefined;
 
 window.addEventListener('storage', (event) => {
   if (event.key === 'auth_token' || event.key === 'username') {
     if (authStorageSyncTimeout !== undefined) {
-      clearTimeout(authStorageSyncTimeout)
+      clearTimeout(authStorageSyncTimeout);
     }
     authStorageSyncTimeout = window.setTimeout(() => {
-      authStore.initAuth()
-    }, 50)
+      authStore.initAuth();
+    }, 50);
   }
-})
+});
 
-app.mount('#app')
+app.mount('#app');

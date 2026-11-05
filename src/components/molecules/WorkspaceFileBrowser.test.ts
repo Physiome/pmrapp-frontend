@@ -1,16 +1,16 @@
-import { flushPromises, mount } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick } from 'vue'
-import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
-import { mockWorkspaceInfo } from '@/mocks/workspaceInfo'
-import { useWorkspaceStore } from '@/stores/workspace'
+import { flushPromises, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
+import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue';
+import { mockWorkspaceInfo } from '@/mocks/workspaceInfo';
+import { useWorkspaceStore } from '@/stores/workspace';
 
 describe('WorkspaceFileBrowser', () => {
-  let workspaceStore: ReturnType<typeof useWorkspaceStore>
+  let workspaceStore: ReturnType<typeof useWorkspaceStore>;
 
   const mountComponent = async (extraProps: Record<string, unknown> = {}) => {
-    vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockResolvedValue(mockWorkspaceInfo)
+    vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockResolvedValue(mockWorkspaceInfo);
 
     const wrapper = mount(WorkspaceFileBrowser, {
       props: {
@@ -31,61 +31,61 @@ describe('WorkspaceFileBrowser', () => {
           DownloadIcon: true,
         },
       },
-    })
+    });
 
-    await flushPromises()
-    await nextTick()
+    await flushPromises();
+    await nextTick();
 
-    return wrapper
-  }
+    return wrapper;
+  };
 
   beforeEach(() => {
-    setActivePinia(createPinia())
-    workspaceStore = useWorkspaceStore()
-    vi.clearAllMocks()
-  })
+    setActivePinia(createPinia());
+    workspaceStore = useWorkspaceStore();
+    vi.clearAllMocks();
+  });
 
   it('renders 7 file items and the correct file count text', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
-    const listItems = wrapper.findAll('ul.divide-y > li')
-    expect(listItems).toHaveLength(7)
+    const listItems = wrapper.findAll('ul.divide-y > li');
+    expect(listItems).toHaveLength(7);
 
-    const fileCountText = wrapper.find('.text-gray-600')
-    expect(fileCountText.exists()).toBe(true)
-    expect(fileCountText.text()).toContain('7 items')
-  })
+    const fileCountText = wrapper.find('.text-gray-600');
+    expect(fileCountText.exists()).toBe(true);
+    expect(fileCountText.text()).toContain('7 items');
+  });
 
   it('shows a skeleton while the files are loading', async () => {
-    vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockReturnValue(new Promise(() => {}))
+    vi.spyOn(workspaceStore, 'getWorkspaceInfo').mockReturnValue(new Promise(() => {}));
 
     const wrapper = mount(WorkspaceFileBrowser, {
       props: {
         alias: 'test-alias',
         commitId: mockWorkspaceInfo.commit.commit_id,
       },
-    })
-    await nextTick()
+    });
+    await nextTick();
 
-    expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true)
-    expect(wrapper.text()).not.toContain('items')
-  })
+    expect(wrapper.findComponent({ name: 'SkeletonBlock' }).exists()).toBe(true);
+    expect(wrapper.text()).not.toContain('items');
+  });
 
   it('shows the in-box path when browsing folders in place', async () => {
-    const wrapper = await mountComponent({ path: 'src/models', onPathChange: vi.fn() })
+    const wrapper = await mountComponent({ path: 'src/models', onPathChange: vi.fn() });
 
-    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true)
-  })
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true);
+  });
 
   it('shows the in-box path on standalone workspace pages', async () => {
-    const wrapper = await mountComponent({ path: 'src/models' })
+    const wrapper = await mountComponent({ path: 'src/models' });
 
-    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true)
-  })
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(true);
+  });
 
   it('does not show the in-box path at the workspace root', async () => {
-    const wrapper = await mountComponent()
+    const wrapper = await mountComponent();
 
-    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(false)
-  })
-})
+    expect(wrapper.findComponent({ name: 'FileBrowserBreadcrumb' }).exists()).toBe(false);
+  });
+});

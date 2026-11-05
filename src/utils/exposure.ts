@@ -1,5 +1,5 @@
-import { TITLE } from '@/constants/global'
-import type { SearchQueryRequest, SearchResult } from '@/types/search'
+import { TITLE } from '@/constants/global';
+import type { SearchQueryRequest, SearchResult } from '@/types/search';
 
 /**
  * Utility function to extract the exposure ID from a resource path string.
@@ -8,13 +8,13 @@ import type { SearchQueryRequest, SearchResult } from '@/types/search'
  * @returns The exposure ID as a number, or null if not found.
  */
 export const getExposureIdFromResourcePath = (resourcePath: string): number | null => {
-  const match = resourcePath.match(/\/exposure\/(\d+)\//)
+  const match = resourcePath.match(/\/exposure\/(\d+)\//);
   if (match?.[1]) {
     // match[1] contains the captured digits, which is the exposure ID.
-    return Number(match[1])
+    return Number(match[1]);
   }
-  return null
-}
+  return null;
+};
 
 /**
  * Generate exposure page title from description or ID.
@@ -29,31 +29,31 @@ export const generateExposureTitle = (
   id: number | null | undefined,
   withTitleSuffix = false,
 ): string => {
-  let title: string
+  let title: string;
 
   // Generic title if neither description nor ID is available.
   if (!description && !id) {
-    title = 'Exposure Detail'
+    title = 'Exposure Detail';
   } else if (description && description.trim() !== '') {
     // Title using description.
-    title = description
+    title = description;
   } else {
     // Fallback title using ID.
-    title = `Exposure ${id}`
+    title = `Exposure ${id}`;
   }
 
-  return withTitleSuffix ? `${title} – ${TITLE}` : title
-}
+  return withTitleSuffix ? `${title} – ${TITLE}` : title;
+};
 
 const findExposureFileTitle = (results: SearchResult[], file: string): string => {
   const match = results.find((result) => {
-    const resourcePath = result.resource_path
-    const parts = resourcePath.split('/')
-    const lastPart = parts[parts.length - 1]
-    return lastPart === file
-  })
-  return match?.data._title?.[0] || ''
-}
+    const resourcePath = result.resource_path;
+    const parts = resourcePath.split('/');
+    const lastPart = parts[parts.length - 1];
+    return lastPart === file;
+  });
+  return match?.data._title?.[0] || '';
+};
 
 /**
  * Resolve an exposure file title from search index results.
@@ -75,11 +75,11 @@ export const resolveExposureFileTitle = async (
         term: alias,
       },
     ],
-  })
+  });
 
   if (!Array.isArray(results)) {
-    return ''
+    return '';
   }
 
-  return findExposureFileTitle(results, file)
-}
+  return findExposureFileTitle(results, file);
+};

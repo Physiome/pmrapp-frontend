@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue'
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue';
 
 defineProps<{
-  to: string
-  title: string
-  description: string
-}>()
+  to: string;
+  title: string;
+  description: string;
+}>();
 </script>
 
 <template>
@@ -30,5 +30,5 @@ defineProps<{
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

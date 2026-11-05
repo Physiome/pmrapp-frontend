@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue'
-import LoadingBox from '@/components/atoms/LoadingBox.vue'
-import BugIcon from '@/components/icons/BugIcon.vue'
-import DownloadIcon from '@/components/icons/DownloadIcon.vue'
-import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue'
-import ErrorBlock from '@/components/molecules/ErrorBlock.vue'
-import PageHeader from '@/components/molecules/PageHeader.vue'
-import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue'
-import { GITHUB_ISSUES_URL } from '@/constants/global'
-import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService'
-import { useWorkspaceStore } from '@/stores/workspace'
-import type { ErrorInfo } from '@/types/error'
-import type { WorkspaceInfo } from '@/types/workspace'
-import { generateWorkspaceBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace'
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import FormattedEmailText from '@/components/atoms/FormattedEmailText.vue';
+import LoadingBox from '@/components/atoms/LoadingBox.vue';
+import BugIcon from '@/components/icons/BugIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue';
+import ErrorBlock from '@/components/molecules/ErrorBlock.vue';
+import PageHeader from '@/components/molecules/PageHeader.vue';
+import WorkspaceFileBrowser from '@/components/molecules/WorkspaceFileBrowser.vue';
+import { GITHUB_ISSUES_URL } from '@/constants/global';
+import { getWorkspaceArchiveUrl } from '@/services/downloadUrlService';
+import { useWorkspaceStore } from '@/stores/workspace';
+import type { ErrorInfo } from '@/types/error';
+import type { WorkspaceInfo } from '@/types/workspace';
+import { generateWorkspaceBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace';
 
 const props = defineProps<{
-  alias: string
-  commitId?: string
-  path?: string
-}>()
+  alias: string;
+  commitId?: string;
+  path?: string;
+}>();
 
-const router = useRouter()
-const workspaceStore = useWorkspaceStore()
-const workspaceInfo = ref<WorkspaceInfo | null>(null)
-const error = ref<ErrorInfo | null>(null)
-const isLoading = ref(true)
-const requestCounter = ref(0)
+const router = useRouter();
+const workspaceStore = useWorkspaceStore();
+const workspaceInfo = ref<WorkspaceInfo | null>(null);
+const error = ref<ErrorInfo | null>(null);
+const isLoading = ref(true);
+const requestCounter = ref(0);
 
 const breadcrumbItems = computed(() =>
   generateWorkspaceBreadcrumbs(
@@ -38,30 +38,30 @@ const breadcrumbItems = computed(() =>
     props.path ?? '',
     !workspaceInfo.value && isLoading.value,
   ),
-)
+);
 
 const workspaceArchiveFilename = computed(() => {
-  if (!workspaceInfo.value) return ''
+  if (!workspaceInfo.value) return '';
 
-  return workspaceInfo.value.workspace.description || props.alias
-})
+  return workspaceInfo.value.workspace.description || props.alias;
+});
 
 const workspaceArchiveUrlBase = computed(() => {
-  if (!workspaceInfo.value) return ''
+  if (!workspaceInfo.value) return '';
 
-  return getWorkspaceArchiveUrl(props.alias, workspaceInfo.value.commit.commit_id)
-})
+  return getWorkspaceArchiveUrl(props.alias, workspaceInfo.value.commit.commit_id);
+});
 
 const pageTitle = computed(() => {
   return generateWorkspaceTitle(
     workspaceInfo.value?.workspace.description,
     workspaceInfo.value?.workspace.id,
-  )
-})
+  );
+});
 
 const workspaceIssueUrl = computed(() => {
   if (!props.alias) {
-    return `${GITHUB_ISSUES_URL}/new`
+    return `${GITHUB_ISSUES_URL}/new`;
   }
 
   const resolved = router.resolve(
@@ -71,62 +71,62 @@ const workspaceIssueUrl = computed(() => {
           params: { alias: props.alias, commitId: props.commitId, path: props.path },
         }
       : { name: 'workspace-detail', params: { alias: props.alias } },
-  )
-  const decodedHref = decodeURIComponent(resolved.href)
-  const workspaceUrl = new URL(decodedHref, window.location.origin).toString()
+  );
+  const decodedHref = decodeURIComponent(resolved.href);
+  const workspaceUrl = new URL(decodedHref, window.location.origin).toString();
   const params = new URLSearchParams({
     labels: 'workspace,preview-feedback',
     template: 'workspace.yml',
     title: `[Workspace]: ${error.value ? error.value.title : pageTitle.value}`,
     'workspace-url': workspaceUrl,
-  })
+  });
 
-  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
-})
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`;
+});
 
 const loadWorkspaceInfo = async () => {
-  isLoading.value = true
-  error.value = null
+  isLoading.value = true;
+  error.value = null;
 
-  const currentRequest = ++requestCounter.value
+  const currentRequest = ++requestCounter.value;
 
   try {
-    const alias = props.alias
-    const commitId = props.commitId || ''
-    const path = props.path || ''
-    const workspaceData = await workspaceStore.getWorkspaceInfo(alias, commitId, path)
+    const alias = props.alias;
+    const commitId = props.commitId || '';
+    const path = props.path || '';
+    const workspaceData = await workspaceStore.getWorkspaceInfo(alias, commitId, path);
 
     if (currentRequest === requestCounter.value) {
-      workspaceInfo.value = workspaceData
+      workspaceInfo.value = workspaceData;
     }
   } catch (err) {
     if (currentRequest === requestCounter.value) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load workspace.'
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load workspace.';
 
       if (errorMessage.toLowerCase().includes('not found')) {
         error.value = {
           title: 'Workspace not found',
           message: 'The workspace you are looking for does not exist or has been removed.',
-        }
+        };
       } else {
         error.value = {
           title: 'Error loading workspace',
           message: errorMessage,
-        }
+        };
       }
-      console.error('Error loading workspace:', err)
+      console.error('Error loading workspace:', err);
     }
   } finally {
     if (currentRequest === requestCounter.value) {
-      isLoading.value = false
+      isLoading.value = false;
     }
   }
-}
+};
 
-onMounted(loadWorkspaceInfo)
+onMounted(loadWorkspaceInfo);
 
 // Watch for changes in props to reload data when navigating between folders.
-watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
+watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo);
 </script>
 
 <template>
@@ -147,18 +147,12 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
     </ActionButton>
   </div>
 
-  <ErrorBlock
-    v-if="error"
-    :title="error.title"
-    :error="error.message"
-  />
+  <ErrorBlock v-if="error" :title="error.title" :error="error.message" />
 
   <LoadingBox v-else-if="isLoading" message="Loading workspace..." />
 
   <div v-else-if="workspaceInfo">
-    <PageHeader
-      :title="pageTitle"
-    />
+    <PageHeader :title="pageTitle" />
 
     <div class="mb-6 space-y-4">
       <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2">
@@ -173,7 +167,10 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
         </a>
       </div>
 
-      <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2" v-if="workspaceInfo.commit.author">
+      <div
+        class="flex flex-col lg:flex-row items-start lg:items-center gap-2"
+        v-if="workspaceInfo.commit.author"
+      >
         <span class="font-bold text-gray-600 dark:text-gray-400">Author:</span>
         <FormattedEmailText :text="workspaceInfo.commit.author" />
       </div>
@@ -189,7 +186,11 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             content-section="Workspace Detail"
           >
             <DownloadIcon class="w-4 h-4" />
-            <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code> file)</span>
+            <span
+              >Complete archive (as a
+              <code class="code-inline bg-gray-100 dark:bg-gray-700">.zip</code>
+              file)</span
+            >
           </ActionButton>
           <ActionButton
             variant="secondary"
@@ -199,7 +200,11 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
             content-section="Workspace Detail"
           >
             <DownloadIcon class="w-4 h-4" />
-            <span>Complete archive (as a <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code> file)</span>
+            <span
+              >Complete archive (as a
+              <code class="code-inline bg-gray-100 dark:bg-gray-700">.tgz</code>
+              file)</span
+            >
           </ActionButton>
         </div>
       </div>
@@ -214,13 +219,13 @@ watch(() => [props.alias, props.commitId, props.path], loadWorkspaceInfo)
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
-@import '@/assets/box.css';
+@import "@/assets/text-link.css";
+@import "@/assets/box.css";
 
 .code-inline {
   display: inline-block;
   padding: 0 0.25em;
   border-radius: 0.25rem;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
 }
 </style>

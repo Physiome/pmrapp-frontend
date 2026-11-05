@@ -1,64 +1,64 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import Dialog from '@/components/molecules/Dialog.vue'
-import { SEARCH_KIND_NAMES } from '@/constants/search'
-import { buildQuerySearchQuery, buildSearchQuery, parseQueryFiltersFromQuery } from '@/utils/search'
-import SearchComboBox from '../molecules/SearchComboBox.vue'
+import { nextTick, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import Dialog from '@/components/molecules/Dialog.vue';
+import { SEARCH_KIND_NAMES } from '@/constants/search';
+import { buildQuerySearchQuery, parseQueryFiltersFromQuery } from '@/utils/search';
+import SearchComboBox from '../molecules/SearchComboBox.vue';
 
 const props = defineProps<{
-  show: boolean
-}>()
+  show: boolean;
+}>();
 
-const emit = defineEmits<(e: 'close') => void>()
+const emit = defineEmits<(e: 'close') => void>();
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
-const searchComboBoxRef = ref<InstanceType<typeof SearchComboBox> | null>(null)
-const dropdownSpacerHeight = ref(0)
+const searchComboBoxRef = ref<InstanceType<typeof SearchComboBox> | null>(null);
+const dropdownSpacerHeight = ref(0);
 
 watch(
   () => props.show,
   (show) => {
     if (show) {
       nextTick().then(() => {
-        searchComboBoxRef.value?.focusInput()
-      })
+        searchComboBoxRef.value?.focusInput();
+      });
     }
   },
   { immediate: true },
-)
+);
 
 watch(
   () => route.fullPath,
   () => {
     if (props.show) {
-      emit('close')
+      emit('close');
     }
   },
-)
+);
 
 const handleQuerySearch = (request: {
-  query?: string
-  filters?: Array<{ kind: string; term: string }>
+  query?: string;
+  filters?: Array<{ kind: string; term: string }>;
 }) => {
   router.push({
     path: '/search',
     query: buildQuerySearchQuery(request.query ?? '', request.filters ?? [], route.query),
-  })
-  emit('close')
-}
+  });
+  emit('close');
+};
 
 const getInitialTerm = (): string => {
-  const queryParam = route.query.query
+  const queryParam = route.query.query;
 
   if (typeof queryParam === 'string') {
-    return queryParam
+    return queryParam;
   }
 
-  return ''
-}
+  return '';
+};
 </script>
 
 <template>
@@ -79,6 +79,9 @@ const getInitialTerm = (): string => {
       @dropdown-height-change="(h) => (dropdownSpacerHeight = h)"
     />
     <!-- Spacer that grows the dialog to accommodate the absolute-positioned dropdown -->
-    <div :style="{ height: dropdownSpacerHeight > 0 ? `${dropdownSpacerHeight}px` : '0' }" aria-hidden="true" />
+    <div
+      :style="{ height: dropdownSpacerHeight > 0 ? `${dropdownSpacerHeight}px` : '0' }"
+      aria-hidden="true"
+    />
   </Dialog>
 </template>

@@ -5,8 +5,8 @@
 /**
  * Licence URL used as a fallback when an exposure does not provide one.
  */
-export const DEFAULT_LICENCE = 'https://creativecommons.org/licenses/by/3.0/'
-export const LICENCE_ERROR_MESSAGE = 'Licence information could not be loaded.'
+export const DEFAULT_LICENCE = 'https://creativecommons.org/licenses/by/3.0/';
+export const LICENCE_ERROR_MESSAGE = 'Licence information could not be loaded.';
 
 /**
  * Views offered alongside the default exposure preview.
@@ -20,7 +20,7 @@ export const AVAILABLE_VIEWS = [
     name: 'Mathematics',
     view_key: 'cellml_math',
   },
-]
+];
 
 /**
  * Languages supported by the CellML code generation view.
@@ -51,4 +51,4 @@ export const CODEGEN_LANGUAGES = [
     path: 'code.Python.py',
     fileName: 'code.py',
   },
-]
+];

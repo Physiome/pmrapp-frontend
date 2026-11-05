@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GitHubIcon from '@/components/icons/GitHubIcon.vue'
+import GitHubIcon from '@/components/icons/GitHubIcon.vue';
 
 const repositories = [
   {
@@ -10,7 +10,7 @@ const repositories = [
     name: 'Web app',
     url: 'https://github.com/Physiome/pmrapp-frontend',
   },
-]
+];
 </script>
 
 <template>

@@ -1,104 +1,104 @@
 <script setup lang="ts">
-import type { ComponentPublicInstance } from 'vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import Chip from '@/components/atoms/Chip.vue'
-import SearchField from '@/components/atoms/SearchField.vue'
-import TermButton from '@/components/atoms/TermButton.vue'
-import { SEARCH_CATEGORIES } from '@/constants/search'
-import { useSearchStore } from '@/stores/search'
-import type { SearchFilter } from '@/types/search'
-import { formatSearchKey } from '@/utils/format'
-import { isValidTerm } from '@/utils/search'
+import type { ComponentPublicInstance } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import Chip from '@/components/atoms/Chip.vue';
+import SearchField from '@/components/atoms/SearchField.vue';
+import TermButton from '@/components/atoms/TermButton.vue';
+import { SEARCH_CATEGORIES } from '@/constants/search';
+import { useSearchStore } from '@/stores/search';
+import type { SearchFilter } from '@/types/search';
+import { formatSearchKey } from '@/utils/format';
+import { isValidTerm } from '@/utils/search';
 
 const props = defineProps<{
-  isSuggestionsVisible: boolean
-  inOverlay?: boolean
-  searchInput: string
-  initialFilters?: SearchFilter[]
-}>()
+  isSuggestionsVisible: boolean;
+  inOverlay?: boolean;
+  searchInput: string;
+  initialFilters?: SearchFilter[];
+}>();
 
 const emit = defineEmits<{
-  (e: 'searchTermClick', filters: SearchFilter[]): void
-  (e: 'focusSearchInput'): void
-  (e: 'escape'): void
-  (e: 'search'): void
-  (e: 'cancel'): void
-}>()
+  (e: 'searchTermClick', filters: SearchFilter[]): void;
+  (e: 'focusSearchInput'): void;
+  (e: 'escape'): void;
+  (e: 'search'): void;
+  (e: 'cancel'): void;
+}>();
 
-const searchStore = useSearchStore()
-const termsFilter = ref<string>('')
-const formattedTermsFilter = computed(() => formatSearchKey(termsFilter.value))
-const categoriesError = ref<string | null>(null)
-const expandedCategoryKinds = ref<Record<string, boolean>>({})
-const filterInputRef = ref<InstanceType<typeof SearchField> | null>(null)
-const chipRefs = ref<InstanceType<typeof Chip>[]>([])
-const termButtonRefs = ref<InstanceType<typeof TermButton>[]>([])
-const toggleButtonRefs = ref<(HTMLButtonElement | null)[]>([])
-const clearAllButtonRef = ref<HTMLButtonElement | null>(null)
-const searchButtonRef = ref<HTMLButtonElement | null>(null)
-const cancelButtonRef = ref<HTMLButtonElement | null>(null)
-const MAX_TERMS_PER_CATEGORY = 10
-const selectedFilters = ref<SearchFilter[]>(props.initialFilters ? [...props.initialFilters] : [])
+const searchStore = useSearchStore();
+const termsFilter = ref<string>('');
+const formattedTermsFilter = computed(() => formatSearchKey(termsFilter.value));
+const categoriesError = ref<string | null>(null);
+const expandedCategoryKinds = ref<Record<string, boolean>>({});
+const filterInputRef = ref<InstanceType<typeof SearchField> | null>(null);
+const chipRefs = ref<InstanceType<typeof Chip>[]>([]);
+const termButtonRefs = ref<InstanceType<typeof TermButton>[]>([]);
+const toggleButtonRefs = ref<(HTMLButtonElement | null)[]>([]);
+const clearAllButtonRef = ref<HTMLButtonElement | null>(null);
+const searchButtonRef = ref<HTMLButtonElement | null>(null);
+const cancelButtonRef = ref<HTMLButtonElement | null>(null);
+const MAX_TERMS_PER_CATEGORY = 10;
+const selectedFilters = ref<SearchFilter[]>(props.initialFilters ? [...props.initialFilters] : []);
 
 const resultGroupClass = computed(() => [
   'border-b last:border-0 border-gray-200 dark:border-gray-700',
   'transition-all group-hover/results:opacity-75 hover:!opacity-100',
-])
+]);
 
-const resultGroupHeaderClass = computed(() => ['sticky-container', 'sticky top-0 z-1'])
+const resultGroupHeaderClass = computed(() => ['sticky-container', 'sticky top-0 z-1']);
 
 const resultGroupHeaderInnerClass = computed(() => [
   'sticky-container-inner',
   'p-4 gap-3',
   'flex items-start justify-between',
   'bg-background transition-shadow',
-])
+]);
 
 const resultGroupBodyClass = computed(() => [
   'p-4 pt-0 gap-2',
   'flex flex-row items-start justify-start flex-wrap',
-])
+]);
 
 watch(
   () => props.initialFilters,
   (newFilters) => {
-    selectedFilters.value = newFilters ? [...newFilters] : []
+    selectedFilters.value = newFilters ? [...newFilters] : [];
   },
   { deep: true },
-)
+);
 
 const setTermButtonRef = (el: Element | ComponentPublicInstance | null, index: number) => {
   if (el) {
-    termButtonRefs.value[index] = el as InstanceType<typeof TermButton>
+    termButtonRefs.value[index] = el as InstanceType<typeof TermButton>;
   }
-}
+};
 
 const setChipRef = (el: Element | ComponentPublicInstance | null, index: number) => {
   if (el) {
-    chipRefs.value[index] = el as InstanceType<typeof Chip>
+    chipRefs.value[index] = el as InstanceType<typeof Chip>;
   }
-}
+};
 
 const setToggleButtonRef = (el: Element | ComponentPublicInstance | null, index: number) => {
-  toggleButtonRefs.value[index] = el as HTMLButtonElement | null
-}
+  toggleButtonRefs.value[index] = el as HTMLButtonElement | null;
+};
 
 const filteredSearchTermsByCategory = computed(() => {
-  const searchTermValue = termsFilter.value.trim().toLowerCase()
-  const shouldFilterByInput = Boolean(searchTermValue)
+  const searchTermValue = termsFilter.value.trim().toLowerCase();
+  const shouldFilterByInput = Boolean(searchTermValue);
 
   return SEARCH_CATEGORIES.map((category) => {
-    const categoryData = searchStore.categories.find((cat) => cat.kind === category.value)
-    const terms = categoryData?.kindInfo?.terms || []
+    const categoryData = searchStore.categories.find((cat) => cat.kind === category.value);
+    const terms = categoryData?.kindInfo?.terms || [];
 
     const filteredTerms = terms.filter((term) => {
-      if (!isValidTerm(term)) return false
-      if (!shouldFilterByInput) return true
-      return term.toLowerCase().includes(searchTermValue)
-    })
+      if (!isValidTerm(term)) return false;
+      if (!shouldFilterByInput) return true;
+      return term.toLowerCase().includes(searchTermValue);
+    });
 
-    const totalCount = filteredTerms.length
-    const isExpanded = Boolean(expandedCategoryKinds.value[category.value])
+    const totalCount = filteredTerms.length;
+    const isExpanded = Boolean(expandedCategoryKinds.value[category.value]);
 
     return {
       kind: category.value,
@@ -106,65 +106,65 @@ const filteredSearchTermsByCategory = computed(() => {
       terms: isExpanded ? filteredTerms : filteredTerms.slice(0, MAX_TERMS_PER_CATEGORY),
       totalCount,
       isExpanded,
-    }
-  }).filter((group) => group.terms.length > 0)
-})
+    };
+  }).filter((group) => group.terms.length > 0);
+});
 
 const getTermIndexInFlattenedList = (groupIndex: number, termIndex: number): number => {
   const priorTermsCount = filteredSearchTermsByCategory.value
     .slice(0, groupIndex)
-    .reduce((acc, group) => acc + group.terms.length, 0)
+    .reduce((acc, group) => acc + group.terms.length, 0);
 
-  return priorTermsCount + termIndex
-}
+  return priorTermsCount + termIndex;
+};
 
 const getGroupTermStartIndex = (groupIndex: number): number => {
   const priorTermsCount = filteredSearchTermsByCategory.value
     .slice(0, groupIndex)
-    .reduce((acc, group) => acc + group.terms.length, 0)
+    .reduce((acc, group) => acc + group.terms.length, 0);
 
-  return priorTermsCount
-}
+  return priorTermsCount;
+};
 
 onMounted(async () => {
-  const validKinds = SEARCH_CATEGORIES.map((cat) => cat.value)
+  const validKinds = SEARCH_CATEGORIES.map((cat) => cat.value);
 
   try {
-    await searchStore.fetchCategories(validKinds)
+    await searchStore.fetchCategories(validKinds);
   } catch (err) {
-    categoriesError.value = 'Failed to fetch search categories.'
-    console.error('Failed to fetch search categories:', err)
+    categoriesError.value = 'Failed to fetch search categories.';
+    console.error('Failed to fetch search categories:', err);
   }
-})
+});
 
 const isLoading = computed(
   () => searchStore.isLoading || searchStore.categories.some((cat) => cat.loading),
-)
+);
 
 const handleToggleTerms = (kind: string) => {
   expandedCategoryKinds.value = {
     ...expandedCategoryKinds.value,
     [kind]: !expandedCategoryKinds.value[kind],
-  }
-}
+  };
+};
 
 const handleToggleTermsByKeyboard = async (kind: string, groupIndex: number) => {
-  const wasExpanded = Boolean(expandedCategoryKinds.value[kind])
-  handleToggleTerms(kind)
-  await nextTick()
+  const wasExpanded = Boolean(expandedCategoryKinds.value[kind]);
+  handleToggleTerms(kind);
+  await nextTick();
 
   if (!wasExpanded) {
     // Move focus to first newly revealed term after expanding from "... more".
-    const firstRevealedIndex = getGroupTermStartIndex(groupIndex) + MAX_TERMS_PER_CATEGORY
-    const revealedTerm = termButtonRefs.value[firstRevealedIndex]
-    const revealedTermEl = (revealedTerm?.$el ?? revealedTerm) as HTMLElement | undefined
-    revealedTermEl?.focus()
-    return
+    const firstRevealedIndex = getGroupTermStartIndex(groupIndex) + MAX_TERMS_PER_CATEGORY;
+    const revealedTerm = termButtonRefs.value[firstRevealedIndex];
+    const revealedTermEl = (revealedTerm?.$el ?? revealedTerm) as HTMLElement | undefined;
+    revealedTermEl?.focus();
+    return;
   }
 
-  const toggleEl = toggleButtonRefs.value[groupIndex]
-  toggleEl?.focus()
-}
+  const toggleEl = toggleButtonRefs.value[groupIndex];
+  toggleEl?.focus();
+};
 
 const handleToggleButtonKeyDown = async (
   event: KeyboardEvent,
@@ -172,166 +172,166 @@ const handleToggleButtonKeyDown = async (
   groupIndex: number,
 ) => {
   if (event.key === 'Escape') {
-    event.preventDefault()
-    handleEscape()
-    return
+    event.preventDefault();
+    handleEscape();
+    return;
   }
 
   if (event.key === 'Enter') {
-    event.preventDefault()
-    await handleToggleTermsByKeyboard(kind, groupIndex)
-    return
+    event.preventDefault();
+    await handleToggleTermsByKeyboard(kind, groupIndex);
+    return;
   }
 
   if (event.key === 'Tab') {
-    event.preventDefault()
-    handleSuggestionButtonKeyDown(event)
+    event.preventDefault();
+    handleSuggestionButtonKeyDown(event);
   }
-}
+};
 
 const chipButtons = computed<HTMLElement[]>(
   () =>
     chipRefs.value
       .map((chip) => {
-        const el = (chip?.$el ?? chip) as HTMLElement | undefined
-        return el?.querySelector('button') as HTMLElement | null
+        const el = (chip?.$el ?? chip) as HTMLElement | undefined;
+        return el?.querySelector('button') as HTMLElement | null;
       })
       .filter(Boolean) as HTMLElement[],
-)
+);
 
 const allSuggestionButtons = computed<HTMLElement[]>(() => {
-  const buttons: HTMLElement[] = [...chipButtons.value]
-  let termOffset = 0
+  const buttons: HTMLElement[] = [...chipButtons.value];
+  let termOffset = 0;
 
   if (clearAllButtonRef.value) {
-    buttons.push(clearAllButtonRef.value)
+    buttons.push(clearAllButtonRef.value);
   }
 
   filteredSearchTermsByCategory.value.forEach((group, groupIndex) => {
     const termEls = termButtonRefs.value
       .slice(termOffset, termOffset + group.terms.length)
       .map((ref) => (ref?.$el ?? ref) as HTMLElement | undefined)
-      .filter(Boolean) as HTMLElement[]
+      .filter(Boolean) as HTMLElement[];
 
-    buttons.push(...termEls)
-    termOffset += group.terms.length
+    buttons.push(...termEls);
+    termOffset += group.terms.length;
 
-    const toggleEl = toggleButtonRefs.value[groupIndex]
+    const toggleEl = toggleButtonRefs.value[groupIndex];
     if (group.totalCount > MAX_TERMS_PER_CATEGORY && toggleEl) {
-      buttons.push(toggleEl)
+      buttons.push(toggleEl);
     }
-  })
+  });
 
   if (selectedFilters.value.length > 0) {
-    if (cancelButtonRef.value) buttons.push(cancelButtonRef.value)
-    if (searchButtonRef.value) buttons.push(searchButtonRef.value)
+    if (cancelButtonRef.value) buttons.push(cancelButtonRef.value);
+    if (searchButtonRef.value) buttons.push(searchButtonRef.value);
   }
 
-  return buttons
-})
+  return buttons;
+});
 
-const hasResults = computed(() => filteredSearchTermsByCategory.value.length > 0)
+const hasResults = computed(() => filteredSearchTermsByCategory.value.length > 0);
 
 const focusSearchInput = () => {
-  emit('focusSearchInput')
-}
+  emit('focusSearchInput');
+};
 
 const handleEscape = () => {
-  emit('escape')
-}
+  emit('escape');
+};
 
 const handleSuggestionButtonKeyDown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
-    event.preventDefault()
-    handleEscape()
-    return
+    event.preventDefault();
+    handleEscape();
+    return;
   }
 
-  if (event.key !== 'Tab') return
+  if (event.key !== 'Tab') return;
 
-  const buttons = allSuggestionButtons.value
-  if (buttons.length === 0) return
+  const buttons = allSuggestionButtons.value;
+  if (buttons.length === 0) return;
 
-  const activeIndex = buttons.indexOf(event.target as HTMLElement)
-  if (activeIndex === -1) return
+  const activeIndex = buttons.indexOf(event.target as HTMLElement);
+  if (activeIndex === -1) return;
 
-  event.preventDefault()
+  event.preventDefault();
 
   if (event.shiftKey) {
     if (activeIndex === 0) {
-      filterInputRef.value?.inputRef?.focus()
+      filterInputRef.value?.inputRef?.focus();
     } else {
-      buttons[activeIndex - 1]?.focus()
+      buttons[activeIndex - 1]?.focus();
     }
-    return
+    return;
   }
 
   if (activeIndex === buttons.length - 1) {
-    focusSearchInput()
+    focusSearchInput();
   } else {
-    buttons[activeIndex + 1]?.focus()
+    buttons[activeIndex + 1]?.focus();
   }
-}
+};
 
 const handleFilterInputKeyDown = async (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
-    event.preventDefault()
-    handleEscape()
-    return
+    event.preventDefault();
+    handleEscape();
+    return;
   }
 
-  if (event.key !== 'Tab') return
+  if (event.key !== 'Tab') return;
 
   if (event.shiftKey) {
-    return
+    return;
   }
 
-  event.preventDefault()
-  await nextTick()
+  event.preventDefault();
+  await nextTick();
 
-  const buttons = allSuggestionButtons.value
-  if (buttons.length === 0) return
+  const buttons = allSuggestionButtons.value;
+  if (buttons.length === 0) return;
 
-  buttons[0]?.focus()
-}
+  buttons[0]?.focus();
+};
 
 watch(
   () => props.searchInput,
   () => {
-    expandedCategoryKinds.value = {}
+    expandedCategoryKinds.value = {};
   },
-)
+);
 
 watch(filteredSearchTermsByCategory, () => {
-  termButtonRefs.value = []
-  toggleButtonRefs.value = []
-})
+  termButtonRefs.value = [];
+  toggleButtonRefs.value = [];
+});
 
 watch(
   () => selectedFilters.value,
   () => {
-    chipRefs.value = []
+    chipRefs.value = [];
   },
-)
+);
 
 const selectedFilterChips = computed(() =>
   selectedFilters.value.map((filter) => ({
     id: `${filter.kind}:${filter.term}`,
     label: `${filter.term}`,
   })),
-)
+);
 
 const hasFilter = (kind: string, term: string): boolean => {
   return selectedFilters.value.some(
     (filter) => filter.kind === kind && filter.term.toLowerCase() === term.toLowerCase(),
-  )
-}
+  );
+};
 
 const handleSearchTermClick = (kind: string, term: string) => {
-  const normalisedKind = kind.trim()
-  const normalisedTerm = term.trim()
+  const normalisedKind = kind.trim();
+  const normalisedTerm = term.trim();
   if (!normalisedKind || !normalisedTerm) {
-    return
+    return;
   }
 
   if (hasFilter(normalisedKind, normalisedTerm)) {
@@ -339,26 +339,29 @@ const handleSearchTermClick = (kind: string, term: string) => {
       (filter) =>
         filter.kind !== normalisedKind ||
         filter.term.toLowerCase() !== normalisedTerm.toLowerCase(),
-    )
-    emit('searchTermClick', selectedFilters.value)
-    return
+    );
+    emit('searchTermClick', selectedFilters.value);
+    return;
   }
 
-  selectedFilters.value = [...selectedFilters.value, { kind: normalisedKind, term: normalisedTerm }]
-  emit('searchTermClick', selectedFilters.value)
-}
+  selectedFilters.value = [
+    ...selectedFilters.value,
+    { kind: normalisedKind, term: normalisedTerm },
+  ];
+  emit('searchTermClick', selectedFilters.value);
+};
 
 const handleRemoveChip = (chipId: string): void => {
   selectedFilters.value = selectedFilters.value.filter(
     (filter) => `${filter.kind}:${filter.term}` !== chipId,
-  )
-  emit('searchTermClick', selectedFilters.value)
-}
+  );
+  emit('searchTermClick', selectedFilters.value);
+};
 
 const handleClearAllFilters = (): void => {
-  selectedFilters.value = []
-  emit('searchTermClick', selectedFilters.value)
-}
+  selectedFilters.value = [];
+  emit('searchTermClick', selectedFilters.value);
+};
 </script>
 
 <template>
@@ -367,7 +370,9 @@ const handleClearAllFilters = (): void => {
     :class="`top-full left-0 w-full z-200 ${inOverlay ? '' : 'absolute'}`"
   >
     <div class="mt-2 box box-small overflow-hidden !shadow-none !p-0">
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div
+        class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4"
+      >
         <p class="text-gray-500 dark:text-gray-400 text-sm">
           Click a term to add it to your search or use the filter to narrow results.
         </p>
@@ -380,6 +385,7 @@ const handleClearAllFilters = (): void => {
           @keydown="handleFilterInputKeyDown"
         />
       </div>
+      <!-- biome-ignore lint/a11y/noStaticElementInteractions: delegates arrow-key navigation between the focusable chip buttons inside -->
       <div
         v-if="selectedFilterChips.length"
         class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-row flex-1 items-start justify-between gap-2"
@@ -449,7 +455,9 @@ const handleClearAllFilters = (): void => {
               <TermButton
                 v-for="(term, termIndex) in categoryGroup.terms"
                 :key="term"
-                :ref="(el) => setTermButtonRef(el, getTermIndexInFlattenedList(groupIndex, termIndex))"
+                :ref="
+                  (el) => setTermButtonRef(el, getTermIndexInFlattenedList(groupIndex, termIndex))
+                "
                 :term="term"
                 :active="hasFilter(categoryGroup.kind, term)"
                 class="focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
@@ -488,10 +496,10 @@ const handleClearAllFilters = (): void => {
 </template>
 
 <style scoped>
+@import "@/assets/box.css";
+@import "@/assets/error-box.css";
+@import "@/assets/input.css";
 @reference "tailwindcss";
-@import '@/assets/box.css';
-@import '@/assets/error-box.css';
-@import '@/assets/input.css';
 
 .sticky-container {
   container-type: scroll-state;

@@ -1,10 +1,10 @@
-const IMAGE_LOADING_ATTR = 'data-img-loading'
-const IMAGE_UNSIZED_ATTR = 'data-img-unsized'
-const IMAGE_FRAME_CLASS = 'img-frame'
-const IMAGE_FALLBACK_CLASS = 'img-fallback'
-const IMAGE_FALLBACK_TEXT = 'Image not available'
-const SVG_NS = 'http://www.w3.org/2000/svg'
-const IMAGE_SELECTOR = 'img[src], img[srcset]'
+const IMAGE_LOADING_ATTR = 'data-img-loading';
+const IMAGE_UNSIZED_ATTR = 'data-img-unsized';
+const IMAGE_FRAME_CLASS = 'img-frame';
+const IMAGE_FALLBACK_CLASS = 'img-fallback';
+const IMAGE_FALLBACK_TEXT = 'Image not available';
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const IMAGE_SELECTOR = 'img[src], img[srcset]';
 
 /**
  * Returns the element to wrap in a frame for an image:
@@ -14,8 +14,8 @@ const IMAGE_SELECTOR = 'img[src], img[srcset]'
  * otherwise the image itself.
  */
 function getImageFrameContent(img: Element): Element {
-  const parent = img.parentElement
-  return parent?.tagName === 'PICTURE' ? parent : img
+  const parent = img.parentElement;
+  return parent?.tagName === 'PICTURE' ? parent : img;
 }
 
 /**
@@ -30,29 +30,29 @@ function getImageFrameContent(img: Element): Element {
  * Styles: `src/assets/html-images.css` (apply the `html-images` class to the container).
  */
 export function prepareHtmlImages(html: string): string {
-  if (!/<img\b/i.test(html)) return html
+  if (!/<img\b/i.test(html)) return html;
 
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-  const images = Array.from(doc.querySelectorAll(IMAGE_SELECTOR))
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const images = Array.from(doc.querySelectorAll(IMAGE_SELECTOR));
 
-  if (images.length === 0) return html
+  if (images.length === 0) return html;
 
   images.forEach((img) => {
-    if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy')
-    if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async')
+    if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+    if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
 
-    const frame = doc.createElement('span')
-    frame.className = IMAGE_FRAME_CLASS
-    frame.setAttribute(IMAGE_LOADING_ATTR, '')
+    const frame = doc.createElement('span');
+    frame.className = IMAGE_FRAME_CLASS;
+    frame.setAttribute(IMAGE_LOADING_ATTR, '');
     if (!img.hasAttribute('width') && !img.hasAttribute('height')) {
-      frame.setAttribute(IMAGE_UNSIZED_ATTR, '')
+      frame.setAttribute(IMAGE_UNSIZED_ATTR, '');
     }
-    const content = getImageFrameContent(img)
-    content.replaceWith(frame)
-    frame.appendChild(content)
-  })
+    const content = getImageFrameContent(img);
+    content.replaceWith(frame);
+    frame.appendChild(content);
+  });
 
-  return doc.body.innerHTML
+  return doc.body.innerHTML;
 }
 
 /**
@@ -60,38 +60,38 @@ export function prepareHtmlImages(html: string): string {
  * Built with DOM APIs so `alt` text is not interpreted as markup.
  */
 function createImageFallback(img: HTMLImageElement): HTMLElement {
-  const alt = img.getAttribute('alt')?.trim()
+  const alt = img.getAttribute('alt')?.trim();
 
-  const fallback = document.createElement('span')
-  fallback.className = IMAGE_FALLBACK_CLASS
-  fallback.setAttribute('role', 'img')
-  fallback.setAttribute('aria-label', alt ? `${IMAGE_FALLBACK_TEXT}: ${alt}` : IMAGE_FALLBACK_TEXT)
+  const fallback = document.createElement('span');
+  fallback.className = IMAGE_FALLBACK_CLASS;
+  fallback.setAttribute('role', 'img');
+  fallback.setAttribute('aria-label', alt ? `${IMAGE_FALLBACK_TEXT}: ${alt}` : IMAGE_FALLBACK_TEXT);
 
-  const icon = document.createElementNS(SVG_NS, 'svg')
-  icon.setAttribute('viewBox', '0 0 24 24')
-  icon.setAttribute('fill', 'none')
-  icon.setAttribute('stroke', 'currentColor')
-  icon.setAttribute('stroke-width', '1.5')
-  icon.setAttribute('aria-hidden', 'true')
-  icon.setAttribute('class', `${IMAGE_FALLBACK_CLASS}-icon`)
-  const path = document.createElementNS(SVG_NS, 'path')
-  path.setAttribute('stroke-linecap', 'round')
-  path.setAttribute('stroke-linejoin', 'round')
+  const icon = document.createElementNS(SVG_NS, 'svg');
+  icon.setAttribute('viewBox', '0 0 24 24');
+  icon.setAttribute('fill', 'none');
+  icon.setAttribute('stroke', 'currentColor');
+  icon.setAttribute('stroke-width', '1.5');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.setAttribute('class', `${IMAGE_FALLBACK_CLASS}-icon`);
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('stroke-linejoin', 'round');
   path.setAttribute(
     'd',
     'M3 3l18 18M21 15.5V5a2 2 0 0 0-2-2H8.5M3 7v12a2 2 0 0 0 2 2h12m-3-6-3-3-6 6m10-11h.01',
-  )
-  icon.appendChild(path)
+  );
+  icon.appendChild(path);
 
-  const label = document.createElement('span')
+  const label = document.createElement('span');
   if (alt) {
-    label.append(document.createTextNode(alt), document.createElement('br'))
+    label.append(document.createTextNode(alt), document.createElement('br'));
   }
-  label.append(document.createTextNode(IMAGE_FALLBACK_TEXT))
+  label.append(document.createTextNode(IMAGE_FALLBACK_TEXT));
 
-  fallback.append(icon, label)
+  fallback.append(icon, label);
 
-  return fallback
+  return fallback;
 }
 
 /**
@@ -100,24 +100,24 @@ function createImageFallback(img: HTMLImageElement): HTMLElement {
  * and replaces images that fail to load with an accessible "Image not available" placeholder.
  */
 export function markHtmlImagesLoaded(container: HTMLElement): void {
-  const images = container.querySelectorAll<HTMLImageElement>(IMAGE_SELECTOR)
+  const images = container.querySelectorAll<HTMLImageElement>(IMAGE_SELECTOR);
 
   images.forEach((img) => {
-    const content = getImageFrameContent(img)
+    const content = getImageFrameContent(img);
     const frame = content.parentElement?.classList.contains(IMAGE_FRAME_CLASS)
       ? content.parentElement
-      : content
-    const handleLoad = () => frame.removeAttribute(IMAGE_LOADING_ATTR)
-    const handleError = () => frame.replaceWith(createImageFallback(img))
+      : content;
+    const handleLoad = () => frame.removeAttribute(IMAGE_LOADING_ATTR);
+    const handleError = () => frame.replaceWith(createImageFallback(img));
 
     if (img.complete) {
       // The load or error event has already fired, so check the result directly.
       // `decode()` rejects for broken images, without misreading images that have no intrinsic size.
-      img.decode().then(handleLoad, handleError)
-      return
+      img.decode().then(handleLoad, handleError);
+      return;
     }
 
-    img.addEventListener('load', handleLoad, { once: true })
-    img.addEventListener('error', handleError, { once: true })
-  })
+    img.addEventListener('load', handleLoad, { once: true });
+    img.addEventListener('error', handleError, { once: true });
+  });
 }

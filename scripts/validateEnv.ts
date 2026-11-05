@@ -12,19 +12,19 @@
 
 export interface EnvVarProblem {
   /** The name of the environment variable, for example `VITE_API_BASE_URL`. */
-  name: string
+  name: string;
   /** A human-readable explanation of why the variable is not acceptable. */
-  reason: string
+  reason: string;
 }
 
 export interface EnvValidationResult {
-  problems: EnvVarProblem[]
+  problems: EnvVarProblem[];
 }
 
 interface RequiredVarSpec {
-  name: string
-  description: string
-  type: 'url' | 'text'
+  name: string;
+  description: string;
+  type: 'url' | 'text';
 }
 
 /**
@@ -57,10 +57,10 @@ const REQUIRED_VARS: RequiredVarSpec[] = [
     description: 'CSV file URL for the feature comparison page',
     type: 'url',
   },
-]
+];
 
 /** GA4 measurement IDs look like `G-XXXXXXXXXX`. */
-const GA4_MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{6,}$/i
+const GA4_MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{6,}$/i;
 
 /**
  * Validate the environment variables required to build the app.
@@ -69,46 +69,46 @@ const GA4_MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{6,}$/i
  * @returns The list of problems found; empty when the environment is acceptable.
  */
 export function validateRequiredEnv(env: Record<string, string | undefined>): EnvValidationResult {
-  const problems: EnvVarProblem[] = []
+  const problems: EnvVarProblem[] = [];
 
   for (const spec of REQUIRED_VARS) {
-    const value = env[spec.name]
+    const value = env[spec.name];
 
     if (!isPresent(value)) {
       problems.push({
         name: spec.name,
         reason: `variable is missing or empty (${spec.description})`,
-      })
-      continue
+      });
+      continue;
     }
 
     if (spec.type === 'url' && !isValidHttpUrl(value)) {
       problems.push({
         name: spec.name,
         reason: `expected an absolute http(s) URL but got "${value}" (${spec.description})`,
-      })
+      });
     }
   }
 
   // Analytics is optional, but when it is set it must look like a GA4 ID.
-  const gaMeasurementId = env.VITE_GA_MEASUREMENT_ID
+  const gaMeasurementId = env.VITE_GA_MEASUREMENT_ID;
   if (isPresent(gaMeasurementId) && !GA4_MEASUREMENT_ID_PATTERN.test(gaMeasurementId)) {
     problems.push({
       name: 'VITE_GA_MEASUREMENT_ID',
       reason: `expected a GA4 measurement ID in the format G-XXXXXXXXXX but got "${gaMeasurementId}" (optional; leave unset to disable analytics)`,
-    })
+    });
   }
 
   // Feedback URL is optional, but when it is set it must be an absolute HTTPS URL.
-  const githubIssuesUrl = env.VITE_GITHUB_ISSUES_URL
+  const githubIssuesUrl = env.VITE_GITHUB_ISSUES_URL;
   if (isPresent(githubIssuesUrl) && !isValidHttpsUrl(githubIssuesUrl)) {
     problems.push({
       name: 'VITE_GITHUB_ISSUES_URL',
       reason: `expected an absolute HTTPS URL but got "${githubIssuesUrl}" (optional; leave unset to use the default issues link)`,
-    })
+    });
   }
 
-  return { problems }
+  return { problems };
 }
 
 /**
@@ -125,28 +125,28 @@ export function formatEnvValidationProblems(problems: EnvVarProblem[]): string {
     'Set the missing or invalid variables in your environment or in a local .env file,',
     'then run the build again. See .env.example for the full template and',
     'DEPLOYMENT.md for deployment guidance.',
-  ]
-  return lines.join('\n')
+  ];
+  return lines.join('\n');
 }
 
 function isPresent(value: string | undefined): value is string {
-  return typeof value === 'string' && value.trim().length > 0
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function isValidHttpUrl(value: string): boolean {
   try {
-    const url = new URL(value)
-    return url.protocol === 'http:' || url.protocol === 'https:'
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
   } catch {
-    return false
+    return false;
   }
 }
 
 function isValidHttpsUrl(value: string): boolean {
   try {
-    const url = new URL(value)
-    return url.protocol === 'https:'
+    const url = new URL(value);
+    return url.protocol === 'https:';
   } catch {
-    return false
+    return false;
   }
 }

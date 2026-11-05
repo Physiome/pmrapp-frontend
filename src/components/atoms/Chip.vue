@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import CloseButton from '@/components/atoms/CloseButton.vue'
+import { computed } from 'vue';
+import CloseButton from '@/components/atoms/CloseButton.vue';
 
 interface Props {
-  label: string
-  category?: string
-  removable?: boolean
-  onRemove?: () => void
-  onClick?: () => void
+  label: string;
+  category?: string;
+  removable?: boolean;
+  onRemove?: () => void;
+  onClick?: () => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   removable: false,
-})
+});
 
 const fullLabel = computed(() =>
   props.category ? `${props.category}: ${props.label}` : props.label,
-)
+);
 
-const transitionClasses = 'transition duration-200 ease-linear'
+const transitionClasses = 'transition duration-200 ease-linear';
 
 const chipClasses = [
   'inline-flex items-center gap-1 py-1',
@@ -29,7 +29,7 @@ const chipClasses = [
   'group/chip',
   'cursor-default',
   transitionClasses,
-].join(' ')
+].join(' ');
 
 const closeButtonClasses = [
   'w-4 h-4 p-0',
@@ -39,36 +39,37 @@ const closeButtonClasses = [
   'cursor-pointer',
   'opacity-50 group-hover/chip:opacity-100',
   transitionClasses,
-].join(' ')
+].join(' ');
 
 const handleRemoveChip = () => {
   if (props.onRemove) {
-    props.onRemove()
+    props.onRemove();
   }
-}
+};
 
 const handleClickChip = () => {
   if (props.onClick) {
-    props.onClick()
+    props.onClick();
   }
-}
+};
 </script>
 
 <template>
-  <div
-    :class="[chipClasses, removable ? 'pl-2.5 pr-1' : 'px-2.5']"
-    @click="handleClickChip"
-  >
-  <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
-    <span v-if="category" class="mr-1 text-gray-500 dark:text-gray-400">{{ category }}:</span>
-    <span :class="{ 'font-medium': category }">{{ label }}</span>
-  </span>
-  <span v-if="removable" @click.stop>
-    <CloseButton
-      :class="closeButtonClasses"
-      @click="handleRemoveChip"
-      :aria-label="`Remove ${fullLabel}`"
-    />
-  </span>
+  <!-- biome-ignore lint/a11y/noStaticElementInteractions: chip click is a mouse shortcut; the remove action is a real button -->
+  <!-- biome-ignore lint/a11y/useKeyWithClickEvents: chip click is a mouse shortcut; the remove action is a real button -->
+  <div :class="[chipClasses, removable ? 'pl-2.5 pr-1' : 'px-2.5']" @click="handleClickChip">
+    <span class="group-hover/chip:opacity-75 whitespace-nowrap" :class="[transitionClasses]">
+      <span v-if="category" class="mr-1 text-gray-500 dark:text-gray-400">{{ category }}:</span>
+      <span :class="{ 'font-medium': category }">{{ label }}</span>
+    </span>
+    <!-- biome-ignore lint/a11y/noStaticElementInteractions: only stops the click bubbling to the chip; the inner CloseButton is focusable -->
+    <!-- biome-ignore lint/a11y/useKeyWithClickEvents: only stops the click bubbling to the chip; the inner CloseButton is focusable -->
+    <span v-if="removable" @click.stop>
+      <CloseButton
+        :class="closeButtonClasses"
+        @click="handleRemoveChip"
+        :aria-label="`Remove ${fullLabel}`"
+      />
+    </span>
   </div>
 </template>

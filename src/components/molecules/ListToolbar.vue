@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import SearchField from '@/components/atoms/SearchField.vue'
-import RefreshIcon from '@/components/icons/RefreshIcon.vue'
-import SortDropdown from '@/components/molecules/SortDropdown.vue'
-import type { SortOption } from '@/types/common'
-import { DEFAULT_SORT_OPTION, SORT_OPTIONS_GROUPED } from '@/utils/sort'
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import SearchField from '@/components/atoms/SearchField.vue';
+import RefreshIcon from '@/components/icons/RefreshIcon.vue';
+import SortDropdown from '@/components/molecules/SortDropdown.vue';
+import type { SortOption } from '@/types/common';
+import { DEFAULT_SORT_OPTION, SORT_OPTIONS_GROUPED } from '@/utils/sort';
 
 interface Props {
-  filterQuery: string
-  isLoading: boolean
-  filterPlaceholder?: string
-  contentSection: string
-  sortBy?: SortOption
+  filterQuery: string;
+  isLoading: boolean;
+  filterPlaceholder?: string;
+  contentSection: string;
+  sortBy?: SortOption;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   filterPlaceholder: 'Filter by description or ID...',
   sortBy: DEFAULT_SORT_OPTION,
-})
+});
 
 const emit = defineEmits<{
-  'update:filterQuery': [value: string]
-  'update:sortBy': [value: SortOption]
-  refresh: []
-}>()
+  'update:filterQuery': [value: string];
+  'update:sortBy': [value: SortOption];
+  refresh: [];
+}>();
 
 const handleRefresh = () => {
-  emit('refresh')
-}
+  emit('refresh');
+};
 </script>
 
 <template>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 interface Props {
-  message?: string
+  message?: string;
 }
 
 withDefaults(defineProps<Props>(), {
   message: 'Loading...',
-})
+});
 </script>
 
 <template>
@@ -15,5 +15,5 @@ withDefaults(defineProps<Props>(), {
 </template>
 
 <style scoped>
-@import '@/assets/box.css';
+@import "@/assets/box.css";
 </style>

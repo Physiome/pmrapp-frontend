@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import ArrowUpIcon from '@/components/icons/ArrowUpIcon.vue'
+import { onMounted, onUnmounted, ref } from 'vue';
+import ArrowUpIcon from '@/components/icons/ArrowUpIcon.vue';
 
-const isVisible = ref(false)
+const isVisible = ref(false);
 
 const checkScroll = () => {
   // Show button if user has scrolled down more than 300px.
-  isVisible.value = window.scrollY > 300
-}
+  isVisible.value = window.scrollY > 300;
+};
 
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
     behavior: 'smooth',
-  })
-}
+  });
+};
 
 onMounted(() => {
-  checkScroll() // Check initial scroll position.
-  window.addEventListener('scroll', checkScroll)
-})
+  checkScroll(); // Check initial scroll position.
+  window.addEventListener('scroll', checkScroll);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', checkScroll)
-})
+  window.removeEventListener('scroll', checkScroll);
+});
 </script>
 
 <template>
@@ -41,7 +41,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-@import '@/assets/button.css';
+@import "@/assets/button.css";
 
 .fade-enter-active,
 .fade-leave-active {

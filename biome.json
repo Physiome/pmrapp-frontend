@@ -13,10 +13,16 @@
     "lineWidth": 100,
     "useEditorconfig": true
   },
+  "html": {
+    "experimentalFullSupportEnabled": true,
+    "formatter": {
+      "selfCloseVoidElements": "always"
+    }
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
-      "semicolons": "asNeeded"
+      "semicolons": "always"
     }
   },
   "linter": {
@@ -26,24 +32,16 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.vue"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedImports": "off",
-            "noUnusedVariables": "off"
-          },
-          "style": {
-            "useImportType": "off"
-          }
-        }
-      }
-    },
-    {
       "includes": ["**/*.ts", "**/*.vue"],
       "linter": {
         "rules": {
           "style": {
+            "useVueHyphenatedAttributes": {
+              "level": "warn",
+              "options": {
+                "ignore": ["ariaLabel"]
+              }
+            },
             "useVueMultiWordComponentNames": "off"
           }
         }
@@ -64,5 +62,10 @@
     "clientKind": "git",
     "enabled": true,
     "useIgnoreFile": true
+  },
+  "yaml": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
   }
 }

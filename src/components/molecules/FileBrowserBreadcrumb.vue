@@ -1,24 +1,28 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { getPathSegments } from '@/utils/path'
-import { getWorkspacePathLink } from '@/utils/workspace'
+import { computed } from 'vue';
+import { getPathSegments } from '@/utils/path';
+import { getWorkspacePathLink } from '@/utils/workspace';
 
 // Pass onPathChange to browse folders in place (e.g. inside an exposure),
 // or alias and commitId to link to the workspace folder pages.
 const props = defineProps<{
-  path: string
-  alias?: string
-  commitId?: string
-  onPathChange?: (path: string | undefined) => void
-}>()
+  path: string;
+  alias?: string;
+  commitId?: string;
+  onPathChange?: (path: string | undefined) => void;
+}>();
 
-const pathSegments = computed(() => getPathSegments(props.path))
+const pathSegments = computed(() => getPathSegments(props.path));
 
-const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.commitId ?? '', path)
+const linkTo = (path: string) =>
+  getWorkspacePathLink(props.alias ?? '', props.commitId ?? '', path);
 </script>
 
 <template>
-  <nav aria-label="File path" class="flex items-center gap-1 text-sm min-w-0 flex-1 overflow-hidden">
+  <nav
+    aria-label="File path"
+    class="flex items-center gap-1 text-sm min-w-0 flex-1 overflow-hidden"
+  >
     <button
       v-if="props.onPathChange"
       type="button"
@@ -27,7 +31,11 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
     >
       Files
     </button>
-    <RouterLink v-else :to="linkTo('')" class="text-link text-link-primary shrink-0 truncate text-left cursor-pointer">
+    <RouterLink
+      v-else
+      :to="linkTo('')"
+      class="text-link text-link-primary shrink-0 truncate text-left cursor-pointer"
+    >
       Files
     </RouterLink>
 
@@ -60,5 +68,5 @@ const linkTo = (path: string) => getWorkspacePathLink(props.alias ?? '', props.c
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
+@import "@/assets/text-link.css";
 </style>

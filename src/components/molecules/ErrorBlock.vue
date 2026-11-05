@@ -1,10 +1,10 @@
 <script setup lang="ts">
 interface Props {
-  title: string
-  error: string
+  title: string;
+  error: string;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <template>
@@ -15,5 +15,5 @@ defineProps<Props>()
 </template>
 
 <style scoped>
-@import '@/assets/error-box.css';
+@import "@/assets/error-box.css";
 </style>

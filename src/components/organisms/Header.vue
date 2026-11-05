@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import SearchIcon from '@/components/icons/SearchIcon.vue'
-import PreviewBanner from '@/components/molecules/PreviewBanner.vue'
-import UserDropdown from '@/components/molecules/UserDropdown.vue'
-import SearchOverlay from '@/components/organisms/SearchOverlay.vue'
-import { LOGIN_DISABLED } from '@/constants/auth'
-import { useGlobalStateStore } from '@/stores/globalState'
+import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
+import PreviewBanner from '@/components/molecules/PreviewBanner.vue';
+import UserDropdown from '@/components/molecules/UserDropdown.vue';
+import SearchOverlay from '@/components/organisms/SearchOverlay.vue';
+import { LOGIN_DISABLED } from '@/constants/auth';
+import { useGlobalStateStore } from '@/stores/globalState';
 
 const props = withDefaults(
   defineProps<{
-    showUserDropdown?: boolean
+    showUserDropdown?: boolean;
   }>(),
   {
     showUserDropdown: !LOGIN_DISABLED,
   },
-)
+);
 
-const route = useRoute()
-const isSearchOverlayVisible = ref(false)
-const isMobileMenuOpen = ref(false)
-const globalState = useGlobalStateStore()
+const route = useRoute();
+const isSearchOverlayVisible = ref(false);
+const isMobileMenuOpen = ref(false);
+const globalState = useGlobalStateStore();
 
 const menuContainerClasses = computed(() => [
   isMobileMenuOpen.value ? 'block' : 'hidden',
@@ -29,50 +29,65 @@ const menuContainerClasses = computed(() => [
   'bg-surface shadow-lg border-t border-gray-200 dark:border-gray-700',
   'md:flex md:w-auto md:static md:top-auto md:left-auto md:items-center md:p-0',
   'md:bg-transparent md:shadow-none md:border-0',
-])
+]);
 
-const menuBoxClasses = ['flex flex-col md:flex-row gap-4']
+const menuBoxClasses = ['flex flex-col md:flex-row gap-4'];
 
 const navLinkClasses = [
   'block rounded px-3 py-2',
   'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors',
-]
+];
+
+// Primary-coloured strip along the top of the header, sitting below the notification bar.
+const headerClasses = [
+  'bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]',
+  "before:content-[''] before:absolute before:left-0 before:right-0",
+  'before:top-(--notification-bar-height) before:h-[6px] before:bg-primary',
+];
+
+// Vertical divider line to the left of the user dropdown.
+const userDropdownDividerClasses = [
+  'relative text-center pl-4',
+  "before:content-[''] before:absolute before:left-0 before:top-1/2",
+  'before:h-6 before:w-px before:-translate-y-1/2 before:transform',
+  'before:bg-gray-300 dark:before:bg-gray-600',
+];
 
 const handleSearchClick = () => {
-  isMobileMenuOpen.value = false
+  isMobileMenuOpen.value = false;
 
   if (route.name === 'search-results') {
-    globalState.requestSearchFocus()
+    globalState.requestSearchFocus();
   } else {
-    isSearchOverlayVisible.value = true
+    isSearchOverlayVisible.value = true;
   }
-}
+};
 
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
 
 const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
-}
+  isMobileMenuOpen.value = false;
+};
 
 const navLinks = [
   { path: '/exposure', label: 'Exposures' },
   { path: '/workspace', label: 'Workspaces' },
-]
+];
 
-const isActive = (path: string) => computed(() => route.path.startsWith(path))
+const isActive = (path: string) => computed(() => route.path.startsWith(path));
 
 watch(
   () => route.fullPath,
   () => {
-    closeMobileMenu()
+    closeMobileMenu();
   },
-)
+);
 </script>
 
 <template>
-  <header class="header-border-top bg-surface border-b border-gray-200 dark:border-gray-700 sticky top-0 z-[100]">
+  <header :class="headerClasses">
     <PreviewBanner />
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <RouterLink to="/" class="flex items-center" aria-label="Home">
@@ -106,7 +121,11 @@ watch(
               content-section="Header navigation"
             >
               <span class="sr-only">Toggle navigation menu</span>
-              <span class="mobile-menu-icon" :class="{ 'mobile-menu-icon-open': isMobileMenuOpen }" aria-hidden="true">
+              <span
+                class="mobile-menu-icon"
+                :class="{ 'mobile-menu-icon-open': isMobileMenuOpen }"
+                aria-hidden="true"
+              >
                 <span class="mobile-menu-icon-bar" />
                 <span class="mobile-menu-icon-bar" />
                 <span class="mobile-menu-icon-bar" />
@@ -125,7 +144,7 @@ watch(
               </li>
             </ul>
           </li>
-          <li v-if="props.showUserDropdown" class="user-dropdown-divider pl-4">
+          <li v-if="props.showUserDropdown" :class="userDropdownDividerClasses">
             <UserDropdown />
           </li>
         </ul>
@@ -136,22 +155,8 @@ watch(
 </template>
 
 <style scoped>
-@reference 'tailwindcss';
-@reference '@/assets/main.css';
-
-.header-border-top {
-  @apply
-    before:content-['']
-    before:absolute
-    before:left-0
-    before:right-0
-    before:h-[6px]
-    before:bg-primary;
-
-  &::before {
-    top: var(--notification-bar-height);
-  }
-}
+@reference "tailwindcss";
+@reference "@/assets/main.css";
 
 .mobile-menu-icon {
   @apply relative flex h-6 w-6 flex-col items-center justify-center gap-1;
@@ -171,21 +176,5 @@ watch(
 
 .mobile-menu-icon-open .mobile-menu-icon-bar:nth-child(3) {
   transform: translateY(-6px) rotate(-45deg);
-}
-
-.user-dropdown-divider {
-  @apply
-    relative
-    text-center
-    before:content-['']
-    before:absolute
-    before:left-0
-    before:top-1/2
-    before:h-6
-    before:-translate-y-1/2
-    before:transform
-    before:w-px
-    before:bg-gray-300
-    dark:before:bg-gray-600;
 }
 </style>

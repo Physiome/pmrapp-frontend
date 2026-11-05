@@ -1,8 +1,8 @@
-import type { LocationQuery, LocationQueryRaw } from 'vue-router'
-import type { SortableEntity } from '@/types/common'
-import type { QueryFilterOptions, SearchFilter, SearchResult, TextSegment } from '@/types/search'
-import { ensureTrailingSlash } from '@/utils/path'
-import { DEFAULT_SORT_OPTION, isValidSortOption } from '@/utils/sort'
+import type { LocationQuery, LocationQueryRaw } from 'vue-router';
+import type { SortableEntity } from '@/types/common';
+import type { QueryFilterOptions, SearchFilter, SearchResult, TextSegment } from '@/types/search';
+import { ensureTrailingSlash } from '@/utils/path';
+import { DEFAULT_SORT_OPTION, isValidSortOption } from '@/utils/sort';
 
 /**
  * Returns true if a search term is valid (non-empty and not a broken URN).
@@ -12,12 +12,12 @@ import { DEFAULT_SORT_OPTION, isValidSortOption } from '@/utils/sort'
  * - Unknown author placeholders (e.g. "unknown", "unknown unknown", or "unknown, unknown").
  */
 export const isValidTerm = (term: string): boolean => {
-  const trimmed = term.trim()
-  if (!trimmed) return false
-  if (trimmed.endsWith('pubmed:')) return false
-  if (/^unknown([, ]+unknown)?$/i.test(trimmed)) return false
-  return true
-}
+  const trimmed = term.trim();
+  if (!trimmed) return false;
+  if (trimmed.endsWith('pubmed:')) return false;
+  if (/^unknown([, ]+unknown)?$/i.test(trimmed)) return false;
+  return true;
+};
 
 /**
  * Normalises a string for fuzzy search by replacing non-alphanumeric characters
@@ -28,8 +28,8 @@ export const normaliseSearchText = (text: string): string => {
   return text
     .replace(/[^a-zA-Z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
-    .trim()
-}
+    .trim();
+};
 
 /**
  * Splits free text into search tokens. Bare words become separate tokens,
@@ -41,40 +41,40 @@ export const normaliseSearchText = (text: string): string => {
  * e.g. `calcium "cardiac  myocyte"` → ['calcium', '"cardiac myocyte"']
  */
 export const parseQueryTokens = (text: string): string[] => {
-  const tokens: string[] = []
-  const seen = new Set<string>()
+  const tokens: string[] = [];
+  const seen = new Set<string>();
 
   for (const match of text.matchAll(/"([^"]*)"?|([^\s"]+)/g)) {
-    let token: string
+    let token: string;
     if (match[1] !== undefined) {
-      const phrase = match[1].replace(/\s+/g, ' ').trim()
-      if (!phrase) continue
-      token = phrase.includes(' ') ? `"${phrase}"` : phrase
+      const phrase = match[1].replace(/\s+/g, ' ').trim();
+      if (!phrase) continue;
+      token = phrase.includes(' ') ? `"${phrase}"` : phrase;
     } else {
-      token = match[2] as string
+      token = match[2] as string;
       // Single quotes aren't phrase quotes, but a token of only quote marks (e.g. '') means nothing.
-      if (/^['‘’]+$/.test(token)) continue
+      if (/^['‘’]+$/.test(token)) continue;
     }
 
-    const key = token.toLowerCase()
-    if (seen.has(key)) continue
-    seen.add(key)
-    tokens.push(token)
+    const key = token.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    tokens.push(token);
   }
 
-  return tokens
-}
+  return tokens;
+};
 
 /**
  * Joins search tokens back into the query string the API expects.
  */
-export const buildQueryFromTokens = (tokens: string[]): string => tokens.join(' ')
+export const buildQueryFromTokens = (tokens: string[]): string => tokens.join(' ');
 
 /**
  * Removes the surrounding double quotes of a phrase for display; the quoted term is still what is searched.
  */
 export const stripSurroundingQuotes = (term: string): string =>
-  term.length >= 2 && term.startsWith('"') && term.endsWith('"') ? term.slice(1, -1) : term
+  term.length >= 2 && term.startsWith('"') && term.endsWith('"') ? term.slice(1, -1) : term;
 
 /**
  * Builds a /search query for a single filter in flat format and preserves the
@@ -85,72 +85,72 @@ export const buildSearchQuery = (
   term: string,
   currentQuery: LocationQuery,
 ): LocationQueryRaw => {
-  return buildQuerySearchQuery('', [{ kind, term }], currentQuery)
-}
+  return buildQuerySearchQuery('', [{ kind, term }], currentQuery);
+};
 
 export const getQueryTextFromRouteQuery = (query: LocationQuery): string => {
-  const value = query.query ?? query.SearchableText
+  const value = query.query ?? query.SearchableText;
 
   if (Array.isArray(value)) {
     const firstValue = value.find(
       (item): item is string => typeof item === 'string' && item.trim().length > 0,
-    )
-    return firstValue?.trim() ?? ''
+    );
+    return firstValue?.trim() ?? '';
   }
 
-  return typeof value === 'string' ? value.trim() : ''
-}
+  return typeof value === 'string' ? value.trim() : '';
+};
 
 export const buildQuerySearchQuery = (
   queryText: string,
   filters: SearchFilter[],
   currentQuery: LocationQuery,
 ): LocationQueryRaw => {
-  const query: LocationQueryRaw = {}
-  const trimmedQueryText = queryText.trim()
+  const query: LocationQueryRaw = {};
+  const trimmedQueryText = queryText.trim();
 
   if (trimmedQueryText) {
-    query.query = trimmedQueryText
+    query.query = trimmedQueryText;
   }
 
-  const termsByKind = new Map<string, string[]>()
+  const termsByKind = new Map<string, string[]>();
   for (const filter of filters) {
-    const normalisedKind = filter.kind.trim()
-    const normalisedTerm = filter.term.trim()
-    if (!normalisedKind || !normalisedTerm) continue
+    const normalisedKind = filter.kind.trim();
+    const normalisedTerm = filter.term.trim();
+    if (!normalisedKind || !normalisedTerm) continue;
 
-    const terms = termsByKind.get(normalisedKind) ?? []
-    terms.push(normalisedTerm)
-    termsByKind.set(normalisedKind, terms)
+    const terms = termsByKind.get(normalisedKind) ?? [];
+    terms.push(normalisedTerm);
+    termsByKind.set(normalisedKind, terms);
   }
 
   for (const [kind, terms] of termsByKind) {
-    query[kind] = terms.length === 1 ? (terms[0] as string) : terms
+    query[kind] = terms.length === 1 ? (terms[0] as string) : terms;
   }
 
-  const sortQuery = currentQuery.sort
+  const sortQuery = currentQuery.sort;
   if (
     typeof sortQuery === 'string' &&
     isValidSortOption(sortQuery) &&
     sortQuery !== DEFAULT_SORT_OPTION
   ) {
-    query.sort = sortQuery
+    query.sort = sortQuery;
   }
 
-  return query
-}
+  return query;
+};
 
 const queryParamToStringArray = (value: LocationQuery[string]): string[] => {
   if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === 'string')
+    return value.filter((item): item is string => typeof item === 'string');
   }
 
   if (typeof value === 'string') {
-    return [value]
+    return [value];
   }
 
-  return []
-}
+  return [];
+};
 
 /**
  * Parses flat kind-named filter params used for search API (api/search) queries.
@@ -160,18 +160,18 @@ export const parseQueryFiltersFromQuery = (
   query: LocationQuery,
   knownKinds: readonly string[],
 ): SearchFilter[] => {
-  const filters: SearchFilter[] = []
+  const filters: SearchFilter[] = [];
 
   for (const kind of knownKinds) {
     for (const term of queryParamToStringArray(query[kind])) {
       if (term.trim()) {
-        filters.push({ kind, term: term.trim() })
+        filters.push({ kind, term: term.trim() });
       }
     }
   }
 
-  return filters
-}
+  return filters;
+};
 
 /**
  * Splits `original` into segments marking which parts match any of the given
@@ -181,62 +181,62 @@ export const parseQueryFiltersFromQuery = (
  * highlighted slices always align with the exact displayed characters.
  */
 export const highlightTokens = (original: string, tokens: string[]): TextSegment[] => {
-  if (!tokens.length || !original) return [{ text: original, highlighted: false }]
+  if (!tokens.length || !original) return [{ text: original, highlighted: false }];
 
-  const highlightMask = Array.from({ length: original.length }, () => false)
-  const uniqueTokens = [...new Set(tokens.map((t) => t.trim()).filter((t) => t.length > 0))]
+  const highlightMask = Array.from({ length: original.length }, () => false);
+  const uniqueTokens = [...new Set(tokens.map((t) => t.trim()).filter((t) => t.length > 0))];
 
   for (const token of uniqueTokens) {
-    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(escapedToken, 'gi')
-    let match = regex.exec(original)
+    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedToken, 'gi');
+    let match = regex.exec(original);
 
     while (match !== null) {
-      const start = match.index
-      const end = start + match[0].length
+      const start = match.index;
+      const end = start + match[0].length;
       for (let index = start; index < end; index += 1) {
-        highlightMask[index] = true
+        highlightMask[index] = true;
       }
-      match = regex.exec(original)
+      match = regex.exec(original);
     }
   }
 
-  const segments: TextSegment[] = []
-  let segmentStart = 0
+  const segments: TextSegment[] = [];
+  let segmentStart = 0;
 
   for (let index = 1; index <= original.length; index += 1) {
-    const prevHighlighted = highlightMask[index - 1]
-    const nextHighlighted = index < original.length ? highlightMask[index] : prevHighlighted
+    const prevHighlighted = highlightMask[index - 1];
+    const nextHighlighted = index < original.length ? highlightMask[index] : prevHighlighted;
     if (index === original.length || prevHighlighted !== nextHighlighted) {
       segments.push({
         text: original.slice(segmentStart, index),
         highlighted: prevHighlighted,
-      })
-      segmentStart = index
+      });
+      segmentStart = index;
     }
   }
 
-  return segments
-}
+  return segments;
+};
 
 export function filterItemsByQuery<T extends SortableEntity>(options: QueryFilterOptions<T>): T[] {
-  const { query, items } = options
-  const trimmedQuery = query.trim()
+  const { query, items } = options;
+  const trimmedQuery = query.trim();
 
-  if (!trimmedQuery) return items
+  if (!trimmedQuery) return items;
 
   const tokens = normaliseSearchText(trimmedQuery.toLowerCase())
     .split(' ')
-    .filter((t) => t.length > 0)
+    .filter((t) => t.length > 0);
 
-  if (tokens.length === 0) return items
+  if (tokens.length === 0) return items;
 
   return items.filter((item) => {
-    const searchableText = normaliseSearchText((item.entity.description || '').toLowerCase())
-    const matchesSearchText = tokens.every((token) => searchableText.includes(token))
-    const matchesId = item.entity.id.toString().includes(trimmedQuery)
-    return matchesSearchText || matchesId
-  })
+    const searchableText = normaliseSearchText((item.entity.description || '').toLowerCase());
+    const matchesSearchText = tokens.every((token) => searchableText.includes(token));
+    const matchesId = item.entity.id.toString().includes(trimmedQuery);
+    return matchesSearchText || matchesId;
+  });
 }
 
 /**
@@ -245,15 +245,15 @@ export function filterItemsByQuery<T extends SortableEntity>(options: QueryFilte
  * Falls back to exposure alias or empty string.
  */
 export const getSearchResultLink = (item: SearchResult): string => {
-  const uri = item.data?.aliased_uri?.[0]?.trim()
+  const uri = item.data?.aliased_uri?.[0]?.trim();
   if (uri) {
-    return ensureTrailingSlash(uri)
+    return ensureTrailingSlash(uri);
   }
 
-  const alias = item.data?.exposure_alias?.[0]?.trim()
+  const alias = item.data?.exposure_alias?.[0]?.trim();
   if (alias) {
-    return `/exposure/${alias}/`
+    return `/exposure/${alias}/`;
   }
 
-  return ''
-}
+  return '';
+};

@@ -1,6 +1,6 @@
-import type { CategoryData } from '@/stores/search'
-import type { Exposure } from '@/types/exposure'
-import type { Workspace } from '@/types/workspace'
+import type { CategoryData } from '@/stores/search';
+import type { Exposure } from '@/types/exposure';
+import type { Workspace } from '@/types/workspace';
 
 export const workspaces: Workspace[] = [
   {
@@ -40,7 +40,7 @@ export const workspaces: Workspace[] = [
       exposures: null,
     },
   },
-]
+];
 
 export const exposures: Exposure[] = [
   {
@@ -83,7 +83,7 @@ export const exposures: Exposure[] = [
       files: null,
     },
   },
-]
+];
 
 export const searchCategories: CategoryData[] = [
   {
@@ -122,4 +122,4 @@ export const searchCategories: CategoryData[] = [
     loading: false,
     error: null,
   },
-]
+];

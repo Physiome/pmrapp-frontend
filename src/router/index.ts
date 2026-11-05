@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { LOGIN_DISABLED } from '@/constants/auth'
-import { TITLE } from '@/constants/global'
+import { createRouter, createWebHistory } from 'vue-router';
+import { LOGIN_DISABLED } from '@/constants/auth';
+import { TITLE } from '@/constants/global';
 import {
   createAliases,
   createRouteAliases,
@@ -12,33 +12,33 @@ import {
   workspaceDetailCommitSuffixes,
   workspaceDetailRouteSuffixes,
   workspaceFileRouteSuffixes,
-} from '@/router/routeAliases'
-import { resolveRouteTitle } from '@/router/routeResolvers'
-import { useAuthStore } from '@/stores/auth'
-import { isJwtExpired } from '@/utils/auth'
-import { getQueryTextFromRouteQuery } from '@/utils/search'
-import ExposureDetailView from '@/views/ExposureDetailView.vue'
-import ExposureView from '@/views/ExposureView.vue'
-import FeatureComparisonView from '@/views/FeatureComparisonView.vue'
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import NotFoundView from '@/views/NotFoundView.vue'
-import ProfileView from '@/views/ProfileView.vue'
-import SearchView from '@/views/SearchView.vue'
-import WorkspaceDetailView from '@/views/WorkspaceDetailView.vue'
-import WorkspaceView from '@/views/WorkspaceView.vue'
+} from '@/router/routeAliases';
+import { resolveRouteTitle } from '@/router/routeResolvers';
+import { useAuthStore } from '@/stores/auth';
+import { isJwtExpired } from '@/utils/auth';
+import { getQueryTextFromRouteQuery } from '@/utils/search';
+import ExposureDetailView from '@/views/ExposureDetailView.vue';
+import ExposureView from '@/views/ExposureView.vue';
+import FeatureComparisonView from '@/views/FeatureComparisonView.vue';
+import HomeView from '@/views/HomeView.vue';
+import LoginView from '@/views/LoginView.vue';
+import NotFoundView from '@/views/NotFoundView.vue';
+import ProfileView from '@/views/ProfileView.vue';
+import SearchView from '@/views/SearchView.vue';
+import WorkspaceDetailView from '@/views/WorkspaceDetailView.vue';
+import WorkspaceView from '@/views/WorkspaceView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition
+      return savedPosition;
     }
     // Don't scroll when only the query changes (same route path).
     if (to.path === from.path) {
-      return false
+      return false;
     }
-    return { top: 0 }
+    return { top: 0 };
   },
   routes: [
     {
@@ -157,7 +157,7 @@ const router = createRouter({
       meta: { title: `Page Not Found – ${TITLE}` },
     },
   ],
-})
+});
 
 router.beforeEach((to) => {
   if (
@@ -165,52 +165,52 @@ router.beforeEach((to) => {
     to.query.SearchableText !== undefined &&
     to.query.query === undefined
   ) {
-    const legacyQuery = getQueryTextFromRouteQuery(to.query)
+    const legacyQuery = getQueryTextFromRouteQuery(to.query);
 
     if (legacyQuery) {
-      const nextQuery = { ...to.query }
-      delete nextQuery.SearchableText
-      nextQuery.query = legacyQuery
-      return { path: to.path, query: nextQuery, replace: true }
+      const nextQuery = { ...to.query };
+      delete nextQuery.SearchableText;
+      nextQuery.query = legacyQuery;
+      return { path: to.path, query: nextQuery, replace: true };
     }
   }
 
-  const authStore = useAuthStore()
-  const storedToken = localStorage.getItem('auth_token')
-  const authMethod = localStorage.getItem('auth_method') as 'password' | 'github' | null
-  const looksLikeJwt = storedToken?.split('.').length === 3
+  const authStore = useAuthStore();
+  const storedToken = localStorage.getItem('auth_token');
+  const authMethod = localStorage.getItem('auth_method') as 'password' | 'github' | null;
+  const looksLikeJwt = storedToken?.split('.').length === 3;
 
   // Only check JWT expiry for GitHub OAuth tokens, which use JWTs.
   // Password-auth tokens may not be JWTs, so skip the expiry check.
   if (storedToken && looksLikeJwt && authMethod === 'github' && isJwtExpired(storedToken)) {
-    authStore.clearAuth()
-    return { name: 'login' }
+    authStore.clearAuth();
+    return { name: 'login' };
   }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return { name: 'login' }
+    return { name: 'login' };
   }
 
   if (to.name === 'login' && authStore.isAuthenticated) {
-    return { name: 'profile' }
+    return { name: 'profile' };
   }
-})
+});
 
 router.beforeResolve(async (to) => {
-  const resolvedTitle = await resolveRouteTitle(to)
+  const resolvedTitle = await resolveRouteTitle(to);
   if (resolvedTitle) {
     to.meta.title =
       resolvedTitle === TITLE || resolvedTitle.endsWith(` – ${TITLE}`)
         ? resolvedTitle
-        : `${resolvedTitle} – ${TITLE}`
+        : `${resolvedTitle} – ${TITLE}`;
   }
-})
+});
 
 router.afterEach((to) => {
-  const title = to.meta.title as string | undefined
+  const title = to.meta.title as string | undefined;
   if (title) {
-    document.title = title
+    document.title = title;
   }
-})
+});
 
-export default router
+export default router;

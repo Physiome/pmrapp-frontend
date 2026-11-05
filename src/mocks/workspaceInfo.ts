@@ -1,4 +1,4 @@
-import type { WorkspaceInfo } from '@/types/workspace'
+import type { WorkspaceInfo } from '@/types/workspace';
 
 export const mockWorkspaceInfo: WorkspaceInfo = {
   workspace: {
@@ -65,4 +65,4 @@ export const mockWorkspaceInfo: WorkspaceInfo = {
       ],
     },
   },
-}
+};

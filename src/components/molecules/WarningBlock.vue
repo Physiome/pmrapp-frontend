@@ -1,9 +1,9 @@
 <script setup lang="ts">
 interface Props {
-  title: string
+  title: string;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <template>
@@ -17,5 +17,5 @@ defineProps<Props>()
 </template>
 
 <style scoped>
-@import '@/assets/warning-box.css';
+@import "@/assets/warning-box.css";
 </style>

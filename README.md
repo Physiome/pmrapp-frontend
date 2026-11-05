@@ -1,4 +1,4 @@
-# PMR - Frontend [![Deploy static content to Pages](https://github.com/akhuoa/pmrapp-frontend/actions/workflows/deploy.yml/badge.svg)](https://github.com/akhuoa/pmrapp-frontend/actions/workflows/deploy.yml)
+# PMR - Frontend [![Deploy static content to Pages](https://github.com/physiome/pmrapp-frontend/actions/workflows/deploy.yml/badge.svg)](https://github.com/physiome/pmrapp-frontend/actions/workflows/deploy.yml)
 
 The next-generation frontend web application for the [Physiome Model Repository](https://models.physiomeproject.org/), built with Vue 3, TypeScript, and Tailwind CSS v4.
 
@@ -126,22 +126,34 @@ bun run test:e2e
 
 ## Code Quality
 
-Format code:
+[Biome](https://biomejs.dev/) formats and lints all files, including `.vue` templates, `<script>` and `<style>` blocks.
+
+Format, lint (applying safe fixes) and sort imports in one go. Run this before committing:
 
 ```sh
-bun run format
+bun run check
 ```
 
-Lint and fix code:
+Or run each step on its own:
 
 ```sh
-bun run lint
+bun run format   # format only
+bun run lint     # lint and apply safe fixes
 ```
 
-Run both format and lint:
+CI runs the read-only versions and fails on any formatting, lint or import-order difference:
 
 ```sh
-bun run format && bun run lint
+bun run format:ci
+bun run check:ci
+```
+
+`biome ci` does not yet check formatting of `.vue` files, which is why `format:ci` is a separate step.
+
+Where a lint rule doesn't fit a deliberate pattern, suppress it on that element with a reason rather than disabling the rule:
+
+```vue
+<!-- biome-ignore lint/a11y/noStaticElementInteractions: backdrop click is a mouse convenience -->
 ```
 
 ## Development Tools

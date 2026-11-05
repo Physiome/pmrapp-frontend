@@ -1,48 +1,49 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
-import ChevronRightIcon from '@/components/icons/ChevronRightIcon.vue'
-import type { BreadcrumbItem } from '@/types/breadcrumb'
+import { computed, nextTick, ref, watch } from 'vue';
+import ChevronRightIcon from '@/components/icons/ChevronRightIcon.vue';
+import type { BreadcrumbItem } from '@/types/breadcrumb';
 
 const props = defineProps<{
-  items: BreadcrumbItem[]
-}>()
+  items: BreadcrumbItem[];
+}>();
 
 // Trails longer than this collapse their middle items on small screens.
-const COLLAPSE_THRESHOLD = 4
+const COLLAPSE_THRESHOLD = 4;
 
 // Ancestors with labels this short (e.g. "src", "models") give up space after longer ones.
-const SHORT_LABEL_LENGTH = 16
+const SHORT_LABEL_LENGTH = 16;
 
-const isExpanded = ref(false)
-const listRef = ref<HTMLOListElement | null>(null)
+const isExpanded = ref(false);
+const listRef = ref<HTMLOListElement | null>(null);
 
-const lastIndex = computed(() => props.items.length - 1)
+const lastIndex = computed(() => props.items.length - 1);
 
-const isCollapsible = computed(() => props.items.length > COLLAPSE_THRESHOLD)
+const isCollapsible = computed(() => props.items.length > COLLAPSE_THRESHOLD);
 
 // Keep the first item, the parent and the current page visible; collapse everything in between.
-const hiddenCount = computed(() => (isCollapsible.value ? props.items.length - 3 : 0))
+const hiddenCount = computed(() => (isCollapsible.value ? props.items.length - 3 : 0));
 
 const isCollapsedItem = (index: number) =>
-  !isExpanded.value && index > 0 && index <= hiddenCount.value
+  !isExpanded.value && index > 0 && index <= hiddenCount.value;
 
 // The toggle disappears once clicked, so move focus to the first revealed link.
 // Look it up by item index: the first item is not always a link (e.g. while it loads).
 const expand = async () => {
-  isExpanded.value = true
-  await nextTick()
-  listRef.value?.querySelector<HTMLElement>('[data-index="1"] a')?.focus()
-}
+  isExpanded.value = true;
+  await nextTick();
+  listRef.value?.querySelector<HTMLElement>('[data-index="1"] a')?.focus();
+};
 
-const focusClasses = 'rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+const focusClasses =
+  'rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 
 const shrinkClasses = (item: BreadcrumbItem, index: number) => {
-  if (item.loading) return 'shrink-0'
+  if (item.loading) return 'shrink-0';
   // The current page shrinks least so it stays readable.
-  if (index === lastIndex.value) return 'min-w-0'
+  if (index === lastIndex.value) return 'min-w-0';
   // Ancestors give up space first, long labels before short ones.
-  return item.label.length > SHORT_LABEL_LENGTH ? 'min-w-0 shrink-4' : 'min-w-0 shrink-2'
-}
+  return item.label.length > SHORT_LABEL_LENGTH ? 'min-w-0 shrink-4' : 'min-w-0 shrink-2';
+};
 
 // Identifies the page by where the crumbs point, not by their labels,
 // so a label that finishes loading (or a parent recomputing the same items) doesn't count as navigation.
@@ -51,12 +52,12 @@ const trailKey = computed(() =>
   JSON.stringify(
     props.items.map((item, index) => item.to ?? (index === lastIndex.value ? item.label : '')),
   ),
-)
+);
 
 // Collapse again when navigating to another page.
 watch(trailKey, () => {
-  isExpanded.value = false
-})
+  isExpanded.value = false;
+});
 </script>
 
 <template>
@@ -71,7 +72,10 @@ watch(trailKey, () => {
           v-if="index === 1 && hiddenCount > 0 && !isExpanded"
           class="flex items-center shrink-0 sm:hidden"
         >
-          <ChevronRightIcon class="w-3 h-3 mx-1.5 text-gray-400 dark:text-gray-500 shrink-0" aria-hidden="true" />
+          <ChevronRightIcon
+            class="w-3 h-3 mx-1.5 text-gray-400 dark:text-gray-500 shrink-0"
+            aria-hidden="true"
+          />
           <button
             type="button"
             class="text-link text-link-primary px-1 py-1 leading-none"
@@ -87,10 +91,7 @@ watch(trailKey, () => {
         <li
           :data-index="index"
           class="items-center py-1"
-          :class="[
-            isCollapsedItem(index) ? 'hidden sm:flex' : 'flex',
-            shrinkClasses(item, index),
-          ]"
+          :class="[isCollapsedItem(index) ? 'hidden sm:flex' : 'flex', shrinkClasses(item, index)]"
         >
           <ChevronRightIcon
             v-if="index > 0"
@@ -131,5 +132,5 @@ watch(trailKey, () => {
 </template>
 
 <style scoped>
-@import '@/assets/text-link.css';
+@import "@/assets/text-link.css";
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div
     class="fixed w-[156px] bottom-0 left-[-50px] bg-primary text-white py-2 text-center rotate-45 z-999"
+    role="note"
     aria-label="This site is in beta development"
     title="This site is in beta development"
   >

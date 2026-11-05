@@ -1,135 +1,133 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import ActionButton from '@/components/atoms/ActionButton.vue'
-import CloseButton from '@/components/atoms/CloseButton.vue'
-import GitHubLogin from '@/components/molecules/GitHubLogin.vue'
-import { getAuthService } from '@/services'
-import { useAuthStore } from '@/stores/auth'
-import { useGlobalStateStore } from '@/stores/globalState'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import ActionButton from '@/components/atoms/ActionButton.vue';
+import CloseButton from '@/components/atoms/CloseButton.vue';
+import GitHubLogin from '@/components/molecules/GitHubLogin.vue';
+import { getAuthService } from '@/services';
+import { useAuthStore } from '@/stores/auth';
+import { useGlobalStateStore } from '@/stores/globalState';
 
-const router = useRouter()
-const authStore = useAuthStore()
-const globalStateStore = useGlobalStateStore()
-const username = ref('')
-const usernameInput = ref<HTMLInputElement | null>(null)
-const password = ref('')
-const error = ref<string | null>(null)
-const isLoading = ref(false)
-const isGitHubLoading = ref(false)
-const ERROR_AUTO_HIDE_MS = 5000
-let errorTimer: ReturnType<typeof setTimeout> | null = null
+const router = useRouter();
+const authStore = useAuthStore();
+const globalStateStore = useGlobalStateStore();
+const username = ref('');
+const usernameInput = ref<HTMLInputElement | null>(null);
+const password = ref('');
+const error = ref<string | null>(null);
+const isLoading = ref(false);
+const isGitHubLoading = ref(false);
+const ERROR_AUTO_HIDE_MS = 5000;
+let errorTimer: ReturnType<typeof setTimeout> | null = null;
 
-const authService = getAuthService()
+const authService = getAuthService();
 
 const clearErrorTimer = () => {
   if (!errorTimer) {
-    return
+    return;
   }
 
-  clearTimeout(errorTimer)
-  errorTimer = null
-}
+  clearTimeout(errorTimer);
+  errorTimer = null;
+};
 
 const focusUsernameInput = () => {
-  usernameInput.value?.focus()
-}
+  usernameInput.value?.focus();
+};
 
 onMounted(() => {
-  focusUsernameInput()
+  focusUsernameInput();
 
   if (globalStateStore.isLoginUsernameFocusRequested) {
-    focusUsernameInput()
-    globalStateStore.consumeLoginUsernameFocus()
+    focusUsernameInput();
+    globalStateStore.consumeLoginUsernameFocus();
   }
-})
+});
 
 watch(
   () => globalStateStore.isLoginUsernameFocusRequested,
   (isFocusRequested) => {
     if (!isFocusRequested) {
-      return
+      return;
     }
 
-    focusUsernameInput()
-    globalStateStore.consumeLoginUsernameFocus()
+    focusUsernameInput();
+    globalStateStore.consumeLoginUsernameFocus();
   },
-)
+);
 
 watch(error, (newError) => {
-  clearErrorTimer()
+  clearErrorTimer();
 
   if (!newError) {
-    return
+    return;
   }
 
   errorTimer = setTimeout(() => {
-    error.value = null
-    errorTimer = null
-  }, ERROR_AUTO_HIDE_MS)
-})
+    error.value = null;
+    errorTimer = null;
+  }, ERROR_AUTO_HIDE_MS);
+});
 
 onBeforeUnmount(() => {
-  clearErrorTimer()
-})
+  clearErrorTimer();
+});
 
 const handleSubmit = async () => {
   if (isGitHubLoading.value) {
-    return
+    return;
   }
 
-  error.value = null
+  error.value = null;
 
   if (!username.value || !password.value) {
-    error.value = 'Please enter both username and password'
-    focusUsernameInput()
-    return
+    error.value = 'Please enter both username and password';
+    focusUsernameInput();
+    return;
   }
 
-  isLoading.value = true
+  isLoading.value = true;
 
   try {
     const token = await authService.login({
       login: username.value,
       password: password.value,
-    })
+    });
 
     // Store auth state.
-    authStore.setAuth(token, username.value)
-    authStore.setLoginMethod('password')
+    authStore.setAuth(token, username.value);
+    authStore.setLoginMethod('password');
 
     // Redirect to profile page.
-    router.push('/profile')
+    router.push('/profile');
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Login failed'
-    focusUsernameInput()
+    error.value = err instanceof Error ? err.message : 'Login failed';
+    focusUsernameInput();
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 </script>
 
 <template>
   <!-- Error message -->
   <div
     class="error-box flex items-center max-w-md mx-auto mb-4 transition-all"
-    :class="error ? 'visible opacity-100 translate-y-0 pointer-events-auto' : 'invisible opacity-0 translate-y-[100%] pointer-events-none'"
+    :class="
+      error
+        ? 'visible opacity-100 translate-y-0 pointer-events-auto'
+        : 'invisible opacity-0 translate-y-[100%] pointer-events-none'
+    "
   >
     <p class="text-sm">{{ error }}</p>
-    <CloseButton
-      @click="error = null"
-      class="ml-auto"
-      aria-label="Close error message"
-    />
+    <CloseButton @click="error = null" class="ml-auto" aria-label="Close error message" />
   </div>
 
   <div class="max-w-md mx-auto box relative">
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <!-- Username field -->
       <div>
-        <label for="username" class="label-field block mb-2">
-          Username
-        </label>
+        <label for="username" class="label-field block mb-2"> Username </label>
         <input
           ref="usernameInput"
           id="username"
@@ -145,9 +143,7 @@ const handleSubmit = async () => {
 
       <!-- Password field -->
       <div>
-        <label for="password" class="label-field block mb-2">
-          Password
-        </label>
+        <label for="password" class="label-field block mb-2"> Password </label>
         <input
           id="password"
           v-model="password"
@@ -167,7 +163,7 @@ const handleSubmit = async () => {
         size="lg"
         :disabled="isLoading || isGitHubLoading"
         class="w-full"
-        contentSection="login_page"
+        content-section="login_page"
       >
         {{ isLoading ? 'Logging in...' : 'Login' }}
       </ActionButton>
@@ -176,19 +172,16 @@ const handleSubmit = async () => {
     <div class="mt-6">
       <div class="auth-divider text-gray-600 dark:text-gray-400 mb-5">or</div>
 
-      <GitHubLogin
-        @error="error = $event"
-        @busy-change="isGitHubLoading = $event"
-      />
+      <GitHubLogin @error="error = $event" @busy-change="isGitHubLoading = $event" />
     </div>
   </div>
 </template>
 
 <style scoped>
-@import '@/assets/label.css';
-@import '@/assets/input.css';
-@import '@/assets/box.css';
-@import '@/assets/error-box.css';
+@import "@/assets/label.css";
+@import "@/assets/input.css";
+@import "@/assets/box.css";
+@import "@/assets/error-box.css";
 
 .auth-divider {
   display: flex;
@@ -199,7 +192,7 @@ const handleSubmit = async () => {
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
     background-color: currentColor;

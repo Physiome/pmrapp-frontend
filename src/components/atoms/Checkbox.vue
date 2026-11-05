@@ -1,25 +1,28 @@
 <script setup lang="ts">
 interface Props {
-  modelValue?: boolean
-  disabled?: boolean
+  modelValue?: boolean;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   disabled: false,
-})
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-}>()
+  'update:modelValue': [value: boolean];
+}>();
 
 const toggle = () => {
-  if (props.disabled) return
-  emit('update:modelValue', !props.modelValue)
-}
+  if (props.disabled) return;
+  emit('update:modelValue', !props.modelValue);
+};
 </script>
 
 <template>
+  <!-- biome-ignore-start lint/a11y/noLabelWithoutControl: custom checkbox control; the label is the click area and role/aria-checked/keyboard handlers provide the semantics -->
+  <!-- biome-ignore-start lint/a11y/useSemanticElements: custom checkbox control; the label is the click area and role/aria-checked/keyboard handlers provide the semantics -->
+  <!-- biome-ignore-start lint/a11y/noNoninteractiveElementToInteractiveRole: custom checkbox control; the label is the click area and role/aria-checked/keyboard handlers provide the semantics -->
   <label
     class="group inline-flex cursor-pointer items-center gap-2 select-none focus:outline-none"
     :class="{ 'opacity-50 cursor-not-allowed': disabled }"
@@ -37,7 +40,8 @@ const toggle = () => {
           ? 'bg-primary border-primary'
           : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600',
         !disabled && 'group-hover:border-primary dark:group-hover:border-primary',
-        !disabled && 'group-focus-visible:ring-2 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 dark:group-focus-visible:ring-offset-gray-900',
+        !disabled &&
+          'group-focus-visible:ring-2 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 dark:group-focus-visible:ring-offset-gray-900',
       ]"
     >
       <!-- Checkmark icon -->
@@ -70,6 +74,9 @@ const toggle = () => {
 
     <slot />
   </label>
+  <!-- biome-ignore-end lint/a11y/noLabelWithoutControl: custom checkbox control; the label is the click area and role/aria-checked/keyboard handlers provide the semantics -->
+  <!-- biome-ignore-end lint/a11y/useSemanticElements: custom checkbox control; the label is the click area and role/aria-checked/keyboard handlers provide the semantics -->
+  <!-- biome-ignore-end lint/a11y/noNoninteractiveElementToInteractiveRole: custom checkbox control; the label is the click area and role/aria-checked/keyboard handlers provide the semantics -->
 </template>
 
 <style scoped>

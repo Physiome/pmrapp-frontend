@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import List from '@/components/molecules/List.vue'
-import { useWorkspaceStore } from '@/stores/workspace'
-import type { Workspace } from '@/types/workspace'
+import { onMounted } from 'vue';
+import List from '@/components/molecules/List.vue';
+import { useWorkspaceStore } from '@/stores/workspace';
+import type { Workspace } from '@/types/workspace';
 
 const emit = defineEmits<{
-  updateFilteredCount: [filteredCount: number, totalCount: number, hasFilter: boolean]
-}>()
+  updateFilteredCount: [filteredCount: number, totalCount: number, hasFilter: boolean];
+}>();
 
-const workspaceStore = useWorkspaceStore()
+const workspaceStore = useWorkspaceStore();
 
 const handleRefresh = async () => {
-  await workspaceStore.fetchWorkspaces(true)
-}
+  await workspaceStore.fetchWorkspaces(true);
+};
 
 const getTitle = (workspace: Workspace) => {
-  return workspace.entity.description || workspace.alias
-}
+  return workspace.entity.description || workspace.alias;
+};
 
 onMounted(async () => {
-  await workspaceStore.fetchWorkspaces()
-})
+  await workspaceStore.fetchWorkspaces();
+});
 </script>
 
 <template>
