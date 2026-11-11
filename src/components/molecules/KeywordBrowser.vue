@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import SearchField from '@/components/atoms/SearchField.vue';
 import TermButton from '@/components/atoms/TermButton.vue';
 import { useSearchStore } from '@/stores/search';
-import { buildSearchQuery, isValidTerm } from '@/utils/search';
+import { buildSearchQuery, isValidTerm, matchesTerm } from '@/utils/search';
 
 interface Props {
   inSidebar: boolean;
@@ -46,11 +46,9 @@ const handleTermClick = async (kind: string, term: string) => {
 };
 
 const getFilteredTerms = (terms: string[] | null | undefined, kind: string): string[] => {
-  const filter = categoryFilters.value.get(kind)?.toLowerCase() || '';
+  const filter = categoryFilters.value.get(kind) || '';
   const safeTerms = terms ?? [];
-  return safeTerms.filter(
-    (t) => isValidTerm(t) && (filter === '' || t.toLowerCase().includes(filter)),
-  );
+  return safeTerms.filter((t) => isValidTerm(t) && matchesTerm(t, filter));
 };
 
 const updateFilter = (kind: string, value: string) => {
