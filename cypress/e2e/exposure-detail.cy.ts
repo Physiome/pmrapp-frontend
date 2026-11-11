@@ -85,6 +85,40 @@ describe('Exposure detail page', () => {
     cy.url().should('include', '/cellml_math');
   });
 
+  // The toolbar must stay pinned just below the sticky header,
+  // whether or not the preview banner (which changes the header height) has been dismissed.
+  const assertMathToolbarIsStuck = () => {
+    cy.scrollTo(0, 1500);
+    cy.get('header').then(($header) => {
+      const headerBottom = $header[0].getBoundingClientRect().bottom;
+
+      cy.get('.sticky-container').should(($toolbar) => {
+        const toolbarTop = $toolbar[0].getBoundingClientRect().top;
+
+        expect(toolbarTop).to.be.closeTo(headerBottom, 2);
+      });
+    });
+    cy.get('button[aria-label="Collapse math toolbar"]').should('be.visible');
+  };
+
+  it('keeps the math toolbar stuck below the header when scrolling.', () => {
+    cy.visit('/exposure/da9/noble_denyer_brown_difrancesco_1992.cellml/cellml_math');
+    cy.get('.sticky-container').should('exist');
+    cy.get('math').should('exist');
+
+    assertMathToolbarIsStuck();
+  });
+
+  it('keeps the math toolbar stuck below the header after the preview banner is closed.', () => {
+    cy.visit('/exposure/da9/noble_denyer_brown_difrancesco_1992.cellml/cellml_math');
+    cy.get('.sticky-container').should('exist');
+    cy.get('math').should('exist');
+    cy.get('button[aria-label="Close notification"]').click();
+    cy.get('button[aria-label="Close notification"]').should('not.exist');
+
+    assertMathToolbarIsStuck();
+  });
+
   it('renders the navigation section.', () => {
     cy.get('h4').contains('Navigation').should('exist');
   });
