@@ -20,6 +20,44 @@ export const isValidTerm = (term: string): boolean => {
 };
 
 /**
+ * Reduces a plural word to its singular form by dropping a trailing "s"
+ * (e.g. "myocytes" → "myocyte"). Short words and words ending in "ss" are left unchanged.
+ */
+const stemWord = (word: string): string => {
+  if (word.length <= 3) return word;
+  if (word.endsWith('s') && !word.endsWith('ss')) return word.slice(0, -1);
+  return word;
+};
+
+/**
+ * Builds a comparison key for a term: lowercased, with hyphens, underscores and
+ * whitespace removed, and optionally with each word reduced to its singular form.
+ * e.g. "Long-QT syndrome" → "longqtsyndrome".
+ */
+const termMatchKey = (text: string, stem: boolean): string => {
+  const words = text
+    .toLowerCase()
+    .split(/[\s\-_]+/)
+    .filter(Boolean);
+  return (stem ? words.map(stemWord) : words).join('');
+};
+
+/**
+ * Returns true if a term matches the text typed into a term filter.
+ * Matching is case-insensitive, ignores hyphens, underscores and spaces,
+ * and treats singular and plural forms alike, so that spelling variants of the same term
+ * (e.g. "g-protein" / "g protein", "myocyte" / "myocytes") are all shown.
+ * A blank query matches every term.
+ */
+export const matchesTerm = (term: string, query: string): boolean => {
+  // The unstemmed comparison ensures that any plain substring of a term still matches.
+  return (
+    termMatchKey(term, true).includes(termMatchKey(query, true)) ||
+    termMatchKey(term, false).includes(termMatchKey(query, false))
+  );
+};
+
+/**
  * Normalises a string for fuzzy search by replacing non-alphanumeric characters
  * (dashes, hyphens, single/double quotes, commas, parentheses, dots, etc.) with
  * spaces, then collapsing multiple consecutive spaces and trimming.

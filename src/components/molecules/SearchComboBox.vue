@@ -23,6 +23,7 @@ import type { SearchFilter, SearchQueryRequest } from '@/types/search';
 import {
   buildQueryFromTokens,
   isValidTerm,
+  matchesTerm,
   parseQueryTokens,
   stripSurroundingQuotes,
 } from '@/utils/search';
@@ -471,7 +472,7 @@ function filterTermSuggestions(inputText: string) {
     );
 
   const query = inputText.trim().toLowerCase();
-  termSuggestions.value = query ? terms.filter((t) => t.toLowerCase().includes(query)) : terms;
+  termSuggestions.value = query ? terms.filter((t) => matchesTerm(t, query)) : terms;
   showTermSuggestions.value = true;
   // Highlight an exact match (or else the first match) while typing so Enter/Tab picks it;
   // nothing is pre-selected when the category is first opened.
