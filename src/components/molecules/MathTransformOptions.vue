@@ -153,7 +153,7 @@ watch(
 
 .sticky-container {
   container-type: scroll-state;
-  top: calc(var(--notification-bar-height) + 80px);
+  top: calc(var(--notification-bar-height, 0px) + 80px);
 }
 
 @container scroll-state(stuck: top) {

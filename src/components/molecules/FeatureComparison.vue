@@ -270,10 +270,10 @@ onMounted(() => {
 @import "@/assets/box.css";
 
 .header-row {
-  top: calc(var(--notification-bar-height) + 76px);
+  top: calc(var(--notification-bar-height, 0px) + 76px);
 }
 
 .category-title {
-  top: calc(var(--notification-bar-height) + 120px);
+  top: calc(var(--notification-bar-height, 0px) + 120px);
 }
 </style>

@@ -9,7 +9,9 @@ const notificationBarEl = ref<HTMLElement | null>(null);
 const notificationContainerEl = ref<HTMLElement | null>(null);
 
 const updateNotificationBarHeight = () => {
-  const height = isVisible.value ? '46px' : '0';
+  // The value needs a unit: it is used in calc() expressions (e.g. sticky offsets),
+  // where a unitless zero is invalid and would silently disable the whole declaration.
+  const height = isVisible.value ? '46px' : '0px';
   document.documentElement.style.setProperty('--notification-bar-height', height);
 };
 
