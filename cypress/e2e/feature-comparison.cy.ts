@@ -1,6 +1,13 @@
 describe('Feature comparison page', () => {
   beforeEach(() => {
+    // Stub the sheet with a fixture so the tests do not depend on the live data
+    // (in CI the URL is only a placeholder). It must be configured at build time.
+    const csvUrl = Cypress.expose('featureComparisonCsvUrl');
+    expect(csvUrl, 'VITE_FEATURE_COMPARISON_SHEET_CSV_URL').to.not.be.empty;
+    cy.intercept('GET', csvUrl, { fixture: 'feature-comparison.csv' }).as('featureComparisonCsv');
+
     cy.visit('/feature-comparison');
+    cy.wait('@featureComparisonCsv');
     cy.get('.category-title').should('exist');
   });
 
