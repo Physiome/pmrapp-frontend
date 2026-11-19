@@ -35,6 +35,7 @@ const setUpMonaco = async (): Promise<Monaco> => {
     import('monaco-editor/languages/definitions/markdown/register'),
     import('monaco-editor/languages/definitions/python/register'),
     import('monaco-editor/languages/definitions/r/register'),
+    import('monaco-editor/languages/definitions/restructuredtext/register'),
     import('monaco-editor/languages/definitions/scss/register'),
     import('monaco-editor/languages/definitions/shell/register'),
     import('monaco-editor/languages/definitions/sparql/register'),

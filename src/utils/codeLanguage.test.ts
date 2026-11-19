@@ -43,6 +43,7 @@ describe('detectCodeLanguage', () => {
     ['Model.java', 'java'],
     ['query.rq', 'sparql'],
     ['schema.sql', 'sql'],
+    ['index.rst', 'restructuredtext'],
     ['Dockerfile', 'dockerfile'],
     ['.editorconfig', 'ini'],
     ['.gitmodules', 'ini'],

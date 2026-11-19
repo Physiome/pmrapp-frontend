@@ -19,6 +19,7 @@ export type CodeLanguageId =
   | 'matlab'
   | 'python'
   | 'r'
+  | 'restructuredtext'
   | 'scss'
   | 'shell'
   | 'sparql'
