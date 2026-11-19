@@ -20,6 +20,9 @@ jobs:
       VITE_API_BASE_URL: 'https://pmr3.demo.physiomeproject.org'
       VITE_BASE_PATH: '/'
       VITE_DOWNLOAD_HOST: 'https://pmr3.demo.physiomeproject.org'
+      # Placeholder only: the e2e tests stub this request with
+      # cypress/fixtures/feature-comparison.csv, so it is never fetched.
+      VITE_FEATURE_COMPARISON_SHEET_CSV_URL: 'https://example.com/feature-comparison.csv'
     steps:
       - name: Checkout
         uses: actions/checkout@v7
