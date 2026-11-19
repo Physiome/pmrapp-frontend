@@ -54,4 +54,25 @@ describe('NotificationBar', () => {
 
     wrapper.unmount();
   });
+
+  // Sticky elements use the height in calc() expressions, where a unitless value is invalid.
+  it('sets the notification bar height with a unit, both when shown and when closed', async () => {
+    mockGet.mockResolvedValue(null);
+    mockSet.mockResolvedValue(undefined);
+    const getHeight = () =>
+      document.documentElement.style.getPropertyValue('--notification-bar-height');
+
+    const wrapper = mount(NotificationBar);
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    expect(getHeight()).toBe('46px');
+
+    await wrapper.findComponent({ name: 'CloseButton' }).trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(getHeight()).toBe('0px');
+
+    wrapper.unmount();
+  });
 });
