@@ -124,6 +124,18 @@ describe('isCodeFile', () => {
     expect(isCodeFile('model.xul')).toBe(true);
   });
 
+  it('returns true for files the code viewer can highlight', () => {
+    for (const filename of [
+      'notebook.ipynb',
+      'model.f90',
+      'model.sbml',
+      'model.jl',
+      '.gitignore',
+    ]) {
+      expect(isCodeFile(filename)).toBe(true);
+    }
+  });
+
   it('returns true for .hgsub dotfile', () => {
     expect(isCodeFile('.hgsub')).toBe(true);
   });
@@ -141,7 +153,7 @@ describe('isCodeFile', () => {
 
 describe('isBinaryFile', () => {
   it('returns true for binary extensions', () => {
-    for (const ext of ['pdf', 'png', 'jpg', 'zip', 'exe', 'mp4', 'omex']) {
+    for (const ext of ['pdf', 'png', 'jpg', 'zip', 'exe', 'mp4', 'omex', 'odt', 'ods']) {
       expect(isBinaryFile(`file.${ext}`)).toBe(true);
     }
   });
