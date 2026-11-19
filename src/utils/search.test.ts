@@ -201,6 +201,26 @@ describe('matchesTerm', () => {
     expectMutualMatch('t-cell', 't cells');
   });
 
+  // These test values are not actual CellML keywords.
+  it('treats -es and -ies plurals alike', () => {
+    expectMutualMatch('protein complex', 'protein complexes');
+    expectMutualMatch('cardiac activity', 'cardiac activities');
+    expectMutualMatch('ion channel class', 'ion channel classes');
+    expectMutualMatch('calcium flux', 'calcium fluxes');
+    expectMutualMatch('potassium switch', 'potassium switches');
+    expectMutualMatch('artery', 'arteries');
+  });
+
+  it('keeps matching plurals of words ending in "ie" or a vowel and "y"', () => {
+    expectMutualMatch('calorie', 'calories');
+    expectMutualMatch('kidney', 'kidneys');
+  });
+
+  it('keeps matching while an -ies plural is partially typed', () => {
+    expect(matchesTerm('cardiac activities', 'cardiac activit')).toBe(true);
+    expect(matchesTerm('cardiac activity', 'cardiac activiti')).toBe(true);
+  });
+
   it('keeps matching while a term is partially typed', () => {
     expect(matchesTerm('hodgkin-huxley', 'hodgkin hux')).toBe(true);
     expect(matchesTerm('ryanodine receptors', 'ryanodine rec')).toBe(true);

@@ -20,11 +20,19 @@ export const isValidTerm = (term: string): boolean => {
 };
 
 /**
- * Reduces a plural word to its singular form by dropping a trailing "s"
- * (e.g. "myocytes" → "myocyte"). Short words and words ending in "ss" are left unchanged.
+ * Reduces a word to a stem shared by its singular and plural forms.
+ * - A consonant followed by "ies" or "y" ends in "i" (e.g. "activities" and "activity" → "activiti").
+ *   The "i" form, rather than "y", keeps "calories" matching "calorie".
+ * - "es" is dropped after "ss", "x", "z", "ch" or "sh" (e.g. "complexes" → "complex").
+ * - Otherwise a trailing "s" is dropped (e.g. "myocytes" → "myocyte").
+ * Short words, words ending in "ss" and words with a vowel before "y" (e.g. "kidney") are left unchanged.
+ * Stems need not be real words; they only have to agree between singular and plural forms.
  */
 const stemWord = (word: string): string => {
   if (word.length <= 3) return word;
+  if (/[^aeiou]ies$/.test(word)) return word.slice(0, -2);
+  if (/[^aeiou]y$/.test(word)) return `${word.slice(0, -1)}i`;
+  if (/(ss|x|z|ch|sh)es$/.test(word)) return word.slice(0, -2);
   if (word.endsWith('s') && !word.endsWith('ss')) return word.slice(0, -1);
   return word;
 };
