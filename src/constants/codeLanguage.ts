@@ -4,15 +4,21 @@ import type { CodeLanguageId } from '@/types/codeLanguage';
  * Map of file extensions to code viewer languages.
  */
 export const EXTENSION_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
+  bash: 'shell',
+  bat: 'bat',
   c: 'cpp',
   cc: 'cpp',
   cellml: 'xml',
+  cff: 'yaml',
+  cfg: 'ini',
   cjs: 'javascript',
+  cmd: 'bat',
   conf: 'json',
   cpp: 'cpp',
   css: 'css',
   cts: 'javascript',
   cxx: 'cpp',
+  dockerfile: 'dockerfile',
   f: 'fortran',
   f03: 'fortran',
   f08: 'fortran',
@@ -28,12 +34,16 @@ export const EXTENSION_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
   htm: 'html',
   html: 'html',
   hxx: 'cpp',
+  ini: 'ini',
   ipynb: 'json',
+  java: 'java',
+  jl: 'julia',
   js: 'javascript',
   json: 'json',
   jsonld: 'json',
   jsx: 'javascript',
   kml: 'xml',
+  less: 'less',
   m: 'matlab',
   markdown: 'markdown',
   matlab: 'matlab',
@@ -43,14 +53,21 @@ export const EXTENSION_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
   mts: 'javascript',
   neon: 'json',
   owl: 'xml',
+  properties: 'ini',
   py: 'python',
   python: 'python',
+  r: 'r',
   rdf: 'xml',
-  sass: 'css',
+  rq: 'sparql',
+  sass: 'scss',
   sbml: 'xml',
-  scss: 'css',
+  scss: 'scss',
   sedml: 'xml',
+  sh: 'shell',
+  sparql: 'sparql',
+  sql: 'sql',
   svg: 'xml',
+  toml: 'ini',
   ts: 'javascript',
   tsx: 'javascript',
   xhtml: 'html',
@@ -59,24 +76,51 @@ export const EXTENSION_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
   xsl: 'xml',
   xslt: 'xml',
   xul: 'xml',
+  yaml: 'yaml',
+  yml: 'yaml',
+  zsh: 'shell',
+};
+
+/**
+ * Map of whole filenames (lower case) to code viewer languages, for files without a usable
+ * extension. These take precedence over `EXTENSION_LANGUAGE_MAP`.
+ */
+export const FILENAME_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
+  '.editorconfig': 'ini',
+  '.gitconfig': 'ini',
+  '.gitmodules': 'ini',
+  dockerfile: 'dockerfile',
 };
 
 /**
  * Map of code viewer languages to Monaco language IDs.
- * JSON, Fortran and MATLAB use small tokenizers defined in `utils/monarch`.
+ * JSON, Fortran and MATLAB use small tokenizers defined in `utils/monarch`; the others are
+ * Monaco built-ins, registered in `utils/monaco`.
  */
 export const MONACO_LANGUAGE_MAP: Record<CodeLanguageId, string> = {
+  bat: 'bat',
   cpp: 'cpp',
   css: 'css',
+  dockerfile: 'dockerfile',
   fortran: 'fortran',
   html: 'html',
+  ini: 'ini',
+  java: 'java',
   // The TypeScript tokenizer also covers JavaScript and JSX.
   javascript: 'typescript',
   json: 'json',
+  julia: 'julia',
+  less: 'less',
   markdown: 'markdown',
   matlab: 'matlab',
   python: 'python',
+  r: 'r',
+  scss: 'scss',
+  shell: 'shell',
+  sparql: 'sparql',
+  sql: 'sql',
   xml: 'xml',
+  yaml: 'yaml',
 };
 
 /**

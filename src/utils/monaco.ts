@@ -22,13 +22,25 @@ const setUpMonaco = async (): Promise<Monaco> => {
     import('monaco-editor/features/find/register'),
     import('monaco-editor/features/folding/register'),
     // Each language registration loads its tokenizer only when a file of that language is shown.
+    import('monaco-editor/languages/definitions/bat/register'),
     import('monaco-editor/languages/definitions/cpp/register'),
     import('monaco-editor/languages/definitions/css/register'),
+    import('monaco-editor/languages/definitions/dockerfile/register'),
     import('monaco-editor/languages/definitions/html/register'),
+    import('monaco-editor/languages/definitions/ini/register'),
+    import('monaco-editor/languages/definitions/java/register'),
+    import('monaco-editor/languages/definitions/julia/register'),
+    import('monaco-editor/languages/definitions/less/register'),
     import('monaco-editor/languages/definitions/markdown/register'),
     import('monaco-editor/languages/definitions/python/register'),
+    import('monaco-editor/languages/definitions/r/register'),
+    import('monaco-editor/languages/definitions/scss/register'),
+    import('monaco-editor/languages/definitions/shell/register'),
+    import('monaco-editor/languages/definitions/sparql/register'),
+    import('monaco-editor/languages/definitions/sql/register'),
     import('monaco-editor/languages/definitions/typescript/register'),
     import('monaco-editor/languages/definitions/xml/register'),
+    import('monaco-editor/languages/definitions/yaml/register'),
   ]);
 
   // The viewer is read-only, so only the base editor worker is needed.

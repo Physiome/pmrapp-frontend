@@ -2,13 +2,25 @@
  * Languages supported by the code viewer for syntax highlighting.
  */
 export type CodeLanguageId =
+  | 'bat'
   | 'cpp'
   | 'css'
+  | 'dockerfile'
   | 'fortran'
   | 'html'
+  | 'ini'
+  | 'java'
   | 'javascript'
   | 'json'
+  | 'julia'
+  | 'less'
   | 'markdown'
   | 'matlab'
   | 'python'
-  | 'xml';
+  | 'r'
+  | 'scss'
+  | 'shell'
+  | 'sparql'
+  | 'sql'
+  | 'xml'
+  | 'yaml';

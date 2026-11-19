@@ -9,7 +9,9 @@ describe('detectCodeLanguage', () => {
     ['diagram.svg', 'xml'],
     ['model.xul', 'xml'],
     ['index.html', 'html'],
-    ['styles.scss', 'css'],
+    ['styles.scss', 'scss'],
+    ['styles.sass', 'scss'],
+    ['styles.less', 'less'],
     ['model.c', 'cpp'],
     ['model.h', 'cpp'],
     ['script.tsx', 'javascript'],
@@ -30,6 +32,20 @@ describe('detectCodeLanguage', () => {
     ['page.xhtml', 'html'],
     ['notebook.ipynb', 'json'],
     ['model.m', 'matlab'],
+    ['run.sh', 'shell'],
+    ['run.bat', 'bat'],
+    ['config.yml', 'yaml'],
+    ['CITATION.cff', 'yaml'],
+    ['setup.cfg', 'ini'],
+    ['pyproject.toml', 'ini'],
+    ['analysis.R', 'r'],
+    ['model.jl', 'julia'],
+    ['Model.java', 'java'],
+    ['query.rq', 'sparql'],
+    ['schema.sql', 'sql'],
+    ['Dockerfile', 'dockerfile'],
+    ['.editorconfig', 'ini'],
+    ['.gitmodules', 'ini'],
   ])('detects %s as %s', (filename, expected) => {
     expect(detectCodeLanguage(filename)).toBe(expected);
   });
@@ -41,6 +57,11 @@ describe('detectCodeLanguage', () => {
   it('uses the basename when a path is given', () => {
     expect(detectCodeLanguage('models/v1.2/model.py')).toBe('python');
     expect(detectCodeLanguage('folder.d/Makefile')).toBeNull();
+    expect(detectCodeLanguage('docker/Dockerfile')).toBe('dockerfile');
+  });
+
+  it('is case-insensitive for whole filenames', () => {
+    expect(detectCodeLanguage('dockerfile')).toBe('dockerfile');
   });
 
   it('returns null for unknown extensions', () => {
@@ -60,6 +81,8 @@ describe('toMonacoLanguage', () => {
     ['json', 'json'],
     ['fortran', 'fortran'],
     ['matlab', 'matlab'],
+    ['shell', 'shell'],
+    ['yaml', 'yaml'],
   ] as const)('maps %s to the Monaco language %s', (id, expected) => {
     expect(toMonacoLanguage(id)).toBe(expected);
   });

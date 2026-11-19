@@ -1,4 +1,8 @@
-import { EXTENSION_LANGUAGE_MAP, MONACO_LANGUAGE_MAP } from '@/constants/codeLanguage';
+import {
+  EXTENSION_LANGUAGE_MAP,
+  FILENAME_LANGUAGE_MAP,
+  MONACO_LANGUAGE_MAP,
+} from '@/constants/codeLanguage';
 import type { CodeLanguageId } from '@/types/codeLanguage';
 
 /**
@@ -8,6 +12,10 @@ import type { CodeLanguageId } from '@/types/codeLanguage';
  */
 export const detectCodeLanguage = (filename: string): CodeLanguageId | null => {
   const basename = filename.split('/').pop() ?? '';
+  const byFilename = FILENAME_LANGUAGE_MAP[basename.toLowerCase()];
+
+  if (byFilename) return byFilename;
+
   const dotIndex = basename.lastIndexOf('.');
 
   if (dotIndex < 0) return null;
