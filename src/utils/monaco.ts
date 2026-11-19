@@ -1,6 +1,7 @@
 import { CODE_VIEW_THEMES } from '@/constants/codeLanguage';
 import { fortranConfiguration, fortranLanguage } from '@/utils/monarch/fortran';
 import { gitignoreConfiguration, gitignoreLanguage } from '@/utils/monarch/gitignore';
+import { iniConfiguration, iniLanguage } from '@/utils/monarch/ini';
 import { jsonConfiguration, jsonLanguage } from '@/utils/monarch/json';
 import { matlabConfiguration, matlabLanguage } from '@/utils/monarch/matlab';
 
@@ -28,7 +29,6 @@ const setUpMonaco = async (): Promise<Monaco> => {
     import('monaco-editor/languages/definitions/css/register'),
     import('monaco-editor/languages/definitions/dockerfile/register'),
     import('monaco-editor/languages/definitions/html/register'),
-    import('monaco-editor/languages/definitions/ini/register'),
     import('monaco-editor/languages/definitions/java/register'),
     import('monaco-editor/languages/definitions/julia/register'),
     import('monaco-editor/languages/definitions/less/register'),
@@ -48,7 +48,7 @@ const setUpMonaco = async (): Promise<Monaco> => {
   // The viewer is read-only, so only the base editor worker is needed.
   globalThis.MonacoEnvironment = { getWorker: () => new EditorWorker() };
 
-  // JSON (tokens only), Fortran, MATLAB and `.gitignore` use small tokenizers defined in `utils/monarch`.
+  // JSON (tokens only), Fortran, MATLAB, INI and `.gitignore` use small tokenizers defined in `utils/monarch`.
   monaco.languages.register({ id: 'json', aliases: ['JSON'] });
   monaco.languages.setMonarchTokensProvider('json', jsonLanguage);
   monaco.languages.setLanguageConfiguration('json', jsonConfiguration);
@@ -58,6 +58,9 @@ const setUpMonaco = async (): Promise<Monaco> => {
   monaco.languages.register({ id: 'gitignore', aliases: ['Git Ignore'] });
   monaco.languages.setMonarchTokensProvider('gitignore', gitignoreLanguage);
   monaco.languages.setLanguageConfiguration('gitignore', gitignoreConfiguration);
+  monaco.languages.register({ id: 'ini', aliases: ['INI'] });
+  monaco.languages.setMonarchTokensProvider('ini', iniLanguage);
+  monaco.languages.setLanguageConfiguration('ini', iniConfiguration);
   monaco.languages.register({ id: 'matlab', aliases: ['MATLAB', 'Octave'] });
   monaco.languages.setMonarchTokensProvider('matlab', matlabLanguage);
   monaco.languages.setLanguageConfiguration('matlab', matlabConfiguration);

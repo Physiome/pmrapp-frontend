@@ -2,6 +2,7 @@ import type { languages } from 'monaco-editor/editor/editor.api';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { fortranLanguage } from './fortran';
 import { gitignoreLanguage } from './gitignore';
+import { iniLanguage } from './ini';
 import { jsonLanguage } from './json';
 import { matlabLanguage } from './matlab';
 
@@ -27,6 +28,7 @@ beforeAll(async () => {
   const definitions: [string, languages.IMonarchLanguage][] = [
     ['fortran', fortranLanguage],
     ['gitignore', gitignoreLanguage],
+    ['ini', iniLanguage],
     ['json', jsonLanguage],
     ['matlab', matlabLanguage],
   ];
@@ -156,5 +158,39 @@ describe('.gitignore tokenizer', () => {
 
   it('treats # as part of the pattern when not at the start of a line', () => {
     expect(tokens('a#b\n \\#c', 'gitignore')).toEqual(['a#b: ', ' \\#c: ']);
+  });
+});
+
+describe('INI tokenizer', () => {
+  it('highlights comments, sections, keys and quoted strings', () => {
+    expect(tokens('; note\n[General]\nversion=0.25.0\nname = "Argon Viewer"', 'ini')).toEqual([
+      '; note: comment',
+      '[General]: metatag',
+      'version: key',
+      '=: delimiter',
+      '0.25.0: ',
+      'name: key',
+      '=: delimiter',
+      '"Argon Viewer": string',
+    ]);
+  });
+
+  it('matches Qt keys with backslashes and leaves digits in values plain', () => {
+    expect(
+      tokens('nodelist\\1\\unique_identifier=df3c76ce-b1c3-11ef-b901-00090faa0001', 'ini'),
+    ).toEqual([
+      'nodelist\\1\\unique_identifier: key',
+      '=: delimiter',
+      'df3c76ce-b1c3-11ef-b901-00090faa0001: ',
+    ]);
+    expect(tokens('rect=@Variant(\\0\\0\\0\\x14@$)', 'ini')).toEqual([
+      'rect: key',
+      '=: delimiter',
+      '@Variant(\\0\\0\\0\\x14@$): ',
+    ]);
+  });
+
+  it('keeps a value with an unmatched quote plain', () => {
+    expect(tokens('a=it"s', 'ini')).toEqual(['a: key', '=: delimiter', 'it"s: ']);
   });
 });

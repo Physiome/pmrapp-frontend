@@ -38,6 +38,7 @@ describe('detectCodeLanguage', () => {
     ['CITATION.cff', 'yaml'],
     ['setup.cfg', 'ini'],
     ['pyproject.toml', 'ini'],
+    ['workflow.proj', 'ini'],
     ['analysis.R', 'r'],
     ['model.jl', 'julia'],
     ['Model.java', 'java'],

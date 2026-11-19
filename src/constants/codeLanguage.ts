@@ -53,6 +53,7 @@ export const EXTENSION_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
   mts: 'javascript',
   neon: 'json',
   owl: 'xml',
+  proj: 'ini',
   properties: 'ini',
   py: 'python',
   python: 'python',
@@ -96,7 +97,7 @@ export const FILENAME_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
 
 /**
  * Map of code viewer languages to Monaco language IDs.
- * JSON, Fortran, MATLAB and `.gitignore` use small tokenizers defined in `utils/monarch`; the others are
+ * JSON, Fortran, MATLAB, INI and `.gitignore` use small tokenizers defined in `utils/monarch`; the others are
  * Monaco built-ins, registered in `utils/monaco`.
  */
 export const MONACO_LANGUAGE_MAP: Record<CodeLanguageId, string> = {
