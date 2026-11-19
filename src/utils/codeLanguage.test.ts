@@ -18,6 +18,17 @@ describe('detectCodeLanguage', () => {
     ['model.py', 'python'],
     ['README.md', 'markdown'],
     ['model.f77', 'fortran'],
+    ['model.f', 'fortran'],
+    ['model.f90', 'fortran'],
+    ['model.cc', 'cpp'],
+    ['model.hpp', 'cpp'],
+    ['script.mjs', 'javascript'],
+    ['model.sbml', 'xml'],
+    ['transform.xslt', 'xml'],
+    ['ontology.owl', 'xml'],
+    ['equation.mml', 'xml'],
+    ['page.xhtml', 'html'],
+    ['notebook.ipynb', 'json'],
     ['model.m', 'matlab'],
   ])('detects %s as %s', (filename, expected) => {
     expect(detectCodeLanguage(filename)).toBe(expected);
