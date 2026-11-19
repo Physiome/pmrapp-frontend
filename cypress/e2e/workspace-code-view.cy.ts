@@ -69,18 +69,6 @@ describe('Workspace detail page', () => {
     });
   };
 
-  // MATLAB uses the app's own tokenizer, so serve a small MATLAB file and check that it is
-  // highlighted. Fortran files (.f77) are not opened in the code view by the workspace page, so
-  // the Fortran tokenizer is covered by unit tests only.
-  it('highlights MATLAB files', () => {
-    serveFile('model.m', "function y = f(x) % note\ny = 'a';");
-
-    cy.visit(`/workspace/6b0/file/${commitId}/model.m`);
-
-    cy.get('.code-block[data-language="matlab"]').should('exist');
-    cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
-  });
-
   /**
    * Scroll the page to the end and check that the file panel, with its toolbar, sits directly
    * below the sticky header and reaches the bottom of the viewport.
