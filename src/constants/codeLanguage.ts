@@ -88,13 +88,14 @@ export const EXTENSION_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
 export const FILENAME_LANGUAGE_MAP: Record<string, CodeLanguageId> = {
   '.editorconfig': 'ini',
   '.gitconfig': 'ini',
+  '.gitignore': 'gitignore',
   '.gitmodules': 'ini',
   dockerfile: 'dockerfile',
 };
 
 /**
  * Map of code viewer languages to Monaco language IDs.
- * JSON, Fortran and MATLAB use small tokenizers defined in `utils/monarch`; the others are
+ * JSON, Fortran, MATLAB and `.gitignore` use small tokenizers defined in `utils/monarch`; the others are
  * Monaco built-ins, registered in `utils/monaco`.
  */
 export const MONACO_LANGUAGE_MAP: Record<CodeLanguageId, string> = {
@@ -103,6 +104,7 @@ export const MONACO_LANGUAGE_MAP: Record<CodeLanguageId, string> = {
   css: 'css',
   dockerfile: 'dockerfile',
   fortran: 'fortran',
+  gitignore: 'gitignore',
   html: 'html',
   ini: 'ini',
   java: 'java',

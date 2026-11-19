@@ -46,6 +46,8 @@ describe('detectCodeLanguage', () => {
     ['Dockerfile', 'dockerfile'],
     ['.editorconfig', 'ini'],
     ['.gitmodules', 'ini'],
+    ['.gitignore', 'gitignore'],
+    ['models/.gitignore', 'gitignore'],
   ])('detects %s as %s', (filename, expected) => {
     expect(detectCodeLanguage(filename)).toBe(expected);
   });

@@ -1,6 +1,7 @@
 import type { languages } from 'monaco-editor/editor/editor.api';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { fortranLanguage } from './fortran';
+import { gitignoreLanguage } from './gitignore';
 import { jsonLanguage } from './json';
 import { matlabLanguage } from './matlab';
 
@@ -25,6 +26,7 @@ beforeAll(async () => {
   monaco = await import('monaco-editor/editor/editor.api');
   const definitions: [string, languages.IMonarchLanguage][] = [
     ['fortran', fortranLanguage],
+    ['gitignore', gitignoreLanguage],
     ['json', jsonLanguage],
     ['matlab', matlabLanguage],
   ];
@@ -140,5 +142,19 @@ describe('JSON tokenizer', () => {
       'true: keyword',
       '}: delimiter.curly',
     ]);
+  });
+});
+
+describe('.gitignore tokenizer', () => {
+  it('highlights only comments', () => {
+    expect(tokens('# Build output\n*.py[cod]\n!keep.so', 'gitignore')).toEqual([
+      '# Build output: comment',
+      '*.py[cod]: ',
+      '!keep.so: ',
+    ]);
+  });
+
+  it('treats # as part of the pattern when not at the start of a line', () => {
+    expect(tokens('a#b\n \\#c', 'gitignore')).toEqual(['a#b: ', ' \\#c: ']);
   });
 });
