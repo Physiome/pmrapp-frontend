@@ -107,10 +107,10 @@ describe('Workspace detail page', () => {
   };
 
   it('fits a long file panel below the header, including the notification bar', () => {
-    const code = Array.from({ length: 2000 }, (_, i) => `x${i} = ${i}; % line ${i}`).join('\n');
-    serveFile('long.m', code);
+    const code = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
+    serveFile('long.txt', code);
 
-    cy.visit(`/workspace/6b0/file/${commitId}/long.m`);
+    cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
 
     cy.get('button[aria-label="Close notification"]').should('be.visible');
     assertPanelFitsBelowHeader();
@@ -131,10 +131,10 @@ describe('Workspace detail page', () => {
   };
 
   it('keeps the file panel below the header and scrolls the code with the page', () => {
-    const code = Array.from({ length: 2000 }, (_, i) => `x${i} = ${i}; % line ${i}`).join('\n');
-    serveFile('long.m', code);
+    const code = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
+    serveFile('long.txt', code);
 
-    cy.visit(`/workspace/6b0/file/${commitId}/long.m`);
+    cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
     cy.contains('.code-block .view-line', 'line 0').should('be.visible');
 
     // Scroll the page by 900 lines past the point where the panel sticks:
@@ -158,10 +158,10 @@ describe('Workspace detail page', () => {
   });
 
   it('scrolls the page to a search match', () => {
-    const code = Array.from({ length: 2000 }, (_, i) => `x${i} = ${i}; % line ${i}`).join('\n');
-    serveFile('long.m', code);
+    const code = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
+    serveFile('long.txt', code);
 
-    cy.visit(`/workspace/6b0/file/${commitId}/long.m`);
+    cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
     cy.get('.code-block .view-line').first().click();
     const searchShortcut = Cypress.platform === 'darwin' ? '{meta}f' : '{ctrl}f';
     cy.get('.code-block .monaco-editor textarea').first().type(searchShortcut, { force: true });
