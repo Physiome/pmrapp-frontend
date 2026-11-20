@@ -31,7 +31,8 @@ vi.mock('@/components/atoms/TermButton.vue', () => ({
 }));
 
 // Mock utility functions.
-vi.mock('@/utils/search', () => ({
+vi.mock('@/utils/search', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/search')>()),
   buildSearchQuery: vi.fn((kind, term, query) => ({
     ...query,
     kind,
@@ -340,6 +341,33 @@ describe('KeywordBrowser', () => {
     const termButtons = wrapper.findAllComponents({ name: 'TermButton' });
     expect(termButtons.length).toBe(1);
     expect(termButtons[0].props('term')).toBe('Action_Potential');
+    wrapper.unmount();
+  });
+
+  it('shows spelling variants of the typed keyword', async () => {
+    searchStore.isLoading = false;
+    searchStore.error = null;
+    searchStore.categories = [
+      {
+        kind: 'cellml_keyword',
+        kindInfo: createKindInfo(['g protein', 'g-protein', 'myocyte', 'myocytes', 'binding']),
+        loading: false,
+        error: null,
+      },
+    ];
+
+    wrapper = createWrapper();
+    const searchField = wrapper.findComponent({ name: 'SearchField' });
+    const shownTerms = () =>
+      wrapper.findAllComponents({ name: 'TermButton' }).map((b) => b.props('term'));
+
+    await searchField.vm.$emit('update:modelValue', 'g-protein');
+    await wrapper.vm.$nextTick();
+    expect(shownTerms()).toEqual(['g protein', 'g-protein']);
+
+    await searchField.vm.$emit('update:modelValue', 'myocytes');
+    await wrapper.vm.$nextTick();
+    expect(shownTerms()).toEqual(['myocyte', 'myocytes']);
     wrapper.unmount();
   });
 

@@ -11,6 +11,7 @@ import {
   getSearchResultLink,
   highlightTokens,
   isValidTerm,
+  matchesTerm,
   normaliseSearchText,
   parseQueryFiltersFromQuery,
   parseQueryTokens,
@@ -162,6 +163,57 @@ describe('isValidTerm', () => {
     expect(isValidTerm("O'Hara-Rudy")).toBe(true);
     expect(isValidTerm('CiPA')).toBe(true);
     expect(isValidTerm('2017')).toBe(true);
+  });
+});
+
+describe('matchesTerm', () => {
+  const expectMutualMatch = (a: string, b: string) => {
+    expect(matchesTerm(a, b)).toBe(true);
+    expect(matchesTerm(b, a)).toBe(true);
+  };
+
+  it('matches every term for a blank query', () => {
+    expect(matchesTerm('calcium', '')).toBe(true);
+    expect(matchesTerm('calcium', '   ')).toBe(true);
+  });
+
+  it('matches substrings case-insensitively', () => {
+    expect(matchesTerm('Action_Potential', 'ACTION')).toBe(true);
+    expect(matchesTerm('calcium', 'sodium')).toBe(false);
+  });
+
+  it('treats hyphens, underscores and spaces as interchangeable', () => {
+    expectMutualMatch('g protein', 'g-protein');
+    expectMutualMatch('g protein', 'g_protein');
+    expectMutualMatch('hodgkin-huxley', 'hodgkin huxley');
+    expectMutualMatch('long qt syndrome', 'long-qt syndrome');
+  });
+
+  it('matches joined-up forms with no separator', () => {
+    expectMutualMatch('hodgkin-huxley', 'hodgkinhuxley');
+    expect(matchesTerm('long qt syndrome', 'longqt')).toBe(true);
+  });
+
+  it('treats singular and plural forms alike', () => {
+    expectMutualMatch('cardiac myocyte', 'cardiac myocytes');
+    expectMutualMatch('circadian rhythm', 'circadian rhythms');
+    expectMutualMatch('protein module', 'protein-modules');
+    expectMutualMatch('t-cell', 't cells');
+  });
+
+  it('treats -es and -ies plurals alike', () => {
+    expectMutualMatch('pacemaker activities', 'pacemaker activity');
+    expectMutualMatch('cerebral artery', 'cerebral arteries');
+    expectMutualMatch('cable property', 'cable properties');
+    expect(matchesTerm('pacemaker activity', 'activities')).toBe(true);
+    expect(matchesTerm('cerebral arteries', 'artery')).toBe(true);
+    expect(matchesTerm('cable properties', 'property')).toBe(true);
+  });
+
+  it('keeps matching while a term is partially typed', () => {
+    expect(matchesTerm('hodgkin-huxley', 'hodgkin hux')).toBe(true);
+    expect(matchesTerm('ryanodine receptors', 'ryanodine rec')).toBe(true);
+    expect(matchesTerm('integrins', 'ns')).toBe(true);
   });
 });
 
