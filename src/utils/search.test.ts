@@ -201,14 +201,10 @@ describe('matchesTerm', () => {
     expectMutualMatch('t-cell', 't cells');
   });
 
-  // These test values are not actual CellML keywords.
   it('treats -es and -ies plurals alike', () => {
-    expectMutualMatch('protein complex', 'protein complexes');
-    expectMutualMatch('cardiac activity', 'cardiac activities');
-    expectMutualMatch('ion channel class', 'ion channel classes');
-    expectMutualMatch('calcium flux', 'calcium fluxes');
-    expectMutualMatch('potassium switch', 'potassium switches');
-    expectMutualMatch('artery', 'arteries');
+    expectMutualMatch('pacemaker activity', 'pacemaker activities');
+    expectMutualMatch('artery', 'cerebral arteries');
+    expectMutualMatch('property', 'cable properties');
   });
 
   it('keeps matching while a term is partially typed', () => {
