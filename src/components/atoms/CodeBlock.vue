@@ -173,7 +173,7 @@ watch(
     <pre
       v-if="loadFailed"
       class="code-block-fallback"
-      :style="{ maxHeight: CODE_VIEW_MAX_HEIGHT }"
+      :style="{ maxHeight: CODE_VIEW_MAX_HEIGHT, whiteSpace: startWrapped ? 'pre-wrap' : 'pre' }"
     >{{ code }}</pre>
     <div v-else ref="host" class="code-block-editor" :style="hostStyle" />
   </div>
