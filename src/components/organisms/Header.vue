@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import ActionButton from '@/components/atoms/ActionButton.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
@@ -8,6 +8,7 @@ import UserDropdown from '@/components/molecules/UserDropdown.vue';
 import SearchOverlay from '@/components/organisms/SearchOverlay.vue';
 import { LOGIN_DISABLED } from '@/constants/auth';
 import { useGlobalStateStore } from '@/stores/globalState';
+import { syncHeightToCssProperty } from '@/utils/elementHeight';
 
 const props = withDefaults(
   defineProps<{
@@ -22,6 +23,8 @@ const route = useRoute();
 const isSearchOverlayVisible = ref(false);
 const isMobileMenuOpen = ref(false);
 const globalState = useGlobalStateStore();
+const headerEl = ref<HTMLElement | null>(null);
+let stopHeaderHeightSync: (() => void) | null = null;
 
 const menuContainerClasses = computed(() => [
   isMobileMenuOpen.value ? 'block' : 'hidden',
@@ -76,6 +79,22 @@ const navLinks = [
   { path: '/workspace', label: 'Workspaces' },
 ];
 
+// Publish the sticky header's height, including the notification bar, so that sticky content
+// such as the file panel can sit directly below it.
+onMounted(() => {
+  if (headerEl.value) {
+    stopHeaderHeightSync = syncHeightToCssProperty(
+      headerEl.value,
+      '--header-height',
+      document.documentElement,
+    );
+  }
+});
+
+onBeforeUnmount(() => {
+  stopHeaderHeightSync?.();
+});
+
 const isActive = (path: string) => computed(() => route.path.startsWith(path));
 
 watch(
@@ -87,7 +106,7 @@ watch(
 </script>
 
 <template>
-  <header :class="headerClasses">
+  <header ref="headerEl" :class="headerClasses">
     <PreviewBanner />
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
       <RouterLink to="/" class="flex items-center" aria-label="Home">

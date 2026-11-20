@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ActionButton from '@/components/atoms/ActionButton.vue';
 import Citation from '@/components/atoms/Citation.vue';
-import CodeBlock from '@/components/atoms/CodeBlock.vue';
 import CopyButton from '@/components/atoms/CopyButton.vue';
 import FilePanel from '@/components/atoms/FilePanel.vue';
 import LoadingBox from '@/components/atoms/LoadingBox.vue';
@@ -51,6 +50,9 @@ import { formatLicenceUrl } from '@/utils/licence';
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer';
 import { encodePathSegments } from '@/utils/path';
 import { buildSearchQuery, isValidTerm } from '@/utils/search';
+
+// The code viewer is loaded on demand so that Monaco is not part of the main bundle.
+const CodeBlock = defineAsyncComponent(() => import('@/components/atoms/CodeBlock.vue'));
 
 type ExposureFileEntry = ExposureInfo['files'][number];
 
@@ -1045,7 +1047,7 @@ onMounted(async () => {
             </li>
           </ul>
         </nav>
-        <FilePanel :title="generatedCodeFilename">
+        <FilePanel :title="generatedCodeFilename" sticky>
           <template #actions>
             <WrapButton :active="codeWrapActive" @click="toggleCodeWrap" />
             <CopyButton :text="generatedCode" title="Copy code" />

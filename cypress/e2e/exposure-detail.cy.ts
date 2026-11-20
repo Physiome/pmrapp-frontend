@@ -207,4 +207,38 @@ describe('Exposure detail page', () => {
       cy.get('[aria-current="page"]').should('contain.text', 'Mathematics');
     });
   });
+
+  describe('code generation', () => {
+    const codegenPath = '/exposure/da9/noble_denyer_brown_difrancesco_1992.cellml/cellml_codegen';
+
+    const languages = [
+      { name: 'C', lang: 'C', fileName: 'code.c', language: 'cpp' },
+      { name: 'C (IDA solver)', lang: 'C_IDA', fileName: 'code.ida.c', language: 'cpp' },
+      { name: 'FORTRAN 77', lang: 'F77', fileName: 'code.f77', language: 'fortran' },
+      { name: 'MATLAB', lang: 'MATLAB', fileName: 'code.m', language: 'matlab' },
+      { name: 'Python', lang: 'Python', fileName: 'code.py', language: 'python' },
+    ];
+
+    for (const { name, lang, fileName, language } of languages) {
+      it(`highlights the generated ${name} code.`, () => {
+        cy.visit(`${codegenPath}/${lang}`);
+
+        cy.get('[data-sticky="true"]').should('contain.text', fileName);
+        cy.get(`.code-block[data-language="${language}"]`).should('exist');
+        cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
+      });
+    }
+
+    it('switches the highlighted language when another language is selected.', () => {
+      cy.visit(`${codegenPath}/C`);
+      cy.get('.code-block[data-language="cpp"]').should('exist');
+
+      cy.contains('button', 'FORTRAN 77').click();
+
+      cy.url().should('match', /\/cellml_codegen\/F77$/);
+      cy.get('[data-sticky="true"]').should('contain.text', 'code.f77');
+      cy.get('.code-block[data-language="fortran"]').should('exist');
+      cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
+    });
+  });
 });

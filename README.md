@@ -124,6 +124,31 @@ bun run build
 bun run test:e2e
 ```
 
+### Performance Tests
+
+Performance checks live in `cypress/perf/` and are kept out of the regular e2e suite. They run against the production build and print their measurements to the terminal, prefixed with `PERF>`:
+
+```sh
+bun run build
+bun run test:perf
+```
+
+For example, `large-file.cy.ts` serves a generated ~10 MB CellML file and measures how long the code view takes to show highlighted code, scroll to the end of the file and find a search match. It also reports any long tasks that block the main thread. Change `LINE_PAIRS` in the spec to test other file sizes.
+
+Each measurement has a generous limit, defined in `LIMITS` at the top of the spec. The check fails when a limit is exceeded, so only severe regressions fail CI. The results are written to `cypress/perf-results/`, and you can turn them into a Markdown report with:
+
+```sh
+node scripts/perfReport.ts cypress/perf-results
+```
+
+In CI, the performance checks run on every pull request. The report is added to the job summary, and the **Performance report** workflow (`.github/workflows/perf-comment.yml`) posts it as a comment on the pull request, updating the same comment on each push. That workflow runs from the default branch, so changes to it take effect once merged into `main`.
+
+To watch a check run and record a profile in Chrome DevTools, use `cypress open` instead:
+
+```sh
+bunx start-server-and-test preview http://localhost:4173 'cypress open --e2e --config-file cypress.perf.config.ts'
+```
+
 ## Code Quality
 
 [Biome](https://biomejs.dev/) formats and lints all files, including `.vue` templates, `<script>` and `<style>` blocks.

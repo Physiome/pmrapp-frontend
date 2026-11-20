@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useId,
+} from 'vue';
 import ActionButton from '@/components/atoms/ActionButton.vue';
-import CodeBlock from '@/components/atoms/CodeBlock.vue';
 import CopyButton from '@/components/atoms/CopyButton.vue';
 import FilePanel from '@/components/atoms/FilePanel.vue';
 import LoadingBox from '@/components/atoms/LoadingBox.vue';
@@ -13,6 +20,7 @@ import PreviewIcon from '@/components/icons/PreviewIcon.vue';
 import BreadcrumbsBar from '@/components/molecules/BreadcrumbsBar.vue';
 import ErrorBlock from '@/components/molecules/ErrorBlock.vue';
 import PageHeader from '@/components/molecules/PageHeader.vue';
+import { MAX_PREVIEW_FILE_SIZE_BYTES } from '@/constants/workspace';
 import { getWorkspaceService } from '@/services';
 import { getWorkspaceFileUrl } from '@/services/downloadUrlService';
 import { useWorkspaceStore } from '@/stores/workspace';
@@ -30,8 +38,8 @@ import {
 import { renderMarkdown } from '@/utils/markdown';
 import { generateWorkspaceBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace';
 
-// Files with size above this threshold are not rendered in the preview to prevent browser freeze.
-const MAX_PREVIEW_FILE_SIZE_BYTES = 500 * 1024; // ~500 KB
+// The code viewer is loaded on demand so that Monaco is not part of the main bundle.
+const CodeBlock = defineAsyncComponent(() => import('@/components/atoms/CodeBlock.vue'));
 
 const props = defineProps<{
   alias: string;
@@ -256,7 +264,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
   <LoadingBox v-else-if="isLoading" message="Loading file..." />
 
   <div v-else>
-    <FilePanel :title="filename">
+    <FilePanel :title="filename" sticky>
       <template #actions>
         <div
           v-if="isSvg || isMarkdown"

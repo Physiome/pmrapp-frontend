@@ -50,7 +50,40 @@ jobs:
         run: bun run test:unit
 
       - name: Build
+        id: build
         run: bun run build
 
       - name: Run e2e tests
         run: bun run test:e2e
+
+      # Performance checks (cypress/perf) fail when a measurement exceeds its (generous) limit.
+      # They also run when the e2e tests fail, so a report is still produced.
+      - name: Run performance tests
+        id: perf
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: bun run test:perf
+
+      # The results are uploaded so that the 'Performance report' workflow can comment on the PR.
+      # Commenting happens in that separate workflow because PRs from forks get a read-only token.
+      - name: Save performance report details
+        if: ${{ !cancelled() && steps.perf.outcome != 'skipped' }}
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PERF_OUTCOME: ${{ steps.perf.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p cypress/perf-results
+          echo "$PR_NUMBER" > cypress/perf-results/pr-number.txt
+          echo "$PERF_OUTCOME" > cypress/perf-results/outcome.txt
+          node scripts/perfReport.ts cypress/perf-results >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload performance results
+        if: ${{ !cancelled() && steps.perf.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: perf-results
+          path: cypress/perf-results/
+          retention-days: 7
+          if-no-files-found: warn
