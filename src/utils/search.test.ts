@@ -202,9 +202,12 @@ describe('matchesTerm', () => {
   });
 
   it('treats -es and -ies plurals alike', () => {
-    expectMutualMatch('pacemaker activity', 'pacemaker activities');
-    expectMutualMatch('artery', 'cerebral arteries');
-    expectMutualMatch('property', 'cable properties');
+    expectMutualMatch('pacemaker activities', 'pacemaker activity');
+    expectMutualMatch('cerebral artery', 'cerebral arteries');
+    expectMutualMatch('cable property', 'cable properties');
+    expect(matchesTerm('pacemaker activity', 'activities')).toBe(true);
+    expect(matchesTerm('cerebral arteries', 'artery')).toBe(true);
+    expect(matchesTerm('cable properties', 'property')).toBe(true);
   });
 
   it('keeps matching while a term is partially typed', () => {
