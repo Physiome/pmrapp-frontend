@@ -138,6 +138,7 @@ export const matlabLanguage: languages.IMonarchLanguage = {
       [/((?:\d+\.?\d*|\.\d+)(?:[eEdD][+-]?\d+)?[ij]?)('+)/, ['number', 'operator']],
       [/(?:\d+\.?\d*|\.\d+)(?:[eEdD][+-]?\d+)?[ij]?/, 'number'],
       [/([\])}])('+)/, ['delimiter', 'operator']],
+      [/\.'+/, 'operator'],
       [/'/, 'string', '@stringSingle'],
       [/"/, 'string', '@stringDouble'],
       [/\.?[*/\\^]|[+\-<>=~&|:@]=?|==|~=/, 'operator'],
