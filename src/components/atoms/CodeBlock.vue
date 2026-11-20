@@ -69,16 +69,20 @@ onMounted(async () => {
   colourSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
   colourSchemeQuery.addEventListener('change', handleColourSchemeChange);
 
-  model = monaco.editor.createModel(props.code, toMonacoLanguage(detectedLanguage.value));
+  // The editor creates its own model from `value` and `language`,
+  // so that its options (notably `largeFileOptimizations`) apply
+  // before the model decides whether it can be highlighted.
   editor = monaco.editor.create(host.value, {
-    model,
+    value: props.code,
+    language: toMonacoLanguage(detectedLanguage.value),
     theme: themeName(colourSchemeQuery.matches),
     ariaLabel: ariaLabel(props.filename),
     readOnly: true,
     domReadOnly: true,
     automaticLayout: true,
-    // Keep highlighting files up to the 20 MB preview limit; Monaco otherwise turns it off for
-    // files of 20 MB or 300,000 lines.
+    // Keep highlighting files up to the 20 MB preview limit;
+    // Monaco otherwise turns it off for files of 20 MB or 300,000 lines.
+    // The model fixes this when it is created.
     largeFileOptimizations: false,
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
@@ -98,6 +102,7 @@ onMounted(async () => {
       ? { vertical: 'hidden', verticalScrollbarSize: 0, alwaysConsumeMouseWheel: false }
       : { alwaysConsumeMouseWheel: false },
   });
+  model = editor.getModel();
 
   editor.onDidContentSizeChange((event) => {
     contentHeight.value = event.contentHeight;
@@ -128,8 +133,8 @@ onBeforeUnmount(() => {
   host.value?.removeEventListener('wheel', handleWheel, { capture: true });
   scrollSync?.onPageScroll(null);
   scrollSync?.setContentHeight(null);
+  // The editor owns its model and disposes of it too.
   editor?.dispose();
-  model?.dispose();
   editor = null;
   model = null;
 });

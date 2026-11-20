@@ -20,16 +20,17 @@ const monacoMock = vi.hoisted(() => {
     onDidScrollChange: vi.fn(),
     setScrollTop: vi.fn(),
     getContentHeight: vi.fn(() => 120),
+    getModel: vi.fn(() => model),
     updateOptions: vi.fn(),
     dispose: vi.fn(),
   };
   const monaco = {
     editor: {
-      createModel: vi.fn((value: string, _language: string) => {
-        model.value = value;
-        return model;
+      // Like Monaco, the editor creates its own model from the `value` option.
+      create: vi.fn((_host: HTMLElement, options: Record<string, unknown>) => {
+        model.value = String(options.value ?? '');
+        return editor;
       }),
-      create: vi.fn((_host: HTMLElement, _options: Record<string, unknown>) => editor),
       setModelLanguage: vi.fn(),
       setTheme: vi.fn(),
     },
@@ -93,8 +94,9 @@ describe('CodeBlock', () => {
       domReadOnly: true,
       minimap: { enabled: false },
       largeFileOptimizations: false,
-      model,
+      value: 'const x = 1',
     });
+    expect(createOptions()).not.toHaveProperty('model');
   });
 
   it.each([
@@ -106,7 +108,7 @@ describe('CodeBlock', () => {
   ])('uses the language detected for %s', async (filename, dataLanguage, monacoLanguage) => {
     await mountCodeBlock({ code: 'x', filename });
 
-    expect(monaco.editor.createModel).toHaveBeenCalledWith('x', monacoLanguage);
+    expect(createOptions()).toMatchObject({ value: 'x', language: monacoLanguage });
     expect(wrapper?.attributes('data-language')).toBe(dataLanguage);
   });
 
@@ -171,14 +173,14 @@ describe('CodeBlock', () => {
     expect(monaco.editor.setTheme).toHaveBeenCalledWith('pmr-dark');
   });
 
-  it('disposes the editor and model on unmount', async () => {
+  it('disposes the editor, which owns its model, on unmount', async () => {
     await mountCodeBlock({});
 
     wrapper?.unmount();
     wrapper = null;
 
     expect(editor.dispose).toHaveBeenCalledOnce();
-    expect(model.dispose).toHaveBeenCalledOnce();
+    expect(model.dispose).not.toHaveBeenCalled();
     expect(colourSchemeListeners).toHaveLength(0);
   });
 
