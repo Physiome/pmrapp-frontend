@@ -49,8 +49,8 @@ describe('Workspace detail page', () => {
   });
 
   /**
-   * Serve a file of the given name and content in place of README.md, so tests can open files
-   * that the demo workspace does not contain.
+   * Serve a file of the given name and content in place of README.md,
+   * so tests can open files that the demo workspace does not contain.
    */
   const serveFile = (filename: string, body: string) => {
     cy.intercept('GET', `**/rawfile/**/${filename}`, {
@@ -70,8 +70,8 @@ describe('Workspace detail page', () => {
   };
 
   /**
-   * Scroll the page to the end and check that the file panel, with its toolbar, sits directly
-   * below the sticky header and reaches the bottom of the viewport.
+   * Scroll the page to the end and check that the file panel, with its toolbar,
+   * sits directly below the sticky header and reaches the bottom of the viewport.
    */
   const assertPanelFitsBelowHeader = () => {
     cy.get('.code-block .view-line').should('exist');
@@ -123,8 +123,8 @@ describe('Workspace detail page', () => {
     cy.visit(`/workspace/6b0/file/${commitId}/long.m`);
     cy.contains('.code-block .view-line', 'line 0').should('be.visible');
 
-    // Scroll the page by 900 lines past the point where the panel sticks: the panel stays below
-    // the header and the code scrolls with the page.
+    // Scroll the page by 900 lines past the point where the panel sticks:
+    // the panel stays below the header and the code scrolls with the page.
     cy.get('[data-sticky="true"]').then(($panel) => {
       const win = $panel[0].ownerDocument.defaultView as Window;
       const trackTop = $panel.parent()[0].getBoundingClientRect().top + win.scrollY;

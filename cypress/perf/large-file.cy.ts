@@ -1,7 +1,7 @@
 // Performance check for the code viewer with a large generated CellML file.
 // It is not part of the regular e2e suite; run it with `bun run test:perf`.
-// Measurements are printed with a "PERF>" prefix and written to cypress/perf-results/, which CI
-// uses to post a report on the pull request (see scripts/perfReport.ts).
+// Measurements are printed with a "PERF>" prefix and written to cypress/perf-results/,
+// which CI uses to post a report on the pull request (see scripts/perfReport.ts).
 
 const WORKSPACE_FILE_URL = '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834';
 const LINE_PAIRS = 80000; // About 10 MB. Increase to test larger files (the preview limit is 20 MB).
@@ -68,8 +68,8 @@ describe('Large file code view', () => {
       metrics: [],
     };
 
-    // Results are written after every measurement, so a failure part-way through still leaves
-    // the measurements taken so far.
+    // Results are written after every measurement,
+    // so a failure part-way through still leaves the measurements taken so far.
     const record = (id: MetricId, value: number) => {
       results.metrics.push({ id, value: Math.round(value), limit: LIMITS[id] });
       cy.task('log', `${id}: ${Math.round(value)} (limit ${LIMITS[id]})`);
@@ -79,8 +79,8 @@ describe('Large file code view', () => {
     cy.task('log', `file size: ${results.fileSizeMB} MB, lines: ${results.lines}`);
     cy.writeFile(RESULTS_FILE, results);
 
-    // Serve the generated file in place of README.md, and rename README.md to big.cellml in the
-    // workspace info so the page treats it as an existing CellML file.
+    // Serve the generated file in place of README.md, and rename README.md to big.cellml
+    // in the workspace info so the page treats it as an existing CellML file.
     cy.intercept('GET', '**/rawfile/**/big.cellml', {
       body,
       headers: { 'content-type': 'text/plain' },
