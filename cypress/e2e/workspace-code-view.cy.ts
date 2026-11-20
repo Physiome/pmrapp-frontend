@@ -33,7 +33,7 @@ describe('Workspace detail page', () => {
     cy.get('button[aria-label="Wrap words"]').should('not.be.disabled');
   });
 
-  it('renders the code view with line numbers, syntax highlighting and line wrapping', () => {
+  it('renders the code view with line numbers and syntax highlighting', () => {
     cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
 
     cy.get('button').contains('Code').click();
@@ -42,10 +42,24 @@ describe('Workspace detail page', () => {
     cy.get('.code-block .monaco-editor').should('exist');
     cy.get('.code-block .line-numbers').should('exist');
     cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
+  });
 
-    cy.get('.code-block').should('have.attr', 'data-wrapped', 'false');
+  it('wraps and unwraps long lines in the code view', () => {
+    // A single line far wider than the viewport.
+    serveFile('long-line.txt', 'word '.repeat(500));
+
+    cy.visit(`/workspace/6b0/file/${commitId}/long-line.txt`);
+
+    // Unwrapped, the line is rendered as a single view line.
+    cy.get('.code-block .view-line').should('have.length', 1);
+
+    // Wrapped, the same line is split across several view lines.
     cy.get('button[aria-label="Wrap words"]').click();
-    cy.get('.code-block').should('have.attr', 'data-wrapped', 'true');
+    cy.get('.code-block .view-line').should('have.length.greaterThan', 1);
+
+    // Unwrapped again, it returns to a single view line.
+    cy.get('button[aria-label="Unwrap words"]').click();
+    cy.get('.code-block .view-line').should('have.length', 1);
   });
 
   /**
