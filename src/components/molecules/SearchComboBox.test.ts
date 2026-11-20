@@ -310,6 +310,27 @@ describe('SearchComboBox', () => {
       );
     });
 
+    it('shows spelling variants of the typed term and pre-selects the exact match', async () => {
+      const keywords = mockSearchStore.categories.find((c) => c.kind === 'cellml_keyword');
+      if (keywords?.kindInfo) {
+        keywords.kindInfo.terms = ['hodgkin huxley', 'hodgkin-huxley', 'myocyte', 'myocytes'];
+      }
+      const w = await mountComboBox();
+
+      await selectCategory(w, 'CellML keywords');
+      await getInput(w).setValue('hodgkin-huxley');
+
+      expect(termOptions(w).map((o) => o.get('span').text())).toEqual([
+        'hodgkin huxley',
+        'hodgkin-huxley',
+      ]);
+      expect(termOptions(w)[1]?.attributes('aria-selected')).toBe('true');
+
+      await getInput(w).setValue('myocytes');
+
+      expect(termOptions(w).map((o) => o.get('span').text())).toEqual(['myocyte', 'myocytes']);
+    });
+
     it('adds a chip when a term is clicked and returns to the category menu', async () => {
       const w = await mountComboBox();
 
