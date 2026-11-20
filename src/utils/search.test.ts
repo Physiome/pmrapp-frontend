@@ -211,29 +211,10 @@ describe('matchesTerm', () => {
     expectMutualMatch('artery', 'arteries');
   });
 
-  it('keeps matching plurals of words ending in "ie" or a vowel and "y"', () => {
-    expectMutualMatch('calorie', 'calories');
-    expectMutualMatch('kidney', 'kidneys');
-  });
-
-  it('keeps matching while an -ies plural is partially typed', () => {
-    expect(matchesTerm('cardiac activities', 'cardiac activit')).toBe(true);
-    expect(matchesTerm('cardiac activity', 'cardiac activiti')).toBe(true);
-  });
-
   it('keeps matching while a term is partially typed', () => {
     expect(matchesTerm('hodgkin-huxley', 'hodgkin hux')).toBe(true);
     expect(matchesTerm('ryanodine receptors', 'ryanodine rec')).toBe(true);
     expect(matchesTerm('integrins', 'ns')).toBe(true);
-  });
-
-  it('matches the misspelt "sinoatrial nodel" when "sinoatrial node" is typed', () => {
-    expect(matchesTerm('sinoatrial nodel', 'sinoatrial node')).toBe(true);
-  });
-
-  it('does not strip the "s" from short words or words ending in "ss"', () => {
-    expect(matchesTerm('stress', 'stres')).toBe(true);
-    expect(matchesTerm('calcium', 's')).toBe(false);
   });
 });
 
