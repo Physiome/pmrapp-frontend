@@ -8,7 +8,7 @@ import { SEARCH_CATEGORIES } from '@/constants/search';
 import { useSearchStore } from '@/stores/search';
 import type { SearchFilter } from '@/types/search';
 import { formatSearchKey } from '@/utils/format';
-import { isValidTerm } from '@/utils/search';
+import { isValidTerm, matchesTerm } from '@/utils/search';
 
 const props = defineProps<{
   isSuggestionsVisible: boolean;
@@ -94,7 +94,7 @@ const filteredSearchTermsByCategory = computed(() => {
     const filteredTerms = terms.filter((term) => {
       if (!isValidTerm(term)) return false;
       if (!shouldFilterByInput) return true;
-      return term.toLowerCase().includes(searchTermValue);
+      return matchesTerm(term, searchTermValue);
     });
 
     const totalCount = filteredTerms.length;
