@@ -64,6 +64,9 @@ describe('Workspace file view', () => {
   it('renders the file view page with action buttons', () => {
     cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
 
+    // The file name is on the left of the toolbar.
+    cy.get('[data-sticky="true"]').contains('span', 'README.md').should('be.visible');
+
     cy.get('button').contains('Preview').should('exist');
     cy.get('button').contains('Code').should('exist');
     cy.get('button[aria-label="Wrap words"]').should('exist');
@@ -74,6 +77,35 @@ describe('Workspace file view', () => {
     cy.get('button[aria-label="Wrap words"]').should('be.disabled');
     cy.get('button').contains('Code').click();
     cy.get('button[aria-label="Wrap words"]').should('not.be.disabled');
+  });
+
+  it('copies the file content to the clipboard', () => {
+    const content = 'The content to copy.\nOn two lines.';
+    serveFile('copy.txt', content);
+
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/copy.txt`, {
+      onBeforeLoad(win) {
+        cy.stub(win.navigator.clipboard, 'writeText').as('writeText').resolves();
+      },
+    });
+
+    cy.get('button[aria-label="Copy code"]').click();
+
+    cy.get('@writeText').should('have.been.calledOnceWith', content);
+    cy.get('button[aria-label="Copied!"]').should('exist');
+  });
+
+  it('downloads the file with its name and content', () => {
+    const content = 'The content to download.\nOn two lines.';
+    serveFile('download.txt', content);
+
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/download.txt`);
+
+    // Interactive runs (`cypress open`) keep earlier downloads, which could hide a failure.
+    cy.task('clearDownloads');
+    cy.get('a[download="download.txt"]').click();
+
+    cy.readFile(`${Cypress.config('downloadsFolder')}/download.txt`).should('eq', content);
   });
 
   it('renders the code view with line numbers and syntax highlighting', () => {
