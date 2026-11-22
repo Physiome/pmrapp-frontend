@@ -1,5 +1,10 @@
 describe('Workspace detail page', () => {
   const commitId = 'a8a92308e217ac5626809237dd90a31240b22834';
+  // The app may be served below a base path (`VITE_BASE_PATH`), which `baseUrl` already includes.
+  const basePath = new URL(Cypress.config('baseUrl') ?? '/', 'http://localhost').pathname;
+
+  /** Prefix an app route with the base path, as it appears in hrefs and the location. */
+  const appPath = (route: string) => `${basePath.replace(/\/$/, '')}${route}`;
 
   it('renders the workspace detail page with correct title', () => {
     cy.visit('/workspace/6b0');
@@ -178,7 +183,7 @@ describe('Workspace detail page', () => {
     cy.get('nav[aria-label="Breadcrumb"]').within(() => {
       cy.get('a')
         .should('have.length', 1)
-        .and('have.attr', 'href', '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834');
+        .and('have.attr', 'href', appPath(`/workspace/6b0/file/${commitId}`));
       cy.get('[aria-current="page"]').should('contain.text', 'README.md');
     });
   });
@@ -207,7 +212,7 @@ describe('Workspace detail page', () => {
 
     cy.go('back');
 
-    cy.location('pathname').should('eq', '/workspace/add');
+    cy.location('pathname').should('eq', appPath('/workspace/add'));
     cy.get('a.text-link').contains('README.rst').should('exist');
     cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
       'not.contain.text',
