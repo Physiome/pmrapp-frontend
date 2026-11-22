@@ -11,10 +11,10 @@ describe('Workspace file view', () => {
    * Serve a file of the given name and content in place of README.md,
    * so tests can open files that the demo workspace does not contain.
    */
-  const serveFile = (filename: string, body: string) => {
+  const serveFile = (filename: string, body: string, contentType = 'text/plain') => {
     cy.intercept('GET', `**/rawfile/**/${filename}`, {
       body,
-      headers: { 'content-type': 'text/plain' },
+      headers: { 'content-type': contentType },
     });
     cy.intercept('POST', '**/api/get_workspace_info', (req) => {
       const reqBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
@@ -106,6 +106,58 @@ describe('Workspace file view', () => {
     cy.get('a[download="download.txt"]').click();
 
     cy.readFile(`${Cypress.config('downloadsFolder')}/download.txt`).should('eq', content);
+  });
+
+  it('switches an SVG file between the image preview and its source code', () => {
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20">' +
+      '<rect width="40" height="20" fill="red"/></svg>';
+    serveFile('image.svg', svg, 'image/svg+xml');
+
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/image.svg`);
+
+    // Preview shows the rendered image; there is no code to wrap or copy.
+    cy.get('img[alt="image.svg"]').should(($img) => {
+      expect(($img[0] as HTMLImageElement).naturalWidth).to.equal(40);
+    });
+    cy.get('.code-block').should('not.exist');
+    cy.get('button[aria-label="Wrap words"]').should('be.disabled');
+    cy.get('button[aria-label="Copy code"]').should('be.disabled');
+
+    // Code shows the SVG source, which can be wrapped and copied.
+    cy.get('button').contains('Code').click();
+    cy.get('img[alt="image.svg"]').should('not.exist');
+    cy.get('.code-block[data-language="xml"]').should('exist');
+    cy.contains('.code-block .view-line', '<rect').should('exist');
+    cy.get('button[aria-label="Wrap words"]').should('not.be.disabled');
+    cy.get('button[aria-label="Copy code"]').should('not.be.disabled');
+
+    // Preview shows the image again.
+    cy.get('button').contains('Preview').click();
+    cy.get('img[alt="image.svg"]').should('be.visible');
+    cy.get('.code-block').should('not.exist');
+  });
+
+  it('links an OpenCOR file to the OpenCOR Web app', () => {
+    serveFile('model.cellml', '<model xmlns="http://www.cellml.org/cellml/2.0#" name="m"/>');
+
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/model.cellml`);
+
+    cy.get('a[aria-label="Open with OpenCOR\'s Web app"]')
+      .should('have.attr', 'target', '_blank')
+      .and('have.attr', 'href')
+      .and('match', /^\/\/opencor\.ws\/app\/\?opencor:\/\/openFile\/https?:\/\//)
+      .and('include', `/workspace/${workspaceId}/rawfile/${commitId}/model.cellml`);
+  });
+
+  it('does not link other files to the OpenCOR Web app', () => {
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
+
+    // The button needs the workspace info, which also renders the page heading:
+    // wait for both before checking that the button is absent.
+    cy.get('h1').should('contain.text', '12 L Platform 1 model codes');
+    cy.get('a[download="README.md"]').should('exist');
+    cy.get('a[aria-label="Open with OpenCOR\'s Web app"]').should('not.exist');
   });
 
   it('renders the code view with line numbers and syntax highlighting', () => {
