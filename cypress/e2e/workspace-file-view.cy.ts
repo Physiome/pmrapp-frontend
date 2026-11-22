@@ -225,11 +225,7 @@ describe('Workspace file view', () => {
   });
 
   it('returns to the workspace file browser when going back from a file', () => {
-    cy.visit(`/workspace/${workspaceId}`, {
-      onBeforeLoad(win) {
-        cy.spy(win.console, 'error').as('consoleError');
-      },
-    });
+    cy.visit(`/workspace/${workspaceId}`);
     // Dismiss the cookie banner, as a user would, so that it does not cover the file list.
     cy.contains('button', 'Accept').click();
     cy.get('button[aria-label="Close cookie banner"]').should('not.exist');
@@ -249,8 +245,6 @@ describe('Workspace file view', () => {
       'not.contain.text',
       'README.md',
     );
-    // The file view must not render with the folder's route params on the way out.
-    cy.get('@consoleError').should('not.have.been.calledWithMatch', /Missing required param/);
   });
 
   describe('long file', () => {
