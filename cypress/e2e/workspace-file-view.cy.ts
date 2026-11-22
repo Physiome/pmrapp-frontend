@@ -1,27 +1,10 @@
-describe('Workspace detail page', () => {
+describe('Workspace file view', () => {
   const commitId = 'a8a92308e217ac5626809237dd90a31240b22834';
   // The app may be served below a base path (`VITE_BASE_PATH`), which `baseUrl` already includes.
   const basePath = new URL(Cypress.config('baseUrl') ?? '/', 'http://localhost').pathname;
 
   /** Prefix an app route with the base path, as it appears in hrefs and the location. */
   const appPath = (route: string) => `${basePath.replace(/\/$/, '')}${route}`;
-
-  it('renders the workspace detail page with correct title', () => {
-    cy.visit('/workspace/6b0');
-
-    cy.get('h1').should('exist');
-    cy.get('h1').should('contain.text', '12 L Platform 1 model codes');
-  });
-
-  it('renders the README.md link and navigates to the file view page', () => {
-    cy.visit('/workspace/6b0');
-
-    cy.get('a.text-link').contains('README.md').should('exist');
-    // The link is sometimes covered by the cookie banner.
-    cy.get('a.text-link').contains('README.md').click({ force: true });
-
-    cy.url().should('include', `/workspace/6b0/file/${commitId}/README.md`);
-  });
 
   it('renders the file view page with action buttons', () => {
     cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
