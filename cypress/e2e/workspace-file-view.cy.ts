@@ -159,6 +159,28 @@ describe('Workspace file view', () => {
       cy.visit(`/workspace/${workspaceId}/file/${commitId}/long.txt`);
     });
 
+    /**
+     * Measure the rendered line height and the page scroll position
+     * at which the panel sticks below the header.
+     * Past that point, each line of page scroll scrolls the code by one line.
+     */
+    const measureLayout = () => {
+      cy.get('.code-block .view-line').should('exist');
+
+      return cy.get('[data-sticky="true"]').then(($panel) => {
+        const doc = $panel[0].ownerDocument;
+        const win = doc.defaultView as Window;
+        const header = doc.querySelector('header') as HTMLElement;
+        const line = doc.querySelector('.code-block .view-line') as HTMLElement;
+        const trackTop = $panel.parent()[0].getBoundingClientRect().top + win.scrollY;
+
+        return {
+          lineHeight: line.offsetHeight,
+          stickyStart: trackTop - header.getBoundingClientRect().bottom,
+        };
+      });
+    };
+
     it('fits the panel below the header, including the notification bar', () => {
       cy.get('button[aria-label="Close notification"]').should('be.visible');
       assertPanelFitsBelowHeader();
@@ -173,14 +195,8 @@ describe('Workspace file view', () => {
 
       // Scroll the page by 900 lines past the point where the panel sticks:
       // the panel stays below the header and the code scrolls with the page.
-      cy.get('[data-sticky="true"]').then(($panel) => {
-        const win = $panel[0].ownerDocument.defaultView as Window;
-        const trackTop = $panel.parent()[0].getBoundingClientRect().top + win.scrollY;
-        const headerBottom = (
-          $panel[0].ownerDocument.querySelector('header') as HTMLElement
-        ).getBoundingClientRect().bottom;
-        const lineHeight = 21;
-        win.scrollTo(0, trackTop - headerBottom + 900 * lineHeight);
+      measureLayout().then(({ lineHeight, stickyStart }) => {
+        cy.scrollTo(0, stickyStart + 900 * lineHeight);
       });
       assertPanelStuckBelowHeader();
       cy.contains('.code-block .view-line', 'line 0').should('not.exist');
@@ -192,14 +208,24 @@ describe('Workspace file view', () => {
     });
 
     it('scrolls the page to a search match', () => {
-      cy.get('.code-block .view-line').first().click();
-      const searchShortcut = Cypress.platform === 'darwin' ? '{meta}f' : '{ctrl}f';
-      cy.get('.code-block .monaco-editor textarea').first().type(searchShortcut, { force: true });
-      cy.get('.code-block .find-widget textarea').first().type('line 1500{enter}', { force: true });
+      measureLayout().then(({ lineHeight, stickyStart }) => {
+        cy.get('.code-block .view-line').first().click();
+        const searchShortcut = Cypress.platform === 'darwin' ? '{meta}f' : '{ctrl}f';
+        cy.get('.code-block .monaco-editor textarea').first().type(searchShortcut, { force: true });
+        cy.get('.code-block .find-widget textarea')
+          .first()
+          .type('line 1500{enter}', { force: true });
 
-      cy.contains('.code-block .view-line', 'line 1500').should('be.visible');
-      assertPanelStuckBelowHeader();
-      cy.window().its('scrollY').should('be.greaterThan', 20000);
+        cy.contains('.code-block .view-line', 'line 1500').should('be.visible');
+        assertPanelStuckBelowHeader();
+
+        // The page, not only the editor, scrolled to the match:
+        // line 1500 is within one viewport of the top of the panel.
+        const matchOffset = stickyStart + 1500 * lineHeight;
+        cy.window()
+          .its('scrollY')
+          .should('be.within', matchOffset - Cypress.config('viewportHeight'), matchOffset);
+      });
     });
   });
 });
