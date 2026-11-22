@@ -1,4 +1,5 @@
 describe('Workspace file view', () => {
+  const workspaceId = '6b0';
   const commitId = 'a8a92308e217ac5626809237dd90a31240b22834';
   // The app may be served below a base path (`VITE_BASE_PATH`), which `baseUrl` already includes.
   const basePath = new URL(Cypress.config('baseUrl') ?? '/', 'http://localhost').pathname;
@@ -61,7 +62,7 @@ describe('Workspace file view', () => {
   };
 
   it('renders the file view page with action buttons', () => {
-    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
 
     cy.get('button').contains('Preview').should('exist');
     cy.get('button').contains('Code').should('exist');
@@ -76,7 +77,7 @@ describe('Workspace file view', () => {
   });
 
   it('renders the code view with line numbers and syntax highlighting', () => {
-    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
 
     cy.get('button').contains('Code').click();
 
@@ -90,7 +91,7 @@ describe('Workspace file view', () => {
     // A single line far wider than the viewport.
     serveFile('long-line.txt', 'word '.repeat(500));
 
-    cy.visit(`/workspace/6b0/file/${commitId}/long-line.txt`);
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/long-line.txt`);
 
     // Unwrapped, the line is rendered as a single view line.
     cy.get('.code-block .view-line').should('have.length', 1);
@@ -105,18 +106,18 @@ describe('Workspace file view', () => {
   });
 
   it('renders the page breadcrumb', () => {
-    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
 
     cy.get('nav[aria-label="Breadcrumb"]').within(() => {
       cy.get('a')
         .should('have.length', 1)
-        .and('have.attr', 'href', appPath(`/workspace/6b0/file/${commitId}`));
+        .and('have.attr', 'href', appPath(`/workspace/${workspaceId}/file/${commitId}`));
       cy.get('[aria-current="page"]').should('contain.text', 'README.md');
     });
   });
 
   it('renders no breadcrumb for a file that does not exist', () => {
-    cy.visit(`/workspace/6b0/file/${commitId}/missing/file.txt`);
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/missing/file.txt`);
 
     // The path resolves to neither a file nor a folder, so it shows the workspace error.
     cy.contains('Workspace not found').should('exist');
@@ -155,7 +156,7 @@ describe('Workspace file view', () => {
 
     beforeEach(() => {
       serveFile('long.txt', LONG_FILE);
-      cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
+      cy.visit(`/workspace/${workspaceId}/file/${commitId}/long.txt`);
     });
 
     it('fits the panel below the header, including the notification bar', () => {
