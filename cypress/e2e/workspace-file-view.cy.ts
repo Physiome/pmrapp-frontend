@@ -160,6 +160,24 @@ describe('Workspace file view', () => {
     cy.get('a[aria-label="Open with OpenCOR\'s Web app"]').should('not.exist');
   });
 
+  it('offers a download instead of a preview for a file over 20 MB', () => {
+    // One byte over the preview limit (`MAX_PREVIEW_FILE_SIZE_BYTES`).
+    serveFile('large.txt', 'x'.repeat(20 * 1024 * 1024 + 1));
+
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/large.txt`);
+
+    // The message comes with its own Download button, besides the one in the toolbar.
+    cy.contains('p', 'This file is too large to preview in the browser.')
+      .should('be.visible')
+      .parent()
+      .contains('a', 'Download')
+      .should('be.visible')
+      .and('have.attr', 'download', 'large.txt');
+    cy.get('.code-block').should('not.exist');
+    cy.get('button[aria-label="Wrap words"]').should('not.exist');
+    cy.get('button[aria-label="Copy code"]').should('not.exist');
+  });
+
   it('renders the code view with line numbers and syntax highlighting', () => {
     cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
 
