@@ -6,50 +6,6 @@ describe('Workspace file view', () => {
   /** Prefix an app route with the base path, as it appears in hrefs and the location. */
   const appPath = (route: string) => `${basePath.replace(/\/$/, '')}${route}`;
 
-  it('renders the file view page with action buttons', () => {
-    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
-
-    cy.get('button').contains('Preview').should('exist');
-    cy.get('button').contains('Code').should('exist');
-    cy.get('button[aria-label="Wrap words"]').should('exist');
-    cy.get('button[aria-label="Copy code"]').should('exist');
-    cy.get('a[download="README.md"]').should('exist');
-
-    // Wrap words button should be disabled when in Preview mode, and enabled when in Code mode.
-    cy.get('button[aria-label="Wrap words"]').should('be.disabled');
-    cy.get('button').contains('Code').click();
-    cy.get('button[aria-label="Wrap words"]').should('not.be.disabled');
-  });
-
-  it('renders the code view with line numbers and syntax highlighting', () => {
-    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
-
-    cy.get('button').contains('Code').click();
-
-    cy.get('.code-block[data-language="markdown"]').should('exist');
-    cy.get('.code-block .monaco-editor').should('exist');
-    cy.get('.code-block .line-numbers').should('exist');
-    cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
-  });
-
-  it('wraps and unwraps long lines in the code view', () => {
-    // A single line far wider than the viewport.
-    serveFile('long-line.txt', 'word '.repeat(500));
-
-    cy.visit(`/workspace/6b0/file/${commitId}/long-line.txt`);
-
-    // Unwrapped, the line is rendered as a single view line.
-    cy.get('.code-block .view-line').should('have.length', 1);
-
-    // Wrapped, the same line is split across several view lines.
-    cy.get('button[aria-label="Wrap words"]').click();
-    cy.get('.code-block .view-line').should('have.length.greaterThan', 1);
-
-    // Unwrapped again, it returns to a single view line.
-    cy.get('button[aria-label="Unwrap words"]').click();
-    cy.get('.code-block .view-line').should('have.length', 1);
-  });
-
   /**
    * Serve a file of the given name and content in place of README.md,
    * so tests can open files that the demo workspace does not contain.
@@ -94,20 +50,6 @@ describe('Workspace file view', () => {
     });
   };
 
-  it('fits a long file panel below the header, including the notification bar', () => {
-    const code = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
-    serveFile('long.txt', code);
-
-    cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
-
-    cy.get('button[aria-label="Close notification"]').should('be.visible');
-    assertPanelFitsBelowHeader();
-
-    // The panel grows to fill the space when the notification bar is closed.
-    cy.get('button[aria-label="Close notification"]').click();
-    assertPanelFitsBelowHeader();
-  });
-
   /** Check that the file panel is stuck directly below the sticky header. */
   const assertPanelStuckBelowHeader = () => {
     cy.get('header').then(($header) => {
@@ -118,46 +60,48 @@ describe('Workspace file view', () => {
     });
   };
 
-  it('keeps the file panel below the header and scrolls the code with the page', () => {
-    const code = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
-    serveFile('long.txt', code);
+  it('renders the file view page with action buttons', () => {
+    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
 
-    cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
-    cy.contains('.code-block .view-line', 'line 0').should('be.visible');
+    cy.get('button').contains('Preview').should('exist');
+    cy.get('button').contains('Code').should('exist');
+    cy.get('button[aria-label="Wrap words"]').should('exist');
+    cy.get('button[aria-label="Copy code"]').should('exist');
+    cy.get('a[download="README.md"]').should('exist');
 
-    // Scroll the page by 900 lines past the point where the panel sticks:
-    // the panel stays below the header and the code scrolls with the page.
-    cy.get('[data-sticky="true"]').then(($panel) => {
-      const win = $panel[0].ownerDocument.defaultView as Window;
-      const trackTop = $panel.parent()[0].getBoundingClientRect().top + win.scrollY;
-      const headerBottom = (
-        $panel[0].ownerDocument.querySelector('header') as HTMLElement
-      ).getBoundingClientRect().bottom;
-      const lineHeight = 21;
-      win.scrollTo(0, trackTop - headerBottom + 900 * lineHeight);
-    });
-    assertPanelStuckBelowHeader();
-    cy.contains('.code-block .view-line', 'line 0').should('not.exist');
-    cy.contains('.code-block .view-line', 'line 900').should('be.visible');
-
-    // The end of the page shows the end of the file.
-    cy.scrollTo('bottom');
-    cy.contains('.code-block .view-line', 'line 1999').should('be.visible');
+    // Wrap words button should be disabled when in Preview mode, and enabled when in Code mode.
+    cy.get('button[aria-label="Wrap words"]').should('be.disabled');
+    cy.get('button').contains('Code').click();
+    cy.get('button[aria-label="Wrap words"]').should('not.be.disabled');
   });
 
-  it('scrolls the page to a search match', () => {
-    const code = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
-    serveFile('long.txt', code);
+  it('renders the code view with line numbers and syntax highlighting', () => {
+    cy.visit(`/workspace/6b0/file/${commitId}/README.md`);
 
-    cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
-    cy.get('.code-block .view-line').first().click();
-    const searchShortcut = Cypress.platform === 'darwin' ? '{meta}f' : '{ctrl}f';
-    cy.get('.code-block .monaco-editor textarea').first().type(searchShortcut, { force: true });
-    cy.get('.code-block .find-widget textarea').first().type('line 1500{enter}', { force: true });
+    cy.get('button').contains('Code').click();
 
-    cy.contains('.code-block .view-line', 'line 1500').should('be.visible');
-    assertPanelStuckBelowHeader();
-    cy.window().its('scrollY').should('be.greaterThan', 20000);
+    cy.get('.code-block[data-language="markdown"]').should('exist');
+    cy.get('.code-block .monaco-editor').should('exist');
+    cy.get('.code-block .line-numbers').should('exist');
+    cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
+  });
+
+  it('wraps and unwraps long lines in the code view', () => {
+    // A single line far wider than the viewport.
+    serveFile('long-line.txt', 'word '.repeat(500));
+
+    cy.visit(`/workspace/6b0/file/${commitId}/long-line.txt`);
+
+    // Unwrapped, the line is rendered as a single view line.
+    cy.get('.code-block .view-line').should('have.length', 1);
+
+    // Wrapped, the same line is split across several view lines.
+    cy.get('button[aria-label="Wrap words"]').click();
+    cy.get('.code-block .view-line').should('have.length.greaterThan', 1);
+
+    // Unwrapped again, it returns to a single view line.
+    cy.get('button[aria-label="Unwrap words"]').click();
+    cy.get('.code-block .view-line').should('have.length', 1);
   });
 
   it('renders the page breadcrumb', () => {
@@ -203,5 +147,58 @@ describe('Workspace file view', () => {
     );
     // The file view must not render with the folder's route params on the way out.
     cy.get('@consoleError').should('not.have.been.calledWithMatch', /Missing required param/);
+  });
+
+  describe('long file', () => {
+    /** A file far longer than the viewport, with one numbered line per row. */
+    const LONG_FILE = Array.from({ length: 2000 }, (_, i) => `line ${i}`).join('\n');
+
+    beforeEach(() => {
+      serveFile('long.txt', LONG_FILE);
+      cy.visit(`/workspace/6b0/file/${commitId}/long.txt`);
+    });
+
+    it('fits the panel below the header, including the notification bar', () => {
+      cy.get('button[aria-label="Close notification"]').should('be.visible');
+      assertPanelFitsBelowHeader();
+
+      // The panel grows to fill the space when the notification bar is closed.
+      cy.get('button[aria-label="Close notification"]').click();
+      assertPanelFitsBelowHeader();
+    });
+
+    it('keeps the file panel below the header and scrolls the code with the page', () => {
+      cy.contains('.code-block .view-line', 'line 0').should('be.visible');
+
+      // Scroll the page by 900 lines past the point where the panel sticks:
+      // the panel stays below the header and the code scrolls with the page.
+      cy.get('[data-sticky="true"]').then(($panel) => {
+        const win = $panel[0].ownerDocument.defaultView as Window;
+        const trackTop = $panel.parent()[0].getBoundingClientRect().top + win.scrollY;
+        const headerBottom = (
+          $panel[0].ownerDocument.querySelector('header') as HTMLElement
+        ).getBoundingClientRect().bottom;
+        const lineHeight = 21;
+        win.scrollTo(0, trackTop - headerBottom + 900 * lineHeight);
+      });
+      assertPanelStuckBelowHeader();
+      cy.contains('.code-block .view-line', 'line 0').should('not.exist');
+      cy.contains('.code-block .view-line', 'line 900').should('be.visible');
+
+      // The end of the page shows the end of the file.
+      cy.scrollTo('bottom');
+      cy.contains('.code-block .view-line', 'line 1999').should('be.visible');
+    });
+
+    it('scrolls the page to a search match', () => {
+      cy.get('.code-block .view-line').first().click();
+      const searchShortcut = Cypress.platform === 'darwin' ? '{meta}f' : '{ctrl}f';
+      cy.get('.code-block .monaco-editor textarea').first().type(searchShortcut, { force: true });
+      cy.get('.code-block .find-widget textarea').first().type('line 1500{enter}', { force: true });
+
+      cy.contains('.code-block .view-line', 'line 1500').should('be.visible');
+      assertPanelStuckBelowHeader();
+      cy.window().its('scrollY').should('be.greaterThan', 20000);
+    });
   });
 });
