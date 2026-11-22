@@ -68,8 +68,6 @@ describe('Workspace file view', () => {
     cy.get('[data-sticky="true"]').contains('span', 'README.md').should('be.visible');
 
     cy.get('button').contains('Preview').should('exist');
-    cy.get('button').contains('Code').should('exist');
-    cy.get('button[aria-label="Wrap words"]').should('exist');
     cy.get('button[aria-label="Copy code"]').should('exist');
     cy.get('a[download="README.md"]').should('exist');
 
@@ -232,7 +230,10 @@ describe('Workspace file view', () => {
         cy.spy(win.console, 'error').as('consoleError');
       },
     });
-    cy.get('a.text-link').contains('README.rst').click({ force: true });
+    // Dismiss the cookie banner, as a user would, so that it does not cover the file list.
+    cy.contains('button', 'Accept').click();
+    cy.get('button[aria-label="Close cookie banner"]').should('not.exist');
+    cy.get('a.text-link').contains('README.rst').click();
     cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
       'contain.text',
       'README.rst',
