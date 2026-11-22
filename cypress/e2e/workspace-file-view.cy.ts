@@ -225,7 +225,7 @@ describe('Workspace file view', () => {
   });
 
   it('returns to the workspace file browser when going back from a file', () => {
-    cy.visit('/workspace/add', {
+    cy.visit(`/workspace/${workspaceId}`, {
       onBeforeLoad(win) {
         cy.spy(win.console, 'error').as('consoleError');
       },
@@ -233,21 +233,21 @@ describe('Workspace file view', () => {
     // Dismiss the cookie banner, as a user would, so that it does not cover the file list.
     cy.contains('button', 'Accept').click();
     cy.get('button[aria-label="Close cookie banner"]').should('not.exist');
-    cy.get('a.text-link').contains('README.rst').click();
+    cy.get('a.text-link').contains('README.md').click();
     cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
       'contain.text',
-      'README.rst',
+      'README.md',
     );
     // Wait for the workspace crumb to become a link before leaving.
     cy.get('nav[aria-label="Breadcrumb"] a').should('exist');
 
     cy.go('back');
 
-    cy.location('pathname').should('eq', appPath('/workspace/add'));
-    cy.get('a.text-link').contains('README.rst').should('exist');
+    cy.location('pathname').should('eq', appPath(`/workspace/${workspaceId}`));
+    cy.get('a.text-link').contains('README.md').should('exist');
     cy.get('nav[aria-label="Breadcrumb"] [aria-current="page"]').should(
       'not.contain.text',
-      'README.rst',
+      'README.md',
     );
     // The file view must not render with the folder's route params on the way out.
     cy.get('@consoleError').should('not.have.been.calledWithMatch', /Missing required param/);
