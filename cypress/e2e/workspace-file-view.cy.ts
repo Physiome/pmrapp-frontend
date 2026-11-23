@@ -194,11 +194,12 @@ describe('Workspace file view', () => {
     cy.get('.code-block .view-line').should('have.length.lessThan', 200);
 
     // The end of the page shows the end of the file, still highlighted.
+    // Monaco renders the line before highlighting it, and then replaces the line's element,
+    // so query the highlighted token itself rather than a token inside an earlier line element.
     cy.scrollTo('bottom');
-    cy.contains('.code-block .view-line', 'needle_at_the_end')
-      .should('be.visible')
-      .find(highlightedToken)
-      .should('exist');
+    cy.contains(`.code-block .view-line ${highlightedToken}`, 'needle_at_the_end', {
+      timeout: 30000,
+    }).should('be.visible');
   });
 
   it('renders the code view with line numbers and syntax highlighting', () => {
