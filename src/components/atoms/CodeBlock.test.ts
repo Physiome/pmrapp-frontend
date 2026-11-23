@@ -231,11 +231,43 @@ describe('CodeBlock', () => {
     consoleError.mockRestore();
   });
 
+  it('shows the code as plain text when the editor cannot be created', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    monaco.editor.create.mockImplementationOnce(() => {
+      throw new Error('worker failed');
+    });
+
+    await mountCodeBlock({ code: '<model/>' });
+
+    expect(wrapper?.find('pre').text()).toBe('<model/>');
+    expect(wrapper?.find('[role="status"]').exists()).toBe(false);
+    expect(consoleError).toHaveBeenCalled();
+    expect(colourSchemeListeners).toHaveLength(0);
+    consoleError.mockRestore();
+  });
+
   describe('inside a sticky file panel', () => {
     const createScrollSync = () => ({
       setContentHeight: vi.fn(),
       onPageScroll: vi.fn(),
       scrollPageTo: vi.fn(),
+    });
+
+    it('disposes of a half-created editor and shows plain text when its setup fails', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const scrollSync = createScrollSync();
+      editor.onDidScrollChange.mockImplementationOnce(() => {
+        throw new Error('setup failed');
+      });
+
+      await mountCodeBlock({ code: '<model/>' }, scrollSync);
+
+      expect(editor.dispose).toHaveBeenCalled();
+      expect(scrollSync.onPageScroll).toHaveBeenLastCalledWith(null);
+      expect(scrollSync.setContentHeight).toHaveBeenLastCalledWith(null);
+      expect(colourSchemeListeners).toHaveLength(0);
+      expect(wrapper?.find('pre').text()).toBe('<model/>');
+      consoleError.mockRestore();
     });
 
     it('hides the vertical scrollbar and reports the content height', async () => {

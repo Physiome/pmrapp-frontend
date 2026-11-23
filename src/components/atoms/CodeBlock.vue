@@ -58,25 +58,18 @@ const handleColourSchemeChange = (event: MediaQueryListEvent) => {
   monaco?.editor.setTheme(themeName(event.matches));
 };
 
-onMounted(async () => {
-  try {
-    monaco = await loadMonaco();
-  } catch (err) {
-    console.error('Error loading the code viewer:', err);
-    loadFailed.value = true;
-    return;
-  }
-
-  // The component may have been unmounted while Monaco was loading.
-  if (isUnmounted || !host.value) return;
-
+/**
+ * Create the editor in the host element and connect it to the colour scheme and, inside a sticky
+ * file panel, to the page scroll.
+ */
+const createEditor = (monaco: Monaco, hostElement: HTMLElement) => {
   colourSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
   colourSchemeQuery.addEventListener('change', handleColourSchemeChange);
 
   // The editor creates its own model from `value` and `language`,
   // so that its options (notably `largeFileOptimizations`) apply
   // before the model decides whether it can be highlighted.
-  editor = monaco.editor.create(host.value, {
+  editor = monaco.editor.create(hostElement, {
     value: props.code,
     language: toMonacoLanguage(detectedLanguage.value),
     theme: themeName(colourSchemeQuery.matches),
@@ -127,13 +120,14 @@ onMounted(async () => {
       if (event.scrollTopChanged && !isFollowingPage) scrollSync.scrollPageTo(event.scrollTop);
     });
     // Capture the wheel before it reaches the editor's own handler.
-    host.value.addEventListener('wheel', handleWheel, { capture: true, passive: true });
+    hostElement.addEventListener('wheel', handleWheel, { capture: true, passive: true });
   }
-});
+};
 
-onBeforeUnmount(() => {
-  isUnmounted = true;
+/** Dispose of the editor and disconnect everything that `createEditor` connected. */
+const destroyEditor = () => {
   colourSchemeQuery?.removeEventListener('change', handleColourSchemeChange);
+  colourSchemeQuery = null;
   host.value?.removeEventListener('wheel', handleWheel, { capture: true });
   scrollSync?.onPageScroll(null);
   scrollSync?.setContentHeight(null);
@@ -141,6 +135,36 @@ onBeforeUnmount(() => {
   editor?.dispose();
   editor = null;
   model = null;
+};
+
+const showFallback = (err: unknown) => {
+  console.error('Error loading the code viewer:', err);
+  loadFailed.value = true;
+};
+
+onMounted(async () => {
+  try {
+    monaco = await loadMonaco();
+  } catch (err) {
+    showFallback(err);
+    return;
+  }
+
+  // The component may have been unmounted while Monaco was loading.
+  if (isUnmounted || !host.value) return;
+
+  try {
+    createEditor(monaco, host.value);
+  } catch (err) {
+    // Do not leave a half-created editor behind the plain-text fallback.
+    destroyEditor();
+    showFallback(err);
+  }
+});
+
+onBeforeUnmount(() => {
+  isUnmounted = true;
+  destroyEditor();
 });
 
 watch(
