@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import {
-  computed,
-  defineAsyncComponent,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  useId,
-} from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId } from 'vue';
 import ActionButton from '@/components/atoms/ActionButton.vue';
 import CopyButton from '@/components/atoms/CopyButton.vue';
 import FilePanel from '@/components/atoms/FilePanel.vue';
+import LazyCodeBlock from '@/components/atoms/LazyCodeBlock.vue';
 import LoadingBox from '@/components/atoms/LoadingBox.vue';
 import WrapButton from '@/components/atoms/WrapButton.vue';
 import CodeIcon from '@/components/icons/CodeIcon.vue';
@@ -37,9 +30,6 @@ import {
 } from '@/utils/file';
 import { renderMarkdown } from '@/utils/markdown';
 import { generateWorkspaceBreadcrumbs, generateWorkspaceTitle } from '@/utils/workspace';
-
-// The code viewer is loaded on demand so that Monaco is not part of the main bundle.
-const CodeBlock = defineAsyncComponent(() => import('@/components/atoms/CodeBlock.vue'));
 
 const props = defineProps<{
   alias: string;
@@ -395,7 +385,7 @@ const switchCodeView = async (event: Event, showCodeView: boolean) => {
 
       <!-- Code/Text View -->
       <div :id="codePanelId" role="tabpanel" v-else-if="shouldShowAsText" class="relative">
-        <CodeBlock :code="fileContent" :filename="filename" :start-wrapped="codeWrapActive" />
+        <LazyCodeBlock :code="fileContent" :filename="filename" :start-wrapped="codeWrapActive" />
       </div>
 
       <!-- Binary/Unknown File Type -->

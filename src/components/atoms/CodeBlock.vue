@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { editor as MonacoEditor } from 'monaco-editor/editor/editor.api';
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import PlainCodeBlock from '@/components/atoms/PlainCodeBlock.vue';
 import { CODE_VIEW_MAX_HEIGHT, CODE_VIEW_THEMES } from '@/constants/codeLanguage';
 import { FILE_PANEL_SCROLL_SYNC } from '@/constants/filePanel';
 import { detectCodeLanguage, toMonacoLanguage } from '@/utils/codeLanguage';
@@ -165,17 +166,14 @@ watch(
 </script>
 
 <template>
+  <PlainCodeBlock v-if="loadFailed" :code="code" :start-wrapped="startWrapped" />
   <div
+    v-else
     class="code-block"
     :data-language="detectedLanguage ?? 'plaintext'"
     :data-wrapped="startWrapped ? 'true' : 'false'"
   >
-    <pre
-      v-if="loadFailed"
-      class="code-block-fallback"
-      :style="{ maxHeight: CODE_VIEW_MAX_HEIGHT, whiteSpace: startWrapped ? 'pre-wrap' : 'pre' }"
-    >{{ code }}</pre>
-    <div v-else ref="host" class="code-block-editor" :style="hostStyle" />
+    <div ref="host" class="code-block-editor" :style="hostStyle" />
   </div>
 </template>
 
@@ -188,15 +186,6 @@ watch(
 
 .code-block-editor {
   min-height: 3rem;
-}
-
-.code-block-fallback {
-  margin: 0;
-  padding: 1em;
-  overflow: auto;
-  font-family: "Consolas", "Monaco", "Courier New", monospace;
-  font-size: 0.875rem;
-  line-height: 1.5;
 }
 
 @media (prefers-color-scheme: dark) {

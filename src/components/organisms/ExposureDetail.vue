@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ActionButton from '@/components/atoms/ActionButton.vue';
 import Citation from '@/components/atoms/Citation.vue';
 import CopyButton from '@/components/atoms/CopyButton.vue';
 import FilePanel from '@/components/atoms/FilePanel.vue';
+import LazyCodeBlock from '@/components/atoms/LazyCodeBlock.vue';
 import LoadingBox from '@/components/atoms/LoadingBox.vue';
 import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue';
 import TermButton from '@/components/atoms/TermButton.vue';
@@ -50,9 +51,6 @@ import { formatLicenceUrl } from '@/utils/licence';
 import { formatMathMLTable, initMathPolyfills, transformMathString } from '@/utils/mathTransformer';
 import { encodePathSegments } from '@/utils/path';
 import { buildSearchQuery, isValidTerm } from '@/utils/search';
-
-// The code viewer is loaded on demand so that Monaco is not part of the main bundle.
-const CodeBlock = defineAsyncComponent(() => import('@/components/atoms/CodeBlock.vue'));
 
 type ExposureFileEntry = ExposureInfo['files'][number];
 
@@ -1063,7 +1061,7 @@ onMounted(async () => {
               <span class="sr-only">Download {{ generatedCodeFilename }}</span>
             </ActionButton>
           </template>
-          <CodeBlock
+          <LazyCodeBlock
             :code="generatedCode"
             :filename="generatedCodeFilename"
             :start-wrapped="codeWrapActive"
