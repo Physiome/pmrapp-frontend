@@ -141,7 +141,7 @@ Each measurement has a generous limit, defined in `LIMITS` at the top of the spe
 node scripts/perfReport.ts cypress/perf-results
 ```
 
-In CI, the performance checks run on every pull request. The report is added to the job summary, and the **Performance report** workflow (`.github/workflows/perf-comment.yml`) posts it as a comment on the pull request, updating the same comment on each push. That workflow runs from the default branch, so changes to it take effect once merged into `main`.
+In CI, the performance checks only run on pull requests that change the code view or the checks themselves; the file patterns are listed in the **Check for code view changes** step of `.github/workflows/ci.yml`, so add to them when the code view depends on a new file. The report is added to the job summary, and the **Performance report** workflow (`.github/workflows/perf-comment.yml`) posts it as a comment on the pull request, updating the same comment on each push. That workflow runs from the default branch, so changes to it take effect once merged into `main`.
 
 To watch a check run and record a profile in Chrome DevTools, use `cypress open` instead:
 

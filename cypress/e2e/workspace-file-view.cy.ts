@@ -176,6 +176,31 @@ describe('Workspace file view', () => {
     cy.get('button[aria-label="Copy code"]').should('not.exist');
   });
 
+  it('highlights a file of over 300,000 lines and renders only the visible lines', () => {
+    // Monaco turns highlighting off for files of over 300,000 lines unless the code view disables
+    // `largeFileOptimizations`, which it does to keep highlighting up to the preview limit.
+    const lines = Array.from({ length: 310_000 }, () => '<a/>');
+    lines.push('<needle_at_the_end/>');
+    serveFile('many-lines.cellml', lines.join('\n'));
+
+    cy.visit(`/workspace/${workspaceId}/file/${commitId}/many-lines.cellml`);
+
+    // A token with a colour other than the default foreground (`mtk1`) means highlighting is shown.
+    const highlightedToken = 'span[class*="mtk"]:not(.mtk1)';
+    cy.get('.code-block[data-language="xml"]').should('exist');
+    cy.get(`.code-block .view-line ${highlightedToken}`, { timeout: 30000 }).should('exist');
+
+    // Only the lines in view are rendered, not all 310,001 of them.
+    cy.get('.code-block .view-line').should('have.length.lessThan', 200);
+
+    // The end of the page shows the end of the file, still highlighted.
+    cy.scrollTo('bottom');
+    cy.contains('.code-block .view-line', 'needle_at_the_end')
+      .should('be.visible')
+      .find(highlightedToken)
+      .should('exist');
+  });
+
   it('renders the code view with line numbers and syntax highlighting', () => {
     cy.visit(`/workspace/${workspaceId}/file/${commitId}/README.md`);
 

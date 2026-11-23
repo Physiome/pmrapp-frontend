@@ -3,12 +3,14 @@
 // Measurements are printed with a "PERF>" prefix and written to cypress/perf-results/,
 // which CI uses to post a report on the pull request (see scripts/perfReport.ts).
 
-const WORKSPACE_FILE_URL = '/workspace/6b0/file/a8a92308e217ac5626809237dd90a31240b22834';
+const COMMIT_ID = 'a8a92308e217ac5626809237dd90a31240b22834';
+const FILENAME = 'big.cellml';
+const WORKSPACE_FILE_URL = `/workspace/6b0/file/${COMMIT_ID}/${FILENAME}`;
 const LINE_PAIRS = 80000; // About 10 MB. Increase to test larger files (the preview limit is 20 MB).
 const RESULTS_FILE = 'cypress/perf-results/large-file.json';
 
 // Generous limits that only catch severe regressions. Typical local values are noted alongside;
-// CI runners are slower and the page also waits for the remote demo API.
+// CI runners are slower than a typical development machine.
 const LIMITS = {
   firstScreenMs: 10000, // Typically about 1.3 s.
   domLines: 500, // Typically 36; a large value means only visible lines are no longer rendered.
@@ -50,6 +52,36 @@ const buildLargeCellML = (): string => {
   return lines.join('\n');
 };
 
+/**
+ * A minimal workspace info response, so the check does not depend on the demo backend's data
+ * and the measurements do not include its response time.
+ * Only the workspace root is a folder (`TreeInfo`); any other path is shown as a file.
+ */
+const workspaceInfoResponse = (path: string) => ({
+  inner: {
+    workspace: {
+      id: 1,
+      url: 'https://example.com/workspace/performance-check/',
+      superceded_by_id: null,
+      description: 'Performance check',
+      long_description: null,
+      created_ts: 0,
+      exposures: null,
+    },
+    commit: { commit_id: COMMIT_ID, author: 'Performance check', committer: 'Performance check' },
+    path,
+    target:
+      path === ''
+        ? {
+            TreeInfo: {
+              filecount: 1,
+              entries: [{ filemode: '100644', kind: 'blob', id: COMMIT_ID, name: FILENAME }],
+            },
+          }
+        : {},
+  },
+});
+
 type PerfWindow = Window & { __longTasks: number[]; __searchStart: number };
 
 // The application window is extended with fields that collect measurements during the test.
@@ -79,25 +111,18 @@ describe('Large file code view', () => {
     cy.task('log', `file size: ${results.fileSizeMB} MB, lines: ${results.lines}`);
     cy.writeFile(RESULTS_FILE, results);
 
-    // Serve the generated file in place of README.md, and rename README.md to big.cellml
-    // in the workspace info so the page treats it as an existing CellML file.
-    cy.intercept('GET', '**/rawfile/**/big.cellml', {
+    // Serve the generated file and the workspace info, so the page treats it as a CellML file.
+    cy.intercept('GET', `**/rawfile/**/${FILENAME}`, {
       body,
       headers: { 'content-type': 'text/plain' },
     });
     cy.intercept('POST', '**/api/get_workspace_info', (req) => {
       const reqBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      if (reqBody.path === 'big.cellml') {
-        reqBody.path = 'README.md';
-        req.body = reqBody;
-        req.continue((res) => {
-          res.body = JSON.parse(JSON.stringify(res.body).split('README.md').join('big.cellml'));
-        });
-      }
+      req.reply({ body: workspaceInfoResponse(reqBody.path ?? '') });
     });
 
     let start = 0;
-    cy.visit(`${WORKSPACE_FILE_URL}/big.cellml`, {
+    cy.visit(WORKSPACE_FILE_URL, {
       onBeforeLoad(win) {
         const perfWin = asPerfWindow(win);
         start = win.performance.now();
