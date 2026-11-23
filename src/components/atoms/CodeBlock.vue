@@ -196,7 +196,7 @@ watch(
   <PlainCodeBlock v-if="loadFailed" :code="code" :start-wrapped="startWrapped" />
   <div
     v-else
-    class="code-block"
+    class="code-block relative rounded overflow-hidden outline outline-gray-200 dark:outline-gray-700"
     :data-language="detectedLanguage ?? 'plaintext'"
     :data-wrapped="startWrapped ? 'true' : 'false'"
   >
@@ -212,13 +212,6 @@ watch(
 </template>
 
 <style scoped>
-.code-block {
-  position: relative;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  outline: 1px solid var(--color-gray-200, #e5e7eb);
-}
-
 .code-block-editor {
   min-height: 3rem;
 }
@@ -233,11 +226,5 @@ watch(
   inset: 0;
   padding: 1rem;
   background-color: var(--color-surface);
-}
-
-@media (prefers-color-scheme: dark) {
-  .code-block {
-    outline-color: var(--color-gray-700, #374151);
-  }
 }
 </style>
