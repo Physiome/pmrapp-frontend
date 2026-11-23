@@ -2,6 +2,7 @@
 import type { editor as MonacoEditor } from 'monaco-editor/editor/editor.api';
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import PlainCodeBlock from '@/components/atoms/PlainCodeBlock.vue';
+import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue';
 import { CODE_VIEW_MAX_HEIGHT, CODE_VIEW_THEMES } from '@/constants/codeLanguage';
 import { FILE_PANEL_SCROLL_SYNC } from '@/constants/filePanel';
 import { detectCodeLanguage, toMonacoLanguage } from '@/utils/codeLanguage';
@@ -16,6 +17,8 @@ const props = defineProps<{
 const host = ref<HTMLElement | null>(null);
 const contentHeight = ref<number | null>(null);
 const loadFailed = ref(false);
+// The content height is known once the editor has been created.
+const isEditorReady = computed(() => contentHeight.value !== null);
 const detectedLanguage = computed(() => detectCodeLanguage(props.filename));
 
 // Inside a sticky file panel, the editor scrolls with the page and uses the browser's scrollbar.
@@ -173,12 +176,20 @@ watch(
     :data-language="detectedLanguage ?? 'plaintext'"
     :data-wrapped="startWrapped ? 'true' : 'false'"
   >
-    <div ref="host" class="code-block-editor" :style="hostStyle" />
+    <div
+      ref="host"
+      class="code-block-editor"
+      :class="{ 'is-loading': !isEditorReady }"
+      :style="hostStyle"
+    />
+    <!-- Shown while Monaco loads, matching the placeholder in LazyCodeBlock. -->
+    <SkeletonBlock v-if="!isEditorReady" class="code-block-skeleton" />
   </div>
 </template>
 
 <style scoped>
 .code-block {
+  position: relative;
   border-radius: 0.25rem;
   overflow: hidden;
   outline: 1px solid var(--color-gray-200, #e5e7eb);
@@ -186,6 +197,18 @@ watch(
 
 .code-block-editor {
   min-height: 3rem;
+}
+
+/* The height of the skeleton: three lines with gaps, plus padding. */
+.code-block-editor.is-loading {
+  min-height: 5.75rem;
+}
+
+.code-block-skeleton {
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+  background-color: var(--color-surface);
 }
 
 @media (prefers-color-scheme: dark) {

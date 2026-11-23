@@ -32,9 +32,12 @@ describe('LazyCodeBlock', () => {
     const wrapper = mount(LazyCodeBlock, {
       props: { code: 'const x = 1', filename: 'example.js', startWrapped: true },
     });
+    expect(wrapper.find('[role="status"]').exists()).toBe(true);
+
     await vi.waitFor(() =>
       expect(wrapper.findComponent({ name: 'CodeBlock' }).exists()).toBe(true),
     );
+    expect(wrapper.find('[role="status"]').exists()).toBe(false);
 
     const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
     expect(codeBlock.props()).toEqual({

@@ -202,6 +202,24 @@ describe('CodeBlock', () => {
     expect(monaco.editor.create).not.toHaveBeenCalled();
   });
 
+  it('shows a loading skeleton until the editor has been created', async () => {
+    let resolveMonaco: (value: typeof monaco) => void = () => {};
+    loadMonaco.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveMonaco = resolve;
+        }),
+    );
+    wrapper = mount(CodeBlock, { props: { code: 'x', filename: 'example.js' } });
+
+    expect(wrapper.find('[role="status"]').exists()).toBe(true);
+
+    resolveMonaco(monaco);
+    await flushPromises();
+
+    expect(wrapper.find('[role="status"]').exists()).toBe(false);
+  });
+
   it('shows the code as plain text when Monaco fails to load', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     loadMonaco.mockImplementation(() => Promise.reject(new Error('network error')));
