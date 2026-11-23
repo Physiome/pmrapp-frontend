@@ -102,7 +102,8 @@ describe('CodeBlock', () => {
   it.each([
     ['model.cellml', 'xml', 'xml'],
     ['script.js', 'javascript', 'typescript'],
-    ['model.f77', 'fortran', 'fortran'],
+    ['model.f77', 'fortran-fixed', 'fortran-fixed'],
+    ['model.f90', 'fortran', 'fortran'],
     ['model.m', 'matlab', 'matlab'],
     ['data.xyz', 'plaintext', 'plaintext'],
   ])('uses the language detected for %s', async (filename, dataLanguage, monacoLanguage) => {

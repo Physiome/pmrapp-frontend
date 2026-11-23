@@ -7,6 +7,7 @@ export type CodeLanguageId =
   | 'css'
   | 'dockerfile'
   | 'fortran'
+  | 'fortran-fixed'
   | 'gitignore'
   | 'html'
   | 'ini'

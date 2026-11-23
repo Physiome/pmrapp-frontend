@@ -14,9 +14,8 @@ export const fortranConfiguration: languages.LanguageConfiguration = {
 };
 
 /**
- * Monarch tokenizer for Fortran (free and fixed form), which Monaco does not include.
- * Like the CodeMirror Fortran mode, only `!` starts a comment, because Monarch cannot match a
- * fixed-form `C` comment by column.
+ * Monarch tokenizer for free-form Fortran (Fortran 90 and later), which Monaco does not include.
+ * Only `!` starts a comment. Fixed-form files use `fortranFixedLanguage`.
  */
 export const fortranLanguage: languages.IMonarchLanguage = {
   ignoreCase: true,
@@ -227,5 +226,21 @@ export const fortranLanguage: languages.IMonarchLanguage = {
       [/""/, 'string.escape'],
       [/"/, 'string', '@pop'],
     ],
+  },
+};
+
+/**
+ * Monarch tokenizer for fixed-form Fortran (FORTRAN 77, `.f` and `.for` files).
+ * As well as `!`, a `C`, `c` or `*` in column 1 makes the whole line a comment.
+ * Monarch only matches a rule that starts with `^` at the start of a line.
+ * This rule is not used for free form, where a line such as `character(len=10) :: s`
+ * may start in column 1.
+ */
+export const fortranFixedLanguage: languages.IMonarchLanguage = {
+  ...fortranLanguage,
+  tokenPostfix: '.fortran-fixed',
+  tokenizer: {
+    ...fortranLanguage.tokenizer,
+    root: [[/^[c*].*$/, 'comment'], ...fortranLanguage.tokenizer.root],
   },
 };

@@ -214,7 +214,7 @@ describe('Exposure detail page', () => {
     const languages = [
       { name: 'C', lang: 'C', fileName: 'code.c', language: 'cpp' },
       { name: 'C (IDA solver)', lang: 'C_IDA', fileName: 'code.ida.c', language: 'cpp' },
-      { name: 'FORTRAN 77', lang: 'F77', fileName: 'code.f77', language: 'fortran' },
+      { name: 'FORTRAN 77', lang: 'F77', fileName: 'code.f77', language: 'fortran-fixed' },
       { name: 'MATLAB', lang: 'MATLAB', fileName: 'code.m', language: 'matlab' },
       { name: 'Python', lang: 'Python', fileName: 'code.py', language: 'python' },
     ];
@@ -237,8 +237,15 @@ describe('Exposure detail page', () => {
 
       cy.url().should('match', /\/cellml_codegen\/F77$/);
       cy.get('[data-sticky="true"]').should('contain.text', 'code.f77');
-      cy.get('.code-block[data-language="fortran"]').should('exist');
+      cy.get('.code-block[data-language="fortran-fixed"]').should('exist');
       cy.get('.code-block .view-line span[class*="mtk"]:not(.mtk1)').should('exist');
+      // A fixed-form comment line is one comment token, not separate words.
+      // Monaco may split a long token into several spans, but they all have the same class.
+      cy.contains('.code-block .view-line', /^C\s/)
+        .find('span[class*="mtk"]')
+        .should(($spans) => {
+          expect(new Set($spans.toArray().map((span) => span.className)).size).to.equal(1);
+        });
     });
   });
 });

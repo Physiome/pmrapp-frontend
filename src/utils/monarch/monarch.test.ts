@@ -1,6 +1,6 @@
 import type { languages } from 'monaco-editor/editor/editor.api';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { fortranLanguage } from './fortran';
+import { fortranFixedLanguage, fortranLanguage } from './fortran';
 import { gitignoreLanguage } from './gitignore';
 import { iniLanguage } from './ini';
 import { jsonLanguage } from './json';
@@ -27,6 +27,7 @@ beforeAll(async () => {
   monaco = await import('monaco-editor/editor/editor.api');
   const definitions: [string, languages.IMonarchLanguage][] = [
     ['fortran', fortranLanguage],
+    ['fortran-fixed', fortranFixedLanguage],
     ['gitignore', gitignoreLanguage],
     ['ini', iniLanguage],
     ['json', jsonLanguage],
@@ -75,6 +76,39 @@ describe('Fortran tokenizer', () => {
 
   it('ends an unterminated string at the end of the line', () => {
     expect(tokens("print *, 'open\nx = 1", 'fortran')).toContain('x: identifier');
+  });
+});
+
+describe('Fixed-form Fortran tokenizer', () => {
+  it('treats a C, c or * in column 1 as a whole-line comment', () => {
+    const code = 'C There are 10 entries.\nc lower case\n* star\n      REAL X ! note';
+    expect(tokens(code, 'fortran-fixed')).toEqual([
+      'C There are 10 entries.: comment',
+      'c lower case: comment',
+      '* star: comment',
+      'REAL: type',
+      'X: identifier',
+      '! note: comment',
+    ]);
+  });
+
+  it('does not treat C or * after column 1 as a comment', () => {
+    expect(tokens('      CALL f(x)\n      y = 2 * x', 'fortran-fixed')).toEqual([
+      'CALL: keyword',
+      'f: identifier',
+      '(: delimiter',
+      'x: identifier',
+      '): delimiter',
+      'y: identifier',
+      '=: operator',
+      '2: number',
+      '*: operator',
+      'x: identifier',
+    ]);
+  });
+
+  it('keeps a line starting with c as code in free form', () => {
+    expect(tokens('character(len=10) :: s', 'fortran')).toContain('character: type');
   });
 });
 

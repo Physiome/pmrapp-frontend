@@ -1,5 +1,9 @@
 import { CODE_VIEW_THEMES } from '@/constants/codeLanguage';
-import { fortranConfiguration, fortranLanguage } from '@/utils/monarch/fortran';
+import {
+  fortranConfiguration,
+  fortranFixedLanguage,
+  fortranLanguage,
+} from '@/utils/monarch/fortran';
 import { gitignoreConfiguration, gitignoreLanguage } from '@/utils/monarch/gitignore';
 import { iniConfiguration, iniLanguage } from '@/utils/monarch/ini';
 import { jsonConfiguration, jsonLanguage } from '@/utils/monarch/json';
@@ -55,6 +59,9 @@ const setUpMonaco = async (): Promise<Monaco> => {
   monaco.languages.register({ id: 'fortran', aliases: ['Fortran'] });
   monaco.languages.setMonarchTokensProvider('fortran', fortranLanguage);
   monaco.languages.setLanguageConfiguration('fortran', fortranConfiguration);
+  monaco.languages.register({ id: 'fortran-fixed', aliases: ['Fortran (fixed form)'] });
+  monaco.languages.setMonarchTokensProvider('fortran-fixed', fortranFixedLanguage);
+  monaco.languages.setLanguageConfiguration('fortran-fixed', fortranConfiguration);
   monaco.languages.register({ id: 'gitignore', aliases: ['Git Ignore'] });
   monaco.languages.setMonarchTokensProvider('gitignore', gitignoreLanguage);
   monaco.languages.setLanguageConfiguration('gitignore', gitignoreConfiguration);
