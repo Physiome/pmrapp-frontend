@@ -24,8 +24,13 @@ jobs:
       # cypress/fixtures/feature-comparison.csv, so it is never fetched.
       VITE_FEATURE_COMPARISON_SHEET_CSV_URL: 'https://example.com/feature-comparison.csv'
     steps:
+      # CI checks out the pull request merged into main.
+      # Fetching its parents as well lets the "Check for code view changes" step
+      # diff it against main (HEAD^1).
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -50,7 +55,77 @@ jobs:
         run: bun run test:unit
 
       - name: Build
+        id: build
         run: bun run build
 
       - name: Run e2e tests
         run: bun run test:e2e
+
+      # The performance checks are slow and only measure the code view,
+      # so they only run when a pull request changes a file
+      # that the code view or the checks depend on (listed below).
+      - name: Check for code view changes
+        id: changes
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        shell: bash
+        run: |
+          patterns=(
+            'src/components/atoms/(CodeBlock|LazyCodeBlock|PlainCodeBlock|FilePanel)\.vue'
+            'src/components/organisms/WorkspaceFileDetail\.vue'
+            'src/utils/(monaco|codeLanguage|elementHeight)\.ts'
+            'src/utils/monarch/'
+            'src/constants/(codeLanguage|filePanel|workspace)\.ts'
+            'src/types/(codeLanguage|filePanel)\.ts'
+            'cypress/perf/'
+            'cypress\.perf\.config\.ts'
+            'scripts/perfReport\.ts'
+            'package\.json'
+            'bun\.lock'
+            'vite\.config\.ts'
+            '\.github/workflows/ci\.yml'
+          )
+          pattern="^($(IFS='|'; echo "${patterns[*]}"))"
+
+          # The checkout is the pull request merged into main, so its first parent is main.
+          # Unit test files are ignored, as they do not change what the checks measure.
+          if ! changed=$(git diff --name-only HEAD^1 HEAD); then
+            echo "Could not list the changed files, so the performance checks will run."
+            echo 'code_view=true' >> "$GITHUB_OUTPUT"
+          elif grep -v '\.test\.ts$' <<< "$changed" > "$RUNNER_TEMP/changed-files.txt"; grep -Eq "$pattern" "$RUNNER_TEMP/changed-files.txt"; then
+            echo 'code_view=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'code_view=false' >> "$GITHUB_OUTPUT"
+            echo 'Performance checks skipped: this pull request does not change the code view.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Performance checks (cypress/perf) fail when a measurement exceeds its (generous) limit.
+      # They also run when the e2e tests fail, so a report is still produced.
+      - name: Run performance tests
+        id: perf
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.changes.outputs.code_view == 'true' }}
+        run: bun run test:perf
+
+      # The results are uploaded so that the 'Performance report' workflow can comment on the PR.
+      # Commenting happens in that separate workflow because PRs from forks get a read-only token.
+      - name: Save performance report details
+        if: ${{ !cancelled() && steps.perf.outcome != 'skipped' }}
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PERF_OUTCOME: ${{ steps.perf.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p cypress/perf-results
+          echo "$PR_NUMBER" > cypress/perf-results/pr-number.txt
+          echo "$PERF_OUTCOME" > cypress/perf-results/outcome.txt
+          node scripts/perfReport.ts cypress/perf-results >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload performance results
+        if: ${{ !cancelled() && steps.perf.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: perf-results
+          path: cypress/perf-results/
+          retention-days: 7
+          if-no-files-found: warn

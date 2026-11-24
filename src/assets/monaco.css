@@ -1,0 +1,11 @@
+/*
+ * Monaco's styles assume the browser's default `content-box` sizing,
+ * which Tailwind's preflight changes to `border-box`;
+ * this misaligned, for example, the find widget's close button.
+ * The selector has no specificity, so Monaco's own `box-sizing` rules still apply,
+ * and it is not in a cascade layer, so it overrides the preflight.
+ * It is global because a scoped selector would gain specificity.
+ */
+:where(.code-block-editor *) {
+  box-sizing: content-box;
+}

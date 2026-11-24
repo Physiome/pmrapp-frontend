@@ -37,6 +37,7 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 /cypress/downloads/
+/cypress/perf-results/
 
 # Vitest
 __screenshots__/
