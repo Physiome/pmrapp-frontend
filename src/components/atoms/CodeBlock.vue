@@ -252,9 +252,10 @@ watch(
 /*
  * Monaco draws tooltips, such as those of the find widget's buttons, inside the editor,
  * where the code block clips them and they can cover the buttons.
+ * The container holds both the tooltip and its pointer arrow.
  * The buttons keep their accessible labels.
  */
-.code-block-editor :deep(.workbench-hover) {
+.code-block-editor :deep(.workbench-hover-container) {
   display: none;
 }
 
