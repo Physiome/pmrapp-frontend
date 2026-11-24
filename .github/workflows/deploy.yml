@@ -15,17 +15,18 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment.
+# Allow only one concurrent deployment, skipping runs queued between the run in progress
+# and the latest queued one. In-progress runs are not cancelled, so that a deployment
+# that has already started is allowed to finish.
 concurrency:
   group: 'pages'
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  # Single deploy job for deployment.
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # The build and the deployment are separate jobs, so that the 'github-pages' artifact
+  # is fully finalised before deploy-pages looks it up. In a single job the lookup can run
+  # within a second of the upload and fail with 'No artifacts named "github-pages" were found'.
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -66,6 +67,13 @@ jobs:
           # Upload the dist folder.
           path: './dist'
 
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
