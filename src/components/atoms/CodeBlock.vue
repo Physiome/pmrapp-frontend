@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { editor as MonacoEditor } from 'monaco-editor/editor/editor.api';
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import '@/assets/monaco.css';
 import PlainCodeBlock from '@/components/atoms/PlainCodeBlock.vue';
 import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue';
 import { CODE_VIEW_MAX_HEIGHT, CODE_VIEW_THEMES } from '@/constants/codeLanguage';
@@ -255,6 +256,20 @@ watch(
  */
 .code-block-editor :deep(.workbench-hover) {
   display: none;
+}
+
+/*
+ * The find widget has no replace toggle in a read-only editor, so it does not keep space for it,
+ * and it keeps the same gap from the right edge as from the top, also when no scrollbar is shown.
+ */
+.code-block-editor :deep(.find-widget) {
+  margin-right: 4px;
+  padding-left: 4px;
+  border-radius: 4px 4px;
+}
+
+.code-block-editor :deep(.find-widget > .find-part) {
+  margin-left: 4px;
 }
 
 .code-block-skeleton {
