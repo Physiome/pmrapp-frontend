@@ -1,3 +1,5 @@
+import { detectCodeLanguage } from '@/utils/codeLanguage';
+
 /**
  * Get file extension from filename.
  * For dotfiles (like .gitignore), returns the part after the leading dot.
@@ -61,6 +63,11 @@ export const isMarkdownFile = (filename: string): boolean => {
  * Check if file is a code/text file.
  */
 export const isCodeFile = (filename: string): boolean => {
+  // Any file the code viewer can highlight is shown as code.
+  if (detectCodeLanguage(filename)) {
+    return true;
+  }
+
   const extension = getFileExtension(filename);
   const codeExtensions = [
     'bash',
@@ -161,6 +168,10 @@ export const isBinaryFile = (filename: string): boolean => {
     'mov',
     'mp3',
     'mp4',
+    'odg',
+    'odp',
+    'ods',
+    'odt',
     'omex',
     'pdf',
     'png',

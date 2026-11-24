@@ -1,0 +1,166 @@
+import type { languages } from 'monaco-editor/editor/editor.api';
+
+/**
+ * Editor behaviour for MATLAB: comments and brackets.
+ */
+export const matlabConfiguration: languages.LanguageConfiguration = {
+  comments: { lineComment: '%', blockComment: ['%{', '%}'] },
+  brackets: [
+    ['(', ')'],
+    ['[', ']'],
+    ['{', '}'],
+  ],
+  autoClosingPairs: [
+    { open: '(', close: ')' },
+    { open: '[', close: ']' },
+    { open: '{', close: '}' },
+    { open: '"', close: '"', notIn: ['string', 'comment'] },
+  ],
+};
+
+/**
+ * Monarch tokenizer for MATLAB (and Octave), which Monaco does not include.
+ * A quote straight after a name, number or closing bracket is the transpose operator, not the
+ * start of a string.
+ */
+export const matlabLanguage: languages.IMonarchLanguage = {
+  defaultToken: '',
+  tokenPostfix: '.matlab',
+
+  keywords: [
+    'break',
+    'case',
+    'catch',
+    'classdef',
+    'continue',
+    'do',
+    'else',
+    'elseif',
+    'end',
+    'end_try_catch',
+    'end_unwind_protect',
+    'endfor',
+    'endfunction',
+    'endif',
+    'endswitch',
+    'endwhile',
+    'enumeration',
+    'events',
+    'for',
+    'function',
+    'global',
+    'if',
+    'methods',
+    'otherwise',
+    'parfor',
+    'persistent',
+    'properties',
+    'return',
+    'spmd',
+    'switch',
+    'try',
+    'until',
+    'unwind_protect',
+    'unwind_protect_cleanup',
+    'while',
+  ],
+
+  builtins: [
+    'abs',
+    'all',
+    'any',
+    'cell',
+    'ceil',
+    'cos',
+    'disp',
+    'error',
+    'exp',
+    'eye',
+    'false',
+    'fieldnames',
+    'find',
+    'floor',
+    'fprintf',
+    'inf',
+    'Inf',
+    'isempty',
+    'isfield',
+    'length',
+    'linspace',
+    'log',
+    'max',
+    'min',
+    'mod',
+    'NaN',
+    'nan',
+    'nargin',
+    'nargout',
+    'numel',
+    'ode15s',
+    'ode45',
+    'ones',
+    'pi',
+    'plot',
+    'rand',
+    'repmat',
+    'reshape',
+    'round',
+    'sin',
+    'size',
+    'sprintf',
+    'sqrt',
+    'struct',
+    'sum',
+    'tan',
+    'true',
+    'warning',
+    'zeros',
+  ],
+
+  tokenizer: {
+    root: [
+      [/^\s*%\{\s*$/, 'comment', '@blockComment'],
+      [/[%#].*$/, 'comment'],
+      [/\.\.\..*$/, 'comment'],
+      [
+        /([a-zA-Z_]\w*)('+)/,
+        [
+          {
+            cases: { '@keywords': 'keyword', '@builtins': 'predefined', '@default': 'identifier' },
+          },
+          'operator',
+        ],
+      ],
+      [
+        /[a-zA-Z_]\w*/,
+        { cases: { '@keywords': 'keyword', '@builtins': 'predefined', '@default': 'identifier' } },
+      ],
+      [/((?:\d+\.?\d*|\.\d+)(?:[eEdD][+-]?\d+)?[ij]?)('+)/, ['number', 'operator']],
+      [/(?:\d+\.?\d*|\.\d+)(?:[eEdD][+-]?\d+)?[ij]?/, 'number'],
+      [/([\])}])('+)/, ['delimiter', 'operator']],
+      [/\.'+/, 'operator'],
+      [/'/, 'string', '@stringSingle'],
+      [/"/, 'string', '@stringDouble'],
+      [/\.?[*/\\^]|[+\-<>=~&|:@]=?|==|~=/, 'operator'],
+      [/[()[\]{},;]/, 'delimiter'],
+      [/\s+/, 'white'],
+    ],
+    blockComment: [
+      [/^\s*%\}\s*$/, 'comment', '@pop'],
+      [/.*$/, 'comment'],
+    ],
+    // Strings do not continue onto the next line, so a missing closing quote ends at the line end.
+    stringSingle: [
+      [/[^']*$/, 'string', '@pop'],
+      [/[^']+/, 'string'],
+      [/''/, 'string.escape'],
+      [/'/, 'string', '@pop'],
+    ],
+    stringDouble: [
+      [/[^"]*$/, 'string', '@pop'],
+      [/[^"]+/, 'string'],
+      [/""/, 'string.escape'],
+      [/"/, 'string', '@pop'],
+    ],
+  },
+};

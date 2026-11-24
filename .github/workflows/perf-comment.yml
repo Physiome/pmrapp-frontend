@@ -1,0 +1,98 @@
+# Posts the performance check results from the CI workflow as a comment on the pull request.
+#
+# This runs separately from CI because pull requests from forks only get a read-only token in
+# the CI workflow. This workflow runs from the default branch with permission to comment, and
+# never checks out or runs code from the pull request: it only reads the uploaded results, which
+# are validated by scripts/perfReport.ts before anything is posted.
+#
+# Note: GitHub only runs workflow_run workflows from the default branch, so changes to this file
+# take effect after they are merged into main.
+name: Performance report
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment:
+    name: Comment on pull request
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out the default branch (trusted code), not the pull request.
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.20.0'
+
+      # The artifact is missing when CI stopped before the performance checks ran.
+      - name: Download performance results
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: perf-results
+          path: perf-results
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build report
+        if: steps.download.outcome == 'success'
+        env:
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: node scripts/perfReport.ts perf-results > perf-report.md
+
+      - name: Post or update comment
+        if: steps.download.outcome == 'success'
+        uses: actions/github-script@v8
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const fs = require('node:fs')
+            const marker = '<!-- pmr-perf-report -->'
+
+            const prNumberText = fs.readFileSync('perf-results/pr-number.txt', 'utf8').trim()
+            if (!/^\d+$/.test(prNumberText)) {
+              core.warning('Invalid pull request number in the performance results.')
+              return
+            }
+            const prNumber = Number(prNumberText)
+
+            // Only comment when the pull request still points at the commit that was tested.
+            // This also stops a results file from targeting an unrelated pull request.
+            const { owner, repo } = context.repo
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber })
+            if (pr.head.sha !== process.env.HEAD_SHA) {
+              core.info(`Pull request #${prNumber} has moved on from ${process.env.HEAD_SHA}; not commenting.`)
+              return
+            }
+
+            const body = fs.readFileSync('perf-report.md', 'utf8')
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: prNumber,
+              per_page: 100,
+            })
+            const existing = comments.find(
+              (comment) => comment.user?.type === 'Bot' && comment.body?.includes(marker),
+            )
+
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+              core.info(`Updated performance report comment on #${prNumber}.`)
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body })
+              core.info(`Posted performance report comment on #${prNumber}.`)
+            }

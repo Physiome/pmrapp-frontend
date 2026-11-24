@@ -3,9 +3,9 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ActionButton from '@/components/atoms/ActionButton.vue';
 import Citation from '@/components/atoms/Citation.vue';
-import CodeBlock from '@/components/atoms/CodeBlock.vue';
 import CopyButton from '@/components/atoms/CopyButton.vue';
 import FilePanel from '@/components/atoms/FilePanel.vue';
+import LazyCodeBlock from '@/components/atoms/LazyCodeBlock.vue';
 import LoadingBox from '@/components/atoms/LoadingBox.vue';
 import SkeletonBlock from '@/components/atoms/SkeletonBlock.vue';
 import TermButton from '@/components/atoms/TermButton.vue';
@@ -1045,7 +1045,7 @@ onMounted(async () => {
             </li>
           </ul>
         </nav>
-        <FilePanel :title="generatedCodeFilename">
+        <FilePanel :title="generatedCodeFilename" sticky>
           <template #actions>
             <WrapButton :active="codeWrapActive" @click="toggleCodeWrap" />
             <CopyButton :text="generatedCode" title="Copy code" />
@@ -1061,7 +1061,7 @@ onMounted(async () => {
               <span class="sr-only">Download {{ generatedCodeFilename }}</span>
             </ActionButton>
           </template>
-          <CodeBlock
+          <LazyCodeBlock
             :code="generatedCode"
             :filename="generatedCodeFilename"
             :start-wrapped="codeWrapActive"

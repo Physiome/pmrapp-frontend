@@ -117,7 +117,7 @@ describe('ExposureDetail', () => {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
           BreadcrumbsBar: true,
-          CodeBlock: true,
+          LazyCodeBlock: true,
           CopyButton: true,
           WrapButton: true,
           LoadingBox: true,
@@ -157,7 +157,7 @@ describe('ExposureDetail', () => {
         stubs: {
           RouterLink: { template: '<a><slot /></a>' },
           BreadcrumbsBar: true,
-          CodeBlock: true,
+          LazyCodeBlock: true,
           CopyButton: true,
           WrapButton: true,
           LoadingBox: true,
@@ -374,8 +374,8 @@ describe('ExposureDetail', () => {
       },
       generatedCode: mockGeneratedCode,
       stubs: {
-        CodeBlock: {
-          name: 'CodeBlock',
+        LazyCodeBlock: {
+          name: 'LazyCodeBlock',
           props: ['code', 'filename'],
           template: '<div class="code-block-stub" />',
         },
@@ -399,7 +399,7 @@ describe('ExposureDetail', () => {
       'code.C.c',
     );
 
-    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
+    const codeBlock = wrapper.findComponent({ name: 'LazyCodeBlock' });
     expect(codeBlock.exists()).toBe(true);
     expect(codeBlock.props('code')).toBe(mockGeneratedCode);
     expect(codeBlock.props('filename')).toBe('code.c');
@@ -433,8 +433,8 @@ describe('ExposureDetail', () => {
       },
       generatedCode: mockGeneratedCode,
       stubs: {
-        CodeBlock: {
-          name: 'CodeBlock',
+        LazyCodeBlock: {
+          name: 'LazyCodeBlock',
           props: ['code', 'filename'],
           template: '<div class="code-block-stub" />',
         },
@@ -454,7 +454,7 @@ describe('ExposureDetail', () => {
       'code.C.c',
     );
 
-    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
+    const codeBlock = wrapper.findComponent({ name: 'LazyCodeBlock' });
     expect(codeBlock.exists()).toBe(true);
     expect(codeBlock.props('code')).toBe(mockGeneratedCode);
     expect(codeBlock.props('filename')).toBe('code.py');
@@ -483,8 +483,8 @@ describe('ExposureDetail', () => {
       },
       generatedCode: mockGeneratedCode,
       stubs: {
-        CodeBlock: {
-          name: 'CodeBlock',
+        LazyCodeBlock: {
+          name: 'LazyCodeBlock',
           props: ['code', 'filename'],
           template: '<div class="code-block-stub" />',
         },
@@ -528,7 +528,7 @@ describe('ExposureDetail', () => {
       'code.Python.py',
     );
 
-    const codeBlock = wrapper.findComponent({ name: 'CodeBlock' });
+    const codeBlock = wrapper.findComponent({ name: 'LazyCodeBlock' });
     expect(codeBlock.props('filename')).toBe('code.py');
     expect(pythonButton?.props('variant')).toBe('primary');
   });
@@ -540,8 +540,8 @@ describe('ExposureDetail', () => {
       },
       generatedCode: mockGeneratedCode,
       stubs: {
-        CodeBlock: {
-          name: 'CodeBlock',
+        LazyCodeBlock: {
+          name: 'LazyCodeBlock',
           props: ['code', 'filename', 'startWrapped'],
           template: '<div class="code-block-stub" />',
         },
@@ -1086,8 +1086,8 @@ describe('ExposureDetail', () => {
         },
         generatedCode: mockGeneratedCode,
         stubs: {
-          CodeBlock: {
-            name: 'CodeBlock',
+          LazyCodeBlock: {
+            name: 'LazyCodeBlock',
             props: ['code', 'filename'],
             template: '<div class="code-block-stub" />',
           },
