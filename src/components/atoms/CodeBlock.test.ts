@@ -113,6 +113,45 @@ describe('CodeBlock', () => {
     expect(wrapper?.attributes('data-language')).toBe(dataLanguage);
   });
 
+  it('opens the find widget without adding space above the first line', async () => {
+    await mountCodeBlock({});
+
+    expect(createOptions()).toMatchObject({ find: { addExtraSpaceOnTop: false } });
+  });
+
+  it('keeps the page where it is when the find widget takes focus', async () => {
+    await mountCodeBlock({});
+    const host = wrapper?.find('.code-block-editor').element as HTMLElement;
+    const findWidget = document.createElement('div');
+    findWidget.className = 'find-widget';
+    const findInput = document.createElement('textarea');
+    findWidget.appendChild(findInput);
+    host.appendChild(findWidget);
+    // jsdom does not lay out, so the host gets a settable scroll position.
+    let hostScrollTop = 0;
+    Object.defineProperty(host, 'scrollTop', {
+      configurable: true,
+      get: () => hostScrollTop,
+      set: (value: number) => {
+        hostScrollTop = value;
+      },
+    });
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    window.scrollY = 500;
+
+    // Like a browser, focus the input and then scroll the page
+    // and the clipping container up to show it, in the same task.
+    findInput.focus();
+    host.scrollTop = 40;
+    window.scrollY = 300;
+    await flushPromises();
+
+    expect(host.scrollTop).toBe(0);
+    expect(scrollTo).toHaveBeenCalledWith(window.scrollX, 500);
+    scrollTo.mockRestore();
+    window.scrollY = 0;
+  });
+
   it('labels the editor with the filename', async () => {
     await mountCodeBlock({ filename: 'model.cellml' });
 

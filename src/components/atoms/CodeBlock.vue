@@ -54,6 +54,28 @@ const handleWheel = (event: WheelEvent) => {
   }
 };
 
+/**
+ * Keep the page where it is when the find widget (Ctrl/Cmd + F) takes focus.
+ */
+const handleFocusIn = (event: FocusEvent) => {
+  const target = event.target;
+  if (!(target instanceof Element) || !target.closest('.find-widget')) return;
+
+  const positions: { element: Element; top: number; left: number }[] = [];
+  for (let element = target.parentElement; element; element = element.parentElement) {
+    positions.push({ element, top: element.scrollTop, left: element.scrollLeft });
+  }
+  const { scrollX, scrollY } = window;
+
+  queueMicrotask(() => {
+    for (const { element, top, left } of positions) {
+      if (element.scrollTop !== top) element.scrollTop = top;
+      if (element.scrollLeft !== left) element.scrollLeft = left;
+    }
+    if (window.scrollX !== scrollX || window.scrollY !== scrollY) window.scrollTo(scrollX, scrollY);
+  });
+};
+
 const handleColourSchemeChange = (event: MediaQueryListEvent) => {
   monaco?.editor.setTheme(themeName(event.matches));
 };
@@ -88,6 +110,9 @@ const createEditor = (monaco: Monaco, hostElement: HTMLElement) => {
     folding: true,
     contextmenu: false,
     renderLineHighlight: 'none',
+    // The find widget overlays the first lines instead of adding space above them,
+    // which would change the content height and scroll the editor, and with it the page.
+    find: { addExtraSpaceOnTop: false },
     occurrencesHighlight: 'off',
     selectionHighlight: false,
     fontFamily: "Consolas, Monaco, 'Courier New', monospace",
@@ -100,6 +125,7 @@ const createEditor = (monaco: Monaco, hostElement: HTMLElement) => {
       : { alwaysConsumeMouseWheel: false },
   });
   model = editor.getModel();
+  hostElement.addEventListener('focusin', handleFocusIn, { capture: true });
 
   editor.onDidContentSizeChange((event) => {
     contentHeight.value = event.contentHeight;
@@ -129,6 +155,7 @@ const destroyEditor = () => {
   colourSchemeQuery?.removeEventListener('change', handleColourSchemeChange);
   colourSchemeQuery = null;
   host.value?.removeEventListener('wheel', handleWheel, { capture: true });
+  host.value?.removeEventListener('focusin', handleFocusIn, { capture: true });
   scrollSync?.onPageScroll(null);
   scrollSync?.setContentHeight(null);
   // The editor owns its model and disposes of it too.
