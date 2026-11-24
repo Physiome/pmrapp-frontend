@@ -266,10 +266,12 @@ watch(
   margin-right: 4px;
   padding-left: 4px;
   border-radius: 4px 4px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .code-block-editor :deep(.find-widget > .find-part) {
-  margin-left: 4px;
+  margin-top: 4px;
+  margin-left: 2px;
 }
 
 .code-block-skeleton {
