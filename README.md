@@ -7,6 +7,7 @@ The next-generation frontend web application for the [Physiome Model Repository]
 A modern, responsive web application for browsing and exploring computational models in the Physiome Model Repository. Built with Vue 3 and powered by [a Rust-based backend](https://github.com/Physiome/pmrplatform), this project represents the next generation of the platform.
 
 **Features:**
+
 - 🎨 Light/Dark theme with system preference support
 - 📱 Responsive design with Tailwind CSS v4
 - ⚡ Built with Vue 3 Composition API and TypeScript
@@ -191,10 +192,12 @@ Where a lint rule doesn't fit a deliberate pattern, suppress it on that element 
 ### Browser DevTools
 
 **Chrome/Edge/Brave:**
+
 - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
 - Enable Custom Object Formatters in DevTools settings
 
 **Firefox:**
+
 - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
 
 ## Related Projects
